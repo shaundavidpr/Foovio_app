@@ -1,98 +1,145 @@
-import * as Device from 'expo-device';
-import { Platform, StyleSheet } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { router } from "expo-router";
+import { StatusBar } from "expo-status-bar";
+import {
+  Image,
+  Pressable,
+  StyleSheet,
+  Text,
+  View,
+} from "react-native";
 
-import { AnimatedIcon } from '@/components/animated-icon';
-import { HintRow } from '@/components/hint-row';
-import { ThemedText } from '@/components/themed-text';
-import { ThemedView } from '@/components/themed-view';
-import { WebBadge } from '@/components/web-badge';
-import { BottomTabInset, MaxContentWidth, Spacing } from '@/constants/theme';
-
-function getDevMenuHint() {
-  if (Platform.OS === 'web') {
-    return <ThemedText type="small">use browser devtools</ThemedText>;
-  }
-  if (Device.isDevice) {
-    return (
-      <ThemedText type="small">
-        shake device or press <ThemedText type="code">m</ThemedText> in terminal
-      </ThemedText>
-    );
-  }
-  const shortcut = Platform.OS === 'android' ? 'cmd+m (or ctrl+m)' : 'cmd+d';
+export default function Index() {
   return (
-    <ThemedText type="small">
-      press <ThemedText type="code">{shortcut}</ThemedText>
-    </ThemedText>
-  );
-}
+    <View style={styles.container}>
+      <StatusBar style="dark" />
 
-export default function HomeScreen() {
-  return (
-    <ThemedView style={styles.container}>
-      <SafeAreaView style={styles.safeArea}>
-        <ThemedView style={styles.heroSection}>
-          <AnimatedIcon />
-          <ThemedText type="title" style={styles.title}>
-            Welcome to&nbsp;Expo
-          </ThemedText>
-        </ThemedView>
+      <View style={styles.brandSection}>
+        <Image
+          source={require("../../assets/images/foovio-logo.png")}
+          style={styles.logo}
+          resizeMode="contain"
+        />
 
-        <ThemedText type="code" style={styles.code}>
-          get started
-        </ThemedText>
+        <Text style={styles.headline}>
+          Food discovery, made fair.
+        </Text>
 
-        <ThemedView type="backgroundElement" style={styles.stepContainer}>
-          <HintRow
-            title="Try editing"
-            hint={<ThemedText type="code">src/app/index.tsx</ThemedText>}
-          />
-          <HintRow title="Dev tools" hint={getDevMenuHint()} />
-          <HintRow
-            title="Fresh start"
-            hint={<ThemedText type="code">npm run reset-project</ThemedText>}
-          />
-        </ThemedView>
+        <Text style={styles.description}>
+          Discover great food, explore restaurants, and see what people around
+          you are eating.
+        </Text>
+      </View>
 
-        {Platform.OS === 'web' && <WebBadge />}
-      </SafeAreaView>
-    </ThemedView>
+      <View style={styles.actions}>
+        {/* New user */}
+        <Pressable
+          onPress={() => router.push("/onboarding/preferences")}
+          style={({ pressed }) => [
+            styles.primaryButton,
+            pressed && styles.primaryButtonPressed,
+          ]}
+        >
+          <Text style={styles.primaryButtonText}>
+            Get Started
+          </Text>
+        </Pressable>
+
+        {/* Existing user */}
+        <Pressable
+          onPress={() => router.push("/auth/login")}
+          style={({ pressed }) => [
+            styles.loginButton,
+            pressed && styles.loginButtonPressed,
+          ]}
+        >
+          <Text style={styles.login}>
+            Already have an account?{" "}
+            <Text style={styles.loginLink}>
+              Log in
+            </Text>
+          </Text>
+        </Pressable>
+      </View>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
-    flexDirection: 'row',
+    backgroundColor: "#FFFFFF",
+    paddingHorizontal: 28,
+    paddingTop: 60,
+    paddingBottom: 40,
   },
-  safeArea: {
+
+  brandSection: {
     flex: 1,
-    paddingHorizontal: Spacing.four,
-    alignItems: 'center',
-    gap: Spacing.three,
-    paddingBottom: BottomTabInset + Spacing.three,
-    maxWidth: MaxContentWidth,
+    justifyContent: "center",
+    alignItems: "center",
   },
-  heroSection: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    flex: 1,
-    paddingHorizontal: Spacing.four,
-    gap: Spacing.four,
+
+  logo: {
+    width: 300,
+    height: 230,
+    marginBottom: 20,
   },
-  title: {
-    textAlign: 'center',
+
+  headline: {
+    color: "#111111",
+    fontSize: 30,
+    fontWeight: "800",
+    textAlign: "center",
+    letterSpacing: -0.7,
   },
-  code: {
-    textTransform: 'uppercase',
+
+  description: {
+    color: "#666666",
+    fontSize: 16,
+    lineHeight: 24,
+    textAlign: "center",
+    maxWidth: 360,
+    marginTop: 14,
   },
-  stepContainer: {
-    gap: Spacing.three,
-    alignSelf: 'stretch',
-    paddingHorizontal: Spacing.three,
-    paddingVertical: Spacing.four,
-    borderRadius: Spacing.four,
+
+  actions: {
+    width: "100%",
+    gap: 20,
+  },
+
+  primaryButton: {
+    backgroundColor: "#29A9EA",
+    paddingVertical: 18,
+    borderRadius: 16,
+    alignItems: "center",
+  },
+
+  primaryButtonPressed: {
+    opacity: 0.85,
+  },
+
+  primaryButtonText: {
+    color: "#FFFFFF",
+    fontSize: 17,
+    fontWeight: "700",
+  },
+
+  loginButton: {
+    paddingVertical: 4,
+  },
+
+  loginButtonPressed: {
+    opacity: 0.6,
+  },
+
+  login: {
+    color: "#777777",
+    fontSize: 14,
+    textAlign: "center",
+  },
+
+  loginLink: {
+    color: "#111111",
+    fontWeight: "700",
   },
 });
