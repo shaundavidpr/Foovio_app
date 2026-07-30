@@ -1,6 +1,8 @@
 import { router } from "expo-router";
 import { StatusBar } from "expo-status-bar";
+import { useEffect, useState } from "react";
 import {
+  ActivityIndicator,
   Image,
   Pressable,
   ScrollView,
@@ -9,37 +11,79 @@ import {
   View,
 } from "react-native";
 
-const foods = [
-  {
-    id: 1,
-    name: "Chicken Biryani",
-    restaurant: "Rahmaniya Kitchen",
-    distance: "1.2 km",
-    rating: "4.7",
-    image:
-      "https://images.unsplash.com/photo-1563379926898-05f4575a45d8?w=800",
-  },
-  {
-    id: 2,
-    name: "Loaded Beef Burger",
-    restaurant: "Burger Junction",
-    distance: "2.4 km",
-    rating: "4.5",
-    image:
-      "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=800",
-  },
-  {
-    id: 3,
-    name: "Margherita Pizza",
-    restaurant: "Napoli",
-    distance: "3.1 km",
-    rating: "4.8",
-    image:
-      "https://images.unsplash.com/photo-1574071318508-1cdbab80d002?w=800",
-  },
-];
+import { supabase } from "../../lib/supabase";
+
+type Restaurant = {
+  id: string;
+  name: string;
+  location: string | null;
+};
+
+type Dish = {
+  id: string;
+  name: string;
+  description: string | null;
+  image_url: string | null;
+  price: number;
+  category: string | null;
+  rating: number | null;
+  restaurant_id: string;
+  restaurants: Restaurant | null;
+};
 
 export default function Home() {
+  const [foods, setFoods] = useState<Dish[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState<string | null>(null);
+
+  useEffect(() => {
+    loadDishes();
+  }, []);
+
+  const loadDishes = async () => {
+    try {
+      setLoading(true);
+      setLoadError(null);
+
+      const { data, error } = await supabase
+        .from("dishes")
+        .select(`
+          id,
+          restaurant_id,
+          name,
+          description,
+          image_url,
+          price,
+          category,
+          rating,
+          restaurants (
+            id,
+            name,
+            location
+          )
+        `)
+        .order("created_at", { ascending: false })
+        .limit(10);
+
+      if (error) {
+        console.error("Dish loading error:", error);
+        setLoadError("Couldn't load dishes.");
+        return;
+      }
+
+      setFoods((data ?? []) as Dish[]);
+    } catch (error) {
+      console.error("Home loading error:", error);
+      setLoadError("Couldn't load dishes.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const openDish = (id: string) => {
+    router.push(`/dish/${id}`);
+  };
+
   return (
     <View style={styles.container}>
       <StatusBar style="dark" />
@@ -89,41 +133,82 @@ export default function Home() {
           </Pressable>
         </View>
 
-        <ScrollView
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          contentContainerStyle={styles.foodRow}
-        >
-          {foods.map((food) => (
-            <Pressable key={food.id} style={styles.foodCard}>
-              <Image
-                source={{ uri: food.image }}
-                style={styles.foodImage}
-              />
+        {loading ? (
+          <View style={styles.loadingSection}>
+            <ActivityIndicator size="small" color="#29A9EA" />
+            <Text style={styles.loadingText}>Finding dishes...</Text>
+          </View>
+        ) : loadError ? (
+          <View style={styles.messageBox}>
+            <Text style={styles.messageText}>{loadError}</Text>
 
-              <View style={styles.foodTitleRow}>
-                <Text
-                  style={styles.foodName}
-                  numberOfLines={1}
-                >
-                  {food.name}
-                </Text>
-
-                <Text style={styles.rating}>
-                  ★ {food.rating}
-                </Text>
-              </View>
-
-              <Text style={styles.restaurant}>
-                {food.restaurant}
-              </Text>
-
-              <Text style={styles.distance}>
-                {food.distance}
-              </Text>
+            <Pressable onPress={loadDishes}>
+              <Text style={styles.retryText}>Try again</Text>
             </Pressable>
-          ))}
-        </ScrollView>
+          </View>
+        ) : foods.length === 0 ? (
+          <View style={styles.messageBox}>
+            <Text style={styles.messageText}>
+              No dishes available yet.
+            </Text>
+          </View>
+        ) : (
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={styles.foodRow}
+          >
+            {foods.map((food) => (
+              <Pressable
+                key={food.id}
+                style={styles.foodCard}
+                onPress={() => openDish(food.id)}
+              >
+                {food.image_url ? (
+                  <Image
+                    source={{ uri: food.image_url }}
+                    style={styles.foodImage}
+                  />
+                ) : (
+                  <View style={[styles.foodImage, styles.imagePlaceholder]}>
+                    <Text style={styles.imagePlaceholderText}>🍽️</Text>
+                  </View>
+                )}
+
+                <View style={styles.foodTitleRow}>
+                  <Text style={styles.foodName} numberOfLines={1}>
+                    {food.name}
+                  </Text>
+
+                  {food.rating !== null && (
+                    <Text style={styles.rating}>
+                      ★ {food.rating}
+                    </Text>
+                  )}
+                </View>
+
+                <Text style={styles.restaurant} numberOfLines={1}>
+                  {food.restaurants?.name ?? "Restaurant"}
+                </Text>
+
+                <View style={styles.foodMeta}>
+                  <Text style={styles.price}>
+                    ₹{Number(food.price).toFixed(0)}
+                  </Text>
+
+                  {food.category && (
+                    <>
+                      <Text style={styles.metaDot}>•</Text>
+                      <Text style={styles.category}>
+                        {food.category}
+                      </Text>
+                    </>
+                  )}
+                </View>
+              </Pressable>
+            ))}
+          </ScrollView>
+        )}
 
         {/* Near You */}
         <View style={styles.sectionHeader}>
@@ -179,8 +264,8 @@ export default function Home() {
           </View>
 
           <Text style={styles.socialText}>
-            Found one of the best biryanis I've had in a while.
-            Definitely coming back for this.
+            Found one of the best biryanis I've had in a while. Definitely
+            coming back for this.
           </Text>
 
           <Text style={styles.socialPlace}>
@@ -297,6 +382,41 @@ const styles = StyleSheet.create({
     fontWeight: "700",
   },
 
+  loadingSection: {
+    height: 145,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+
+  loadingText: {
+    color: "#888888",
+    fontSize: 13,
+    marginTop: 10,
+  },
+
+  messageBox: {
+    marginHorizontal: 22,
+    minHeight: 100,
+    borderRadius: 18,
+    backgroundColor: "#F7F7F7",
+    justifyContent: "center",
+    alignItems: "center",
+    padding: 20,
+  },
+
+  messageText: {
+    color: "#777777",
+    fontSize: 14,
+    textAlign: "center",
+  },
+
+  retryText: {
+    color: "#29A9EA",
+    fontSize: 13,
+    fontWeight: "700",
+    marginTop: 10,
+  },
+
   foodRow: {
     paddingLeft: 22,
     paddingRight: 10,
@@ -312,6 +432,15 @@ const styles = StyleSheet.create({
     height: 145,
     borderRadius: 18,
     backgroundColor: "#EEEEEE",
+  },
+
+  imagePlaceholder: {
+    justifyContent: "center",
+    alignItems: "center",
+  },
+
+  imagePlaceholderText: {
+    fontSize: 34,
   },
 
   foodTitleRow: {
@@ -340,10 +469,27 @@ const styles = StyleSheet.create({
     marginTop: 4,
   },
 
-  distance: {
+  foodMeta: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginTop: 4,
+  },
+
+  price: {
+    color: "#777777",
+    fontSize: 12,
+    fontWeight: "600",
+  },
+
+  metaDot: {
+    color: "#BBBBBB",
+    fontSize: 12,
+    marginHorizontal: 6,
+  },
+
+  category: {
     color: "#999999",
     fontSize: 12,
-    marginTop: 4,
   },
 
   nearCard: {

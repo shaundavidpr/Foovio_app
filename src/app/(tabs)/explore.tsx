@@ -1,5 +1,8 @@
-import { useState } from "react";
+import { router } from "expo-router";
+import { StatusBar } from "expo-status-bar";
+import { useEffect, useMemo, useState } from "react";
 import {
+  ActivityIndicator,
   Image,
   Pressable,
   ScrollView,
@@ -8,83 +11,121 @@ import {
   TextInput,
   View,
 } from "react-native";
-import { StatusBar } from "expo-status-bar";
-import { router } from "expo-router";
 
-const categories = [
-  "All",
-  "Biryani",
-  "Burgers",
-  "Pizza",
-  "Cafe",
-  "Desserts",
-];
+import { supabase } from "../../lib/supabase";
 
-const dishes = [
-  {
-    id: 1,
-    name: "Chicken Biryani",
-    category: "Biryani",
-    restaurant: "Rahmaniya Kitchen",
-    distance: "1.2 km",
-    rating: "4.7",
-    price: "₹180",
-    image:
-      "https://images.unsplash.com/photo-1563379926898-05f4575a45d8?w=800",
-  },
-  {
-    id: 2,
-    name: "Loaded Beef Burger",
-    category: "Burgers",
-    restaurant: "Burger Junction",
-    distance: "2.4 km",
-    rating: "4.5",
-    price: "₹220",
-    image:
-      "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=800",
-  },
-  {
-    id: 3,
-    name: "Margherita Pizza",
-    category: "Pizza",
-    restaurant: "Napoli",
-    distance: "3.1 km",
-    rating: "4.8",
-    price: "₹290",
-    image:
-      "https://images.unsplash.com/photo-1574071318508-1cdbab80d002?w=800",
-  },
-  {
-    id: 4,
-    name: "Chocolate Cheesecake",
-    category: "Desserts",
-    restaurant: "Sugar House",
-    distance: "1.8 km",
-    rating: "4.6",
-    price: "₹160",
-    image:
-      "https://images.unsplash.com/photo-1578985545062-69928b1d9587?w=800",
-  },
-];
+type Restaurant = {
+  id: string;
+  name: string;
+  location: string | null;
+};
+
+type Dish = {
+  id: string;
+  restaurant_id: string;
+  name: string;
+  description: string | null;
+  image_url: string | null;
+  price: number;
+  category: string | null;
+  rating: number | null;
+  restaurants: Restaurant | null;
+};
 
 export default function Explore() {
+  const [dishes, setDishes] = useState<Dish[]>([]);
   const [search, setSearch] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState("All");
+  const [selectedCategory, setSelectedCategory] =
+    useState("All");
 
-  const results = dishes.filter((dish) => {
+  const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] =
+    useState<string | null>(null);
+
+  useEffect(() => {
+    loadDishes();
+  }, []);
+
+  const loadDishes = async () => {
+    try {
+      setLoading(true);
+      setLoadError(null);
+
+      const { data, error } = await supabase
+        .from("dishes")
+        .select(`
+          id,
+          restaurant_id,
+          name,
+          description,
+          image_url,
+          price,
+          category,
+          rating,
+          restaurants (
+            id,
+            name,
+            location
+          )
+        `)
+        .order("created_at", { ascending: false });
+
+      if (error) {
+        console.error("Explore loading error:", error);
+        setLoadError("Couldn't load dishes.");
+        return;
+      }
+
+      setDishes((data ?? []) as Dish[]);
+    } catch (error) {
+      console.error("Explore error:", error);
+      setLoadError("Couldn't load dishes.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Build category buttons from the actual database.
+  const categories = useMemo(() => {
+    const databaseCategories = dishes
+      .map((dish) => dish.category)
+      .filter(
+        (category): category is string =>
+          typeof category === "string" &&
+          category.trim().length > 0
+      );
+
+    return [
+      "All",
+      ...Array.from(new Set(databaseCategories)),
+    ];
+  }, [dishes]);
+
+  const results = useMemo(() => {
     const query = search.trim().toLowerCase();
 
-    const matchesSearch =
-      dish.name.toLowerCase().includes(query) ||
-      dish.restaurant.toLowerCase().includes(query) ||
-      dish.category.toLowerCase().includes(query);
+    return dishes.filter((dish) => {
+      const restaurantName =
+        dish.restaurants?.name ?? "";
 
-    const matchesCategory =
-      selectedCategory === "All" ||
-      dish.category === selectedCategory;
+      const category = dish.category ?? "";
 
-    return matchesSearch && matchesCategory;
-  });
+      const matchesSearch =
+        query.length === 0 ||
+        dish.name.toLowerCase().includes(query) ||
+        restaurantName.toLowerCase().includes(query) ||
+        category.toLowerCase().includes(query) ||
+        (dish.description ?? "")
+          .toLowerCase()
+          .includes(query);
+
+      const matchesCategory =
+        selectedCategory === "All" ||
+        category === selectedCategory;
+
+      return matchesSearch && matchesCategory;
+    });
+  }, [dishes, search, selectedCategory]);
 
   return (
     <View style={styles.container}>
@@ -101,6 +142,8 @@ export default function Explore() {
           Find your next favourite dish.
         </Text>
 
+        {/* Search */}
+
         <View style={styles.search}>
           <Text style={styles.searchIcon}>⌕</Text>
 
@@ -110,6 +153,7 @@ export default function Explore() {
             placeholder="Dish, restaurant or craving"
             placeholderTextColor="#999999"
             style={styles.searchInput}
+            autoCorrect={false}
           />
 
           {search.length > 0 && (
@@ -119,111 +163,207 @@ export default function Explore() {
           )}
         </View>
 
-        <ScrollView
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          contentContainerStyle={styles.categories}
-        >
-          {categories.map((category) => {
-            const active = category === selectedCategory;
+        {/* Categories */}
 
-            return (
-              <Pressable
-                key={category}
-                onPress={() => setSelectedCategory(category)}
-                style={[
-                  styles.category,
-                  active && styles.categoryActive,
-                ]}
-              >
-                <Text
+        {!loading && dishes.length > 0 && (
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={styles.categories}
+          >
+            {categories.map((category) => {
+              const active =
+                category === selectedCategory;
+
+              return (
+                <Pressable
+                  key={category}
+                  onPress={() =>
+                    setSelectedCategory(category)
+                  }
                   style={[
-                    styles.categoryText,
-                    active && styles.categoryTextActive,
+                    styles.category,
+                    active && styles.categoryActive,
                   ]}
                 >
-                  {category}
-                </Text>
-              </Pressable>
-            );
-          })}
-        </ScrollView>
+                  <Text
+                    style={[
+                      styles.categoryText,
+                      active &&
+                        styles.categoryTextActive,
+                    ]}
+                  >
+                    {category}
+                  </Text>
+                </Pressable>
+              );
+            })}
+          </ScrollView>
+        )}
 
-        <View style={styles.sectionHeader}>
-          <Text style={styles.sectionTitle}>
-            {search ? "Search results" : "Discover near you"}
-          </Text>
+        {/* Loading */}
 
-          <Text style={styles.resultCount}>
-            {results.length} {results.length === 1 ? "result" : "results"}
-          </Text>
-        </View>
+        {loading ? (
+          <View style={styles.loadingContainer}>
+            <ActivityIndicator
+              size="large"
+              color="#29A9EA"
+            />
 
-        <View style={styles.results}>
-          {results.map((dish) => (
-            <Pressable key={dish.id} 
-              style={styles.card}
-              onPress={() => router.push(`/dish/${dish.id}`)}
+            <Text style={styles.loadingText}>
+              Finding food...
+            </Text>
+          </View>
+        ) : loadError ? (
+          <View style={styles.errorContainer}>
+            <Text style={styles.emptyIcon}>🍽️</Text>
+
+            <Text style={styles.emptyTitle}>
+              Couldn't load dishes
+            </Text>
+
+            <Text style={styles.emptyText}>
+              Check your connection and try again.
+            </Text>
+
+            <Pressable
+              style={styles.resetButton}
+              onPress={loadDishes}
             >
-              <Image
-                source={{ uri: dish.image }}
-                style={styles.image}
-              />
-
-              <View style={styles.cardTop}>
-                <Text style={styles.dishName}>
-                  {dish.name}
-                </Text>
-
-                <Text style={styles.rating}>
-                  ★ {dish.rating}
-                </Text>
-              </View>
-
-              <Text style={styles.restaurant}>
-                {dish.restaurant}
+              <Text style={styles.resetText}>
+                Try again
               </Text>
-
-              <View style={styles.meta}>
-                <Text style={styles.metaText}>
-                  {dish.distance}
-                </Text>
-
-                <Text style={styles.dot}>•</Text>
-
-                <Text style={styles.price}>
-                  {dish.price}
-                </Text>
-              </View>
             </Pressable>
-          ))}
+          </View>
+        ) : (
+          <>
+            {/* Results heading */}
 
-          {results.length === 0 && (
-            <View style={styles.empty}>
-              <Text style={styles.emptyIcon}>🍽️</Text>
-
-              <Text style={styles.emptyTitle}>
-                Nothing found
+            <View style={styles.sectionHeader}>
+              <Text style={styles.sectionTitle}>
+                {search
+                  ? "Search results"
+                  : selectedCategory !== "All"
+                  ? selectedCategory
+                  : "Discover near you"}
               </Text>
 
-              <Text style={styles.emptyText}>
-                Try another dish, restaurant or category.
+              <Text style={styles.resultCount}>
+                {results.length}{" "}
+                {results.length === 1
+                  ? "result"
+                  : "results"}
               </Text>
-
-              <Pressable
-                style={styles.resetButton}
-                onPress={() => {
-                  setSearch("");
-                  setSelectedCategory("All");
-                }}
-              >
-                <Text style={styles.resetText}>
-                  Reset search
-                </Text>
-              </Pressable>
             </View>
-          )}
-        </View>
+
+            {/* Results */}
+
+            <View style={styles.results}>
+              {results.map((dish) => (
+                <Pressable
+                  key={dish.id}
+                  style={styles.card}
+                  onPress={() =>
+                    router.push(`/dish/${dish.id}`)
+                  }
+                >
+                  {dish.image_url ? (
+                    <Image
+                      source={{ uri: dish.image_url }}
+                      style={styles.image}
+                      resizeMode="cover"
+                    />
+                  ) : (
+                    <View
+                      style={[
+                        styles.image,
+                        styles.imagePlaceholder,
+                      ]}
+                    >
+                      <Text
+                        style={
+                          styles.imagePlaceholderText
+                        }
+                      >
+                        🍽️
+                      </Text>
+                    </View>
+                  )}
+
+                  <View style={styles.cardTop}>
+                    <Text
+                      style={styles.dishName}
+                      numberOfLines={1}
+                    >
+                      {dish.name}
+                    </Text>
+
+                    {dish.rating !== null && (
+                      <Text style={styles.rating}>
+                        ★ {dish.rating}
+                      </Text>
+                    )}
+                  </View>
+
+                  <Text
+                    style={styles.restaurant}
+                    numberOfLines={1}
+                  >
+                    {dish.restaurants?.name ??
+                      "Restaurant"}
+                  </Text>
+
+                  <View style={styles.meta}>
+                    {dish.category && (
+                      <>
+                        <Text style={styles.metaText}>
+                          {dish.category}
+                        </Text>
+
+                        <Text style={styles.dot}>
+                          •
+                        </Text>
+                      </>
+                    )}
+
+                    <Text style={styles.price}>
+                      ₹{Number(dish.price).toFixed(0)}
+                    </Text>
+                  </View>
+                </Pressable>
+              ))}
+
+              {results.length === 0 && (
+                <View style={styles.empty}>
+                  <Text style={styles.emptyIcon}>
+                    🍽️
+                  </Text>
+
+                  <Text style={styles.emptyTitle}>
+                    Nothing found
+                  </Text>
+
+                  <Text style={styles.emptyText}>
+                    Try another dish, restaurant or
+                    category.
+                  </Text>
+
+                  <Pressable
+                    style={styles.resetButton}
+                    onPress={() => {
+                      setSearch("");
+                      setSelectedCategory("All");
+                    }}
+                  >
+                    <Text style={styles.resetText}>
+                      Reset search
+                    </Text>
+                  </Pressable>
+                </View>
+              )}
+            </View>
+          </>
+        )}
       </ScrollView>
     </View>
   );
@@ -314,6 +454,26 @@ const styles = StyleSheet.create({
     color: "#FFFFFF",
   },
 
+  loadingContainer: {
+    minHeight: 300,
+    justifyContent: "center",
+    alignItems: "center",
+    paddingHorizontal: 22,
+  },
+
+  loadingText: {
+    color: "#888888",
+    fontSize: 13,
+    marginTop: 12,
+  },
+
+  errorContainer: {
+    minHeight: 300,
+    alignItems: "center",
+    justifyContent: "center",
+    paddingHorizontal: 22,
+  },
+
   sectionHeader: {
     paddingHorizontal: 22,
     marginTop: 32,
@@ -348,6 +508,15 @@ const styles = StyleSheet.create({
     height: 190,
     borderRadius: 20,
     backgroundColor: "#EEEEEE",
+  },
+
+  imagePlaceholder: {
+    justifyContent: "center",
+    alignItems: "center",
+  },
+
+  imagePlaceholderText: {
+    fontSize: 42,
   },
 
   cardTop: {

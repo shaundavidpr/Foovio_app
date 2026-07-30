@@ -2,12 +2,15 @@ import { router } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { useState } from "react";
 import {
+  Alert,
   Pressable,
   ScrollView,
   StyleSheet,
   Text,
   View,
 } from "react-native";
+
+import { supabase } from "../../lib/supabase";
 
 const diets = [
   "🍗 Non-vegetarian",
@@ -25,7 +28,9 @@ const restrictions = [
 
 export default function Dietary() {
   const [diet, setDiet] = useState<string | null>(null);
-  const [selectedRestrictions, setSelectedRestrictions] = useState<string[]>([]);
+  const [selectedRestrictions, setSelectedRestrictions] =
+    useState<string[]>([]);
+  const [saving, setSaving] = useState(false);
 
   const toggleRestriction = (item: string) => {
     setSelectedRestrictions((current) =>
@@ -35,9 +40,112 @@ export default function Dietary() {
     );
   };
 
-  const finish = () => {
-  router.replace("/auth/signup");
-};
+  const finish = async () => {
+    if (saving) return;
+
+    try {
+      setSaving(true);
+
+      const {
+        data: { user },
+        error: userError,
+      } = await supabase.auth.getUser();
+
+      if (userError || !user) {
+        Alert.alert(
+          "Not signed in",
+          "Please sign in before continuing."
+        );
+        return;
+      }
+
+      const dietaryPreferences = [
+        ...(diet ? [diet] : []),
+        ...selectedRestrictions,
+      ];
+
+      const { error } = await supabase
+        .from("profiles")
+        .update({
+          dietary_preferences: dietaryPreferences,
+          onboarding_completed: true,
+        })
+        .eq("id", user.id);
+
+      if (error) {
+        console.error("Dietary save error:", error);
+
+        Alert.alert(
+          "Couldn't save preferences",
+          "Please try again."
+        );
+
+        return;
+      }
+
+      router.replace("/(tabs)");
+    } catch (error) {
+      console.error("Finish onboarding error:", error);
+
+      Alert.alert(
+        "Something went wrong",
+        "Please try again."
+      );
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const skip = async () => {
+    if (saving) return;
+
+    try {
+      setSaving(true);
+
+      const {
+        data: { user },
+        error: userError,
+      } = await supabase.auth.getUser();
+
+      if (userError || !user) {
+        Alert.alert(
+          "Not signed in",
+          "Please sign in before continuing."
+        );
+        return;
+      }
+
+      const { error } = await supabase
+        .from("profiles")
+        .update({
+          dietary_preferences: [],
+          onboarding_completed: true,
+        })
+        .eq("id", user.id);
+
+      if (error) {
+        console.error("Dietary skip error:", error);
+
+        Alert.alert(
+          "Couldn't finish setup",
+          "Please try again."
+        );
+
+        return;
+      }
+
+      router.replace("/(tabs)");
+    } catch (error) {
+      console.error("Skip onboarding error:", error);
+
+      Alert.alert(
+        "Something went wrong",
+        "Please try again."
+      );
+    } finally {
+      setSaving(false);
+    }
+  };
 
   return (
     <View style={styles.container}>
@@ -51,16 +159,22 @@ export default function Dietary() {
           <Text style={styles.back}>←</Text>
         </Pressable>
 
-        <Text style={styles.label}>FOOD PREFERENCES</Text>
+        <Text style={styles.label}>
+          DIETARY PREFERENCES
+        </Text>
 
-        <Text style={styles.title}>Anything we should{"\n"}know?</Text>
+        <Text style={styles.title}>
+          Anything we should{"\n"}know?
+        </Text>
 
         <Text style={styles.description}>
           Help Foovio show food that's relevant to you. You can change this
           anytime.
         </Text>
 
-        <Text style={styles.sectionTitle}>I eat</Text>
+        <Text style={styles.sectionTitle}>
+          I eat
+        </Text>
 
         <View style={styles.options}>
           {diets.map((item) => {
@@ -69,8 +183,12 @@ export default function Dietary() {
             return (
               <Pressable
                 key={item}
+                disabled={saving}
                 onPress={() => setDiet(item)}
-                style={[styles.option, active && styles.selected]}
+                style={[
+                  styles.option,
+                  active && styles.selected,
+                ]}
               >
                 <Text
                   style={[
@@ -85,19 +203,28 @@ export default function Dietary() {
           })}
         </View>
 
-        <Text style={styles.sectionTitle}>Dietary needs</Text>
+        <Text style={styles.sectionTitle}>
+          Dietary needs
+        </Text>
 
-        <Text style={styles.optional}>Optional</Text>
+        <Text style={styles.optional}>
+          Optional
+        </Text>
 
         <View style={styles.options}>
           {restrictions.map((item) => {
-            const active = selectedRestrictions.includes(item);
+            const active =
+              selectedRestrictions.includes(item);
 
             return (
               <Pressable
                 key={item}
+                disabled={saving}
                 onPress={() => toggleRestriction(item)}
-                style={[styles.option, active && styles.selected]}
+                style={[
+                  styles.option,
+                  active && styles.selected,
+                ]}
               >
                 <Text
                   style={[
@@ -114,12 +241,26 @@ export default function Dietary() {
       </ScrollView>
 
       <View style={styles.footer}>
-        <Pressable style={styles.button} onPress={finish}>
-          <Text style={styles.buttonText}>Finish</Text>
+        <Pressable
+          disabled={saving}
+          style={[
+            styles.button,
+            saving && styles.buttonDisabled,
+          ]}
+          onPress={finish}
+        >
+          <Text style={styles.buttonText}>
+            {saving ? "Saving..." : "Finish"}
+          </Text>
         </Pressable>
 
-        <Pressable onPress={finish}>
-          <Text style={styles.skip}>Skip for now</Text>
+        <Pressable
+          disabled={saving}
+          onPress={skip}
+        >
+          <Text style={styles.skip}>
+            Skip for now
+          </Text>
         </Pressable>
       </View>
     </View>
@@ -225,6 +366,10 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     paddingVertical: 18,
     alignItems: "center",
+  },
+
+  buttonDisabled: {
+    opacity: 0.6,
   },
 
   buttonText: {

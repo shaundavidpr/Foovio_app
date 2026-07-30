@@ -1,6 +1,8 @@
 import { router, useLocalSearchParams } from "expo-router";
 import { StatusBar } from "expo-status-bar";
+import { useEffect, useState } from "react";
 import {
+  ActivityIndicator,
   Image,
   Pressable,
   ScrollView,
@@ -9,34 +11,135 @@ import {
   View,
 } from "react-native";
 
-import { dishes } from "../../data/dishes";
+import { supabase } from "../../lib/supabase";
+
+type Restaurant = {
+  id: string;
+  name: string;
+  location: string | null;
+};
+
+type Dish = {
+  id: string;
+  restaurant_id: string;
+  name: string;
+  description: string | null;
+  image_url: string | null;
+  price: number;
+  category: string | null;
+  rating: number | null;
+  restaurants: Restaurant | null;
+};
 
 export default function DishDetails() {
   const { id } = useLocalSearchParams<{ id: string }>();
 
-  const dish = dishes.find((item) => item.id === id);
+  const [dish, setDish] = useState<Dish | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState<string | null>(null);
 
-  // Handle an invalid or missing dish ID
-  if (!dish) {
+  useEffect(() => {
+    if (!id) {
+      setLoading(false);
+      setLoadError("Dish not found.");
+      return;
+    }
+
+    loadDish();
+  }, [id]);
+
+  const loadDish = async () => {
+    try {
+      setLoading(true);
+      setLoadError(null);
+
+      const { data, error } = await supabase
+        .from("dishes")
+        .select(`
+          id,
+          restaurant_id,
+          name,
+          description,
+          image_url,
+          price,
+          category,
+          rating,
+          restaurants (
+            id,
+            name,
+            location
+          )
+        `)
+        .eq("id", id)
+        .maybeSingle();
+
+      if (error) {
+        console.error("Dish loading error:", error);
+        setLoadError("We couldn't load this dish.");
+        return;
+      }
+
+      if (!data) {
+        setLoadError("Dish not found.");
+        return;
+      }
+
+      setDish(data as Dish);
+    } catch (error) {
+      console.error("Dish details error:", error);
+      setLoadError("We couldn't load this dish.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (loading) {
+    return (
+      <View style={styles.loadingContainer}>
+        <StatusBar style="dark" />
+
+        <ActivityIndicator
+          size="large"
+          color="#29A9EA"
+        />
+
+        <Text style={styles.loadingText}>
+          Loading dish...
+        </Text>
+      </View>
+    );
+  }
+
+  if (!dish || loadError) {
     return (
       <View style={styles.notFoundContainer}>
         <StatusBar style="dark" />
 
-        <Text style={styles.notFoundTitle}>Dish not found</Text>
+        <Text style={styles.notFoundTitle}>
+          Dish not found
+        </Text>
 
         <Text style={styles.notFoundText}>
-          We couldn't find this dish.
+          {loadError ?? "We couldn't find this dish."}
         </Text>
 
         <Pressable
           style={styles.goBackButton}
           onPress={() => router.back()}
         >
-          <Text style={styles.goBackText}>Go back</Text>
+          <Text style={styles.goBackText}>
+            Go back
+          </Text>
         </Pressable>
       </View>
     );
   }
+
+  const restaurantName =
+    dish.restaurants?.name ?? "Restaurant";
+
+  const restaurantLocation =
+    dish.restaurants?.location;
 
   return (
     <View style={styles.container}>
@@ -46,15 +149,27 @@ export default function DishDetails() {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.scrollContent}
       >
-        {/* Dish Image */}
+        {/* Dish image */}
         <View style={styles.imageContainer}>
-          <Image
-            source={{ uri: dish.image }}
-            style={styles.image}
-            resizeMode="cover"
-          />
+          {dish.image_url ? (
+            <Image
+              source={{ uri: dish.image_url }}
+              style={styles.image}
+              resizeMode="cover"
+            />
+          ) : (
+            <View
+              style={[
+                styles.image,
+                styles.imagePlaceholder,
+              ]}
+            >
+              <Text style={styles.imagePlaceholderText}>
+                🍽️
+              </Text>
+            </View>
+          )}
 
-          {/* Back */}
           <Pressable
             style={styles.backButton}
             onPress={() => router.back()}
@@ -62,50 +177,64 @@ export default function DishDetails() {
             <Text style={styles.backText}>‹</Text>
           </Pressable>
 
-          {/* Save */}
           <Pressable style={styles.saveButton}>
             <Text style={styles.saveText}>♡</Text>
           </Pressable>
         </View>
 
         <View style={styles.content}>
-          {/* Dish heading */}
+          {/* Heading */}
           <View style={styles.titleRow}>
             <View style={styles.titleArea}>
-              <Text style={styles.title}>{dish.name}</Text>
+              <Text style={styles.title}>
+                {dish.name}
+              </Text>
 
               <Text style={styles.restaurant}>
-                {dish.restaurant}
+                {restaurantName}
               </Text>
             </View>
 
-            <View style={styles.rating}>
-              <Text style={styles.ratingText}>
-                ★ {dish.rating}
-              </Text>
-            </View>
+            {dish.rating !== null && (
+              <View style={styles.rating}>
+                <Text style={styles.ratingText}>
+                  ★ {dish.rating}
+                </Text>
+              </View>
+            )}
           </View>
 
-          {/* Dish metadata */}
+          {/* Metadata */}
           <View style={styles.meta}>
-            <Text style={styles.price}>{dish.price}</Text>
-
-            <Text style={styles.dot}>•</Text>
-
-            <Text style={styles.metaText}>
-              {dish.distance}
+            <Text style={styles.price}>
+              ₹{Number(dish.price).toFixed(0)}
             </Text>
 
-            <Text style={styles.dot}>•</Text>
+            {dish.category && (
+              <>
+                <Text style={styles.dot}>•</Text>
 
-            <Text style={styles.metaText}>
-              {dish.category}
-            </Text>
+                <Text style={styles.metaText}>
+                  {dish.category}
+                </Text>
+              </>
+            )}
+
+            {restaurantLocation && (
+              <>
+                <Text style={styles.dot}>•</Text>
+
+                <Text style={styles.metaText}>
+                  {restaurantLocation}
+                </Text>
+              </>
+            )}
           </View>
 
           {/* Description */}
           <Text style={styles.description}>
-            {dish.description}
+            {dish.description ??
+              "More information about this dish will be available soon."}
           </Text>
 
           <View style={styles.divider} />
@@ -118,7 +247,7 @@ export default function DishDetails() {
           <View style={styles.scoreCard}>
             <View>
               <Text style={styles.score}>
-                {dish.rating}
+                {dish.rating ?? "—"}
               </Text>
 
               <Text style={styles.reviewCount}>
@@ -176,7 +305,9 @@ export default function DishDetails() {
           <View style={styles.review}>
             <View style={styles.reviewHeader}>
               <View style={styles.avatar}>
-                <Text style={styles.avatarText}>F</Text>
+                <Text style={styles.avatarText}>
+                  F
+                </Text>
               </View>
 
               <View>
@@ -191,32 +322,40 @@ export default function DishDetails() {
             </View>
 
             <Text style={styles.reviewText}>
-              Community reviews and food experiences for{" "}
-              {dish.name} will appear here.
+              Community reviews and food experiences
+              for {` ${dish.name}`} will appear here.
             </Text>
           </View>
 
           {/* Restaurant */}
-                        <Pressable
-                style={styles.restaurantButton}
-                onPress={() => router.push(`/restaurant/${dish.restaurantId}`)}
+          <Pressable
+            style={styles.restaurantButton}
+            onPress={() =>
+              router.push(
+                `/restaurants/${dish.restaurant_id}`
+              )
+            }
+          >
+            <View style={styles.restaurantButtonContent}>
+              <Text style={styles.restaurantButtonLabel}>
+                RESTAURANT
+              </Text>
+
+              <Text style={styles.restaurantButtonName}>
+                {restaurantName}
+              </Text>
+
+              {restaurantLocation && (
+                <Text
+                  style={styles.restaurantButtonDistance}
                 >
-                <View style={styles.restaurantButtonContent}>
-                    <Text style={styles.restaurantButtonLabel}>
-                    RESTAURANT
-                    </Text>
+                  {restaurantLocation}
+                </Text>
+              )}
+            </View>
 
-                    <Text style={styles.restaurantButtonName}>
-                    {dish.restaurant}
-                    </Text>
-
-                    <Text style={styles.restaurantButtonDistance}>
-                    {dish.distance} away
-                    </Text>
-                </View>
-
-  <Text style={styles.arrow}>›</Text>
-</Pressable>             
+            <Text style={styles.arrow}>›</Text>
+          </Pressable>
         </View>
       </ScrollView>
     </View>
@@ -233,6 +372,19 @@ const styles = StyleSheet.create({
     paddingBottom: 30,
   },
 
+  loadingContainer: {
+    flex: 1,
+    backgroundColor: "#FFFFFF",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+
+  loadingText: {
+    color: "#888888",
+    fontSize: 13,
+    marginTop: 12,
+  },
+
   imageContainer: {
     height: 330,
     position: "relative",
@@ -242,6 +394,15 @@ const styles = StyleSheet.create({
     width: "100%",
     height: "100%",
     backgroundColor: "#EEEEEE",
+  },
+
+  imagePlaceholder: {
+    justifyContent: "center",
+    alignItems: "center",
+  },
+
+  imagePlaceholderText: {
+    fontSize: 55,
   },
 
   backButton: {
@@ -528,6 +689,7 @@ const styles = StyleSheet.create({
     color: "#777777",
     fontSize: 14,
     marginTop: 8,
+    textAlign: "center",
   },
 
   goBackButton: {

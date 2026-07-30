@@ -1,29 +1,37 @@
 import { router } from "expo-router";
+import { StatusBar } from "expo-status-bar";
 import { useState } from "react";
 import {
+  Alert,
   Pressable,
   ScrollView,
   StyleSheet,
   Text,
   View,
 } from "react-native";
-import { StatusBar } from "expo-status-bar";
 
-const dietaryOptions = [
-  "🥬 Vegetarian",
-  "🌱 Vegan",
-  "🥩 Non-vegetarian",
-  "🥚 Eggetarian",
-  "☪️ Halal",
-  "🚫 Gluten-free",
-  "🥛 Dairy-free",
-  "🥜 Nut-free",
+import { supabase } from "../../lib/supabase";
+
+const preferences = [
+  "🍛 Indian",
+  "🍕 Pizza",
+  "🍔 Burgers",
+  "🍜 Chinese",
+  "🍗 Chicken",
+  "🥘 Biryani",
+  "🍰 Desserts",
+  "☕ Cafe",
+  "🥗 Healthy",
+  "🌱 Vegetarian",
+  "🌶️ Spicy",
+  "🍽️ Local food",
 ];
 
-export default function Dietary() {
+export default function Preferences() {
   const [selected, setSelected] = useState<string[]>([]);
+  const [saving, setSaving] = useState(false);
 
-  const toggleOption = (item: string) => {
+  const togglePreference = (item: string) => {
     setSelected((current) =>
       current.includes(item)
         ? current.filter((value) => value !== item)
@@ -31,8 +39,55 @@ export default function Dietary() {
     );
   };
 
-  const finish = () => {
-    router.replace("/(tabs)");
+  const continueOnboarding = async () => {
+    if (selected.length === 0 || saving) {
+      return;
+    }
+
+    try {
+      setSaving(true);
+
+      const {
+        data: { user },
+        error: userError,
+      } = await supabase.auth.getUser();
+
+      if (userError || !user) {
+        Alert.alert(
+          "Not signed in",
+          "Please sign in before continuing."
+        );
+        return;
+      }
+
+      const { error } = await supabase
+        .from("profiles")
+        .update({
+          food_preferences: selected,
+        })
+        .eq("id", user.id);
+
+      if (error) {
+        console.error("Food preferences save error:", error);
+
+        Alert.alert(
+          "Couldn't save preferences",
+          "Please try again."
+        );
+        return;
+      }
+
+      router.push("/onboarding/dietary");
+    } catch (error) {
+      console.error("Preferences error:", error);
+
+      Alert.alert(
+        "Something went wrong",
+        "Please try again."
+      );
+    } finally {
+      setSaving(false);
+    }
   };
 
   return (
@@ -43,25 +98,25 @@ export default function Dietary() {
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
-        <Text style={styles.step}>DIETARY PREFERENCES</Text>
+        <Text style={styles.step}>YOUR TASTE</Text>
 
         <Text style={styles.title}>
-          Anything we should{"\n"}know?
+          What do you love{"\n"}to eat?
         </Text>
 
         <Text style={styles.description}>
-          Choose any dietary preferences that matter to you.
-          You can change these later.
+          Pick a few. We'll use these to personalize what you discover.
         </Text>
 
         <View style={styles.options}>
-          {dietaryOptions.map((item) => {
+          {preferences.map((item) => {
             const isSelected = selected.includes(item);
 
             return (
               <Pressable
                 key={item}
-                onPress={() => toggleOption(item)}
+                disabled={saving}
+                onPress={() => togglePreference(item)}
                 style={[
                   styles.option,
                   isSelected && styles.optionSelected,
@@ -82,12 +137,24 @@ export default function Dietary() {
       </ScrollView>
 
       <View style={styles.footer}>
-        <Pressable onPress={finish} style={styles.button}>
-          <Text style={styles.buttonText}>Start exploring</Text>
-        </Pressable>
+        <Text style={styles.count}>
+          {selected.length === 0
+            ? "Choose at least one"
+            : `${selected.length} selected`}
+        </Text>
 
-        <Pressable onPress={finish}>
-          <Text style={styles.skip}>Skip for now</Text>
+        <Pressable
+          disabled={selected.length === 0 || saving}
+          onPress={continueOnboarding}
+          style={[
+            styles.button,
+            (selected.length === 0 || saving) &&
+              styles.buttonDisabled,
+          ]}
+        >
+          <Text style={styles.buttonText}>
+            {saving ? "Saving..." : "Continue"}
+          </Text>
         </Pressable>
       </View>
     </View>
@@ -168,6 +235,13 @@ const styles = StyleSheet.create({
     backgroundColor: "#FFFFFF",
   },
 
+  count: {
+    color: "#888888",
+    fontSize: 13,
+    textAlign: "center",
+    marginBottom: 12,
+  },
+
   button: {
     backgroundColor: "#29A9EA",
     borderRadius: 16,
@@ -175,17 +249,13 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
 
+  buttonDisabled: {
+    backgroundColor: "#C8E9F9",
+  },
+
   buttonText: {
     color: "#FFFFFF",
     fontSize: 17,
     fontWeight: "700",
-  },
-
-  skip: {
-    color: "#777777",
-    fontSize: 14,
-    fontWeight: "600",
-    textAlign: "center",
-    marginTop: 18,
   },
 });

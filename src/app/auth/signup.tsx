@@ -19,13 +19,13 @@ export default function SignUp() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-
   const [loading, setLoading] = useState(false);
 
   const handleSignUp = async () => {
     const cleanName = name.trim();
     const cleanEmail = email.trim().toLowerCase();
 
+    // Basic validation
     if (!cleanName || !cleanEmail || !password) {
       Alert.alert(
         "Missing information",
@@ -56,20 +56,46 @@ export default function SignUp() {
       });
 
       if (error) {
-        Alert.alert("Couldn't create account", error.message);
+        Alert.alert(
+          "Couldn't create account",
+          error.message
+        );
         return;
       }
+      if (data.user) {
+  const { error: profileError } = await supabase
+    .from("profiles")
+    .upsert({
+      id: data.user.id,
+      name: cleanName,
+      onboarding_completed: false,
+    });
 
-      // If email confirmation is enabled, Supabase creates the user
-      // but may not create a session until the email is verified.
+  if (profileError) {
+    console.error("Profile creation error:", profileError);
+
+    Alert.alert(
+      "Account created",
+      "Your account was created, but we couldn't set up your profile."
+    );
+
+    return;
+  }
+}
+
+      /*
+       * If Supabase email confirmation is enabled,
+       * the account may be created without an active session.
+       */
       if (!data.session) {
         Alert.alert(
           "Check your email",
-          "Your account was created. Verify your email, then log in.",
+          "Your account was created. Verify your email to finish signing in.",
           [
             {
               text: "Go to login",
-              onPress: () => router.replace("/auth/login"),
+              onPress: () =>
+                router.replace("/auth/login"),
             },
           ]
         );
@@ -77,9 +103,11 @@ export default function SignUp() {
         return;
       }
 
-      router.replace("/(tabs)");
+      // New account + active session:
+      // continue with Foovio onboarding.
+      router.replace("/onboarding/preferences");
     } catch (error) {
-      console.error(error);
+      console.error("Signup error:", error);
 
       Alert.alert(
         "Something went wrong",
@@ -121,6 +149,7 @@ export default function SignUp() {
             placeholder="Your name"
             placeholderTextColor="#AAAAAA"
             autoCapitalize="words"
+            autoComplete="name"
             style={styles.input}
           />
 
@@ -134,6 +163,7 @@ export default function SignUp() {
             keyboardType="email-address"
             autoCapitalize="none"
             autoCorrect={false}
+            autoComplete="email"
             style={styles.input}
           />
 
@@ -146,19 +176,24 @@ export default function SignUp() {
             placeholderTextColor="#AAAAAA"
             secureTextEntry
             autoCapitalize="none"
+            autoCorrect={false}
+            autoComplete="new-password"
             style={styles.input}
           />
 
           <Pressable
             disabled={loading}
             onPress={handleSignUp}
-            style={[
+            style={({ pressed }) => [
               styles.button,
               loading && styles.buttonDisabled,
+              pressed && !loading && styles.buttonPressed,
             ]}
           >
             <Text style={styles.buttonText}>
-              {loading ? "Creating account..." : "Create account"}
+              {loading
+                ? "Creating account..."
+                : "Create account"}
             </Text>
           </Pressable>
         </View>
@@ -169,9 +204,12 @@ export default function SignUp() {
           </Text>
 
           <Pressable
+            disabled={loading}
             onPress={() => router.push("/auth/login")}
           >
-            <Text style={styles.loginText}>Log in</Text>
+            <Text style={styles.loginText}>
+              Log in
+            </Text>
           </Pressable>
         </View>
       </ScrollView>
@@ -245,6 +283,10 @@ const styles = StyleSheet.create({
     paddingVertical: 18,
     alignItems: "center",
     marginTop: 30,
+  },
+
+  buttonPressed: {
+    opacity: 0.85,
   },
 
   buttonDisabled: {

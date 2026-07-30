@@ -1,6 +1,8 @@
 import { router } from "expo-router";
 import { StatusBar } from "expo-status-bar";
+import { useEffect, useState } from "react";
 import {
+  ActivityIndicator,
   Image,
   Pressable,
   StyleSheet,
@@ -8,7 +10,62 @@ import {
   View,
 } from "react-native";
 
+import { useAuth } from "../hooks/useAuth";
+import { supabase } from "../lib/supabase";
+
 export default function Index() {
+  const { session, loading } = useAuth();
+  const [checkingProfile, setCheckingProfile] = useState(false);
+
+  useEffect(() => {
+    if (loading || !session?.user) {
+      return;
+    }
+
+    const checkOnboarding = async () => {
+      setCheckingProfile(true);
+
+      try {
+        const { data, error } = await supabase
+          .from("profiles")
+          .select("onboarding_completed")
+          .eq("id", session.user.id)
+          .maybeSingle();
+
+        if (error) {
+          console.error("Profile check error:", error);
+          return;
+        }
+
+        // No profile yet or onboarding isn't complete.
+        if (!data || data.onboarding_completed !== true) {
+          router.replace("/onboarding/preferences");
+          return;
+        }
+
+        // Existing user who already completed onboarding.
+        router.replace("/(tabs)");
+      } catch (error) {
+        console.error("Onboarding check error:", error);
+      } finally {
+        setCheckingProfile(false);
+      }
+    };
+
+    checkOnboarding();
+  }, [session, loading]);
+
+  // Supabase is checking the stored auth session.
+  if (loading || checkingProfile || session) {
+    return (
+      <View style={styles.loadingContainer}>
+        <StatusBar style="dark" />
+        <ActivityIndicator size="large" color="#29A9EA" />
+      </View>
+    );
+  }
+
+  // No session = show welcome screen.
   return (
     <View style={styles.container}>
       <StatusBar style="dark" />
@@ -31,9 +88,8 @@ export default function Index() {
       </View>
 
       <View style={styles.actions}>
-        {/* New user */}
         <Pressable
-          onPress={() => router.push("/onboarding/preferences")}
+          onPress={() => router.push("/auth/signup")}
           style={({ pressed }) => [
             styles.primaryButton,
             pressed && styles.primaryButtonPressed,
@@ -44,7 +100,6 @@ export default function Index() {
           </Text>
         </Pressable>
 
-        {/* Existing user */}
         <Pressable
           onPress={() => router.push("/auth/login")}
           style={({ pressed }) => [
@@ -71,6 +126,13 @@ const styles = StyleSheet.create({
     paddingHorizontal: 28,
     paddingTop: 60,
     paddingBottom: 40,
+  },
+
+  loadingContainer: {
+    flex: 1,
+    backgroundColor: "#FFFFFF",
+    justifyContent: "center",
+    alignItems: "center",
   },
 
   brandSection: {

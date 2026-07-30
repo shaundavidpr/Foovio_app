@@ -1,6 +1,8 @@
 import { router, useLocalSearchParams } from "expo-router";
 import { StatusBar } from "expo-status-bar";
+import { useEffect, useState } from "react";
 import {
+  ActivityIndicator,
   Image,
   Pressable,
   ScrollView,
@@ -9,40 +11,201 @@ import {
   View,
 } from "react-native";
 
-import { dishes } from "../../data/dishes";
-import { restaurants } from "../../data/restaurants";
+import { supabase } from "../../lib/supabase";
+
+type Restaurant = {
+  id: string;
+  name: string;
+  description: string | null;
+  image_url: string | null;
+  location: string | null;
+  latitude: number | null;
+  longitude: number | null;
+  rating: number | null;
+};
+
+type Dish = {
+  id: string;
+  restaurant_id: string;
+  name: string;
+  description: string | null;
+  image_url: string | null;
+  price: number;
+  category: string | null;
+  rating: number | null;
+};
 
 export default function RestaurantDetails() {
   const { id } = useLocalSearchParams<{ id: string }>();
 
-  const restaurant = restaurants.find((item) => item.id === id);
+  const [restaurant, setRestaurant] =
+    useState<Restaurant | null>(null);
 
-  if (!restaurant) {
+  const [menu, setMenu] = useState<Dish[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!id) {
+      setLoadError("Restaurant not found.");
+      setLoading(false);
+      return;
+    }
+
+    loadRestaurant();
+  }, [id]);
+
+  const loadRestaurant = async () => {
+    try {
+      setLoading(true);
+      setLoadError(null);
+
+      // Fetch restaurant
+      const {
+        data: restaurantData,
+        error: restaurantError,
+      } = await supabase
+        .from("restaurants")
+        .select(`
+          id,
+          name,
+          description,
+          image_url,
+          location,
+          latitude,
+          longitude,
+          rating
+        `)
+        .eq("id", id)
+        .maybeSingle();
+
+      if (restaurantError) {
+        console.error(
+          "Restaurant loading error:",
+          restaurantError
+        );
+
+        setLoadError("We couldn't load this restaurant.");
+        return;
+      }
+
+      if (!restaurantData) {
+        setLoadError("Restaurant not found.");
+        return;
+      }
+
+      setRestaurant(restaurantData as Restaurant);
+
+      // Fetch dishes belonging to restaurant
+      const {
+        data: dishData,
+        error: dishError,
+      } = await supabase
+        .from("dishes")
+        .select(`
+          id,
+          restaurant_id,
+          name,
+          description,
+          image_url,
+          price,
+          category,
+          rating
+        `)
+        .eq("restaurant_id", id)
+        .order("created_at", { ascending: false });
+
+      if (dishError) {
+        console.error(
+          "Restaurant menu loading error:",
+          dishError
+        );
+
+        setMenu([]);
+        return;
+      }
+
+      setMenu((dishData ?? []) as Dish[]);
+    } catch (error) {
+      console.error(
+        "Restaurant details error:",
+        error
+      );
+
+      setLoadError("We couldn't load this restaurant.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (loading) {
     return (
-      <View style={styles.notFound}>
-        <Text style={styles.notFoundTitle}>Restaurant not found</Text>
+      <View style={styles.loadingContainer}>
+        <StatusBar style="dark" />
 
-        <Pressable onPress={() => router.back()}>
-          <Text style={styles.goBack}>Go back</Text>
-        </Pressable>
+        <ActivityIndicator
+          size="large"
+          color="#29A9EA"
+        />
+
+        <Text style={styles.loadingText}>
+          Loading restaurant...
+        </Text>
       </View>
     );
   }
 
-  const menu = dishes.filter(
-    (dish) => dish.restaurantId === restaurant.id
-  );
+  if (!restaurant || loadError) {
+    return (
+      <View style={styles.notFound}>
+        <StatusBar style="dark" />
+
+        <Text style={styles.notFoundTitle}>
+          Restaurant not found
+        </Text>
+
+        <Text style={styles.notFoundDescription}>
+          {loadError ??
+            "We couldn't find this restaurant."}
+        </Text>
+
+        <Pressable
+          style={styles.goBackButton}
+          onPress={() => router.back()}
+        >
+          <Text style={styles.goBack}>
+            Go back
+          </Text>
+        </Pressable>
+      </View>
+    );
+  }
 
   return (
     <View style={styles.container}>
       <StatusBar style="light" />
 
       <ScrollView showsVerticalScrollIndicator={false}>
+        {/* Hero */}
         <View style={styles.hero}>
-          <Image
-            source={{ uri: restaurant.image }}
-            style={styles.heroImage}
-          />
+          {restaurant.image_url ? (
+            <Image
+              source={{ uri: restaurant.image_url }}
+              style={styles.heroImage}
+              resizeMode="cover"
+            />
+          ) : (
+            <View
+              style={[
+                styles.heroImage,
+                styles.heroPlaceholder,
+              ]}
+            >
+              <Text style={styles.heroPlaceholderText}>
+                🍽️
+              </Text>
+            </View>
+          )}
 
           <Pressable
             style={styles.backButton}
@@ -57,51 +220,67 @@ export default function RestaurantDetails() {
         </View>
 
         <View style={styles.content}>
-          <Text style={styles.name}>{restaurant.name}</Text>
+          {/* Restaurant info */}
 
-          <Text style={styles.cuisine}>
-            {restaurant.cuisine}
+          <Text style={styles.name}>
+            {restaurant.name}
           </Text>
 
+          {restaurant.location && (
+            <Text style={styles.cuisine}>
+              {restaurant.location}
+            </Text>
+          )}
+
           <View style={styles.meta}>
-            <Text style={styles.rating}>
-              ★ {restaurant.rating}
-            </Text>
-
-            <Text style={styles.dot}>•</Text>
-
-            <Text style={styles.metaText}>
-              {restaurant.reviews} reviews
-            </Text>
-
-            <Text style={styles.dot}>•</Text>
-
-            <Text style={styles.metaText}>
-              {restaurant.priceLevel}
-            </Text>
+            {restaurant.rating !== null ? (
+              <Text style={styles.rating}>
+                ★ {restaurant.rating}
+              </Text>
+            ) : (
+              <Text style={styles.metaText}>
+                No rating yet
+              </Text>
+            )}
           </View>
 
-          <View style={styles.locationRow}>
-            <View>
-              <Text style={styles.locationLabel}>LOCATION</Text>
+          {/* Location */}
 
-              <Text style={styles.location}>
-                {restaurant.location} · {restaurant.distance}
-              </Text>
+          {restaurant.location && (
+            <View style={styles.locationRow}>
+              <View style={styles.locationContent}>
+                <Text style={styles.locationLabel}>
+                  LOCATION
+                </Text>
+
+                <Text style={styles.location}>
+                  {restaurant.location}
+                </Text>
+              </View>
+
+              {restaurant.latitude !== null &&
+                restaurant.longitude !== null && (
+                  <Pressable
+                    style={styles.directionsButton}
+                  >
+                    <Text style={styles.directionsText}>
+                      Directions
+                    </Text>
+                  </Pressable>
+                )}
             </View>
+          )}
 
-            <Pressable style={styles.directionsButton}>
-              <Text style={styles.directionsText}>
-                Directions
-              </Text>
-            </Pressable>
-          </View>
+          {/* Description */}
 
           <Text style={styles.description}>
-            {restaurant.description}
+            {restaurant.description ??
+              `Discover dishes from ${restaurant.name} on Foovio.`}
           </Text>
 
           <View style={styles.divider} />
+
+          {/* Menu */}
 
           <Text style={styles.sectionTitle}>
             Popular here
@@ -113,30 +292,56 @@ export default function RestaurantDetails() {
                 <Pressable
                   key={dish.id}
                   style={styles.dishCard}
-                  onPress={() => router.push(`/dish/${dish.id}`)}
+                  onPress={() =>
+                    router.push(`/dish/${dish.id}`)
+                  }
                 >
-                  <Image
-                    source={{ uri: dish.image }}
-                    style={styles.dishImage}
-                  />
+                  {dish.image_url ? (
+                    <Image
+                      source={{ uri: dish.image_url }}
+                      style={styles.dishImage}
+                    />
+                  ) : (
+                    <View
+                      style={[
+                        styles.dishImage,
+                        styles.dishPlaceholder,
+                      ]}
+                    >
+                      <Text
+                        style={
+                          styles.dishPlaceholderText
+                        }
+                      >
+                        🍽️
+                      </Text>
+                    </View>
+                  )}
 
                   <View style={styles.dishContent}>
-                    <Text style={styles.dishName}>
+                    <Text
+                      style={styles.dishName}
+                      numberOfLines={1}
+                    >
                       {dish.name}
                     </Text>
 
-                    <Text style={styles.dishCategory}>
-                      {dish.category}
-                    </Text>
+                    {dish.category && (
+                      <Text style={styles.dishCategory}>
+                        {dish.category}
+                      </Text>
+                    )}
 
                     <View style={styles.dishMeta}>
                       <Text style={styles.dishPrice}>
-                        {dish.price}
+                        ₹{Number(dish.price).toFixed(0)}
                       </Text>
 
-                      <Text style={styles.dishRating}>
-                        ★ {dish.rating}
-                      </Text>
+                      {dish.rating !== null && (
+                        <Text style={styles.dishRating}>
+                          ★ {dish.rating}
+                        </Text>
+                      )}
                     </View>
                   </View>
 
@@ -150,6 +355,8 @@ export default function RestaurantDetails() {
             </Text>
           )}
 
+          {/* Community */}
+
           <Text style={styles.sectionTitle}>
             Foovio community
           </Text>
@@ -160,8 +367,9 @@ export default function RestaurantDetails() {
             </Text>
 
             <Text style={styles.communityText}>
-              Community posts, photos, ratings and recommendations
-              for {restaurant.name} will appear here.
+              Community posts, photos, ratings and
+              recommendations for {restaurant.name} will
+              appear here.
             </Text>
           </View>
         </View>
@@ -176,6 +384,19 @@ const styles = StyleSheet.create({
     backgroundColor: "#FFFFFF",
   },
 
+  loadingContainer: {
+    flex: 1,
+    backgroundColor: "#FFFFFF",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+
+  loadingText: {
+    color: "#888888",
+    fontSize: 13,
+    marginTop: 12,
+  },
+
   hero: {
     height: 285,
     position: "relative",
@@ -185,6 +406,15 @@ const styles = StyleSheet.create({
     width: "100%",
     height: "100%",
     backgroundColor: "#EEEEEE",
+  },
+
+  heroPlaceholder: {
+    justifyContent: "center",
+    alignItems: "center",
+  },
+
+  heroPlaceholderText: {
+    fontSize: 55,
   },
 
   backButton: {
@@ -252,11 +482,6 @@ const styles = StyleSheet.create({
     fontWeight: "800",
   },
 
-  dot: {
-    color: "#BBBBBB",
-    marginHorizontal: 8,
-  },
-
   metaText: {
     color: "#777777",
     fontSize: 13,
@@ -270,6 +495,11 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
+  },
+
+  locationContent: {
+    flex: 1,
+    marginRight: 12,
   },
 
   locationLabel: {
@@ -339,6 +569,15 @@ const styles = StyleSheet.create({
     height: 82,
     borderRadius: 13,
     backgroundColor: "#EEEEEE",
+  },
+
+  dishPlaceholder: {
+    justifyContent: "center",
+    alignItems: "center",
+  },
+
+  dishPlaceholderText: {
+    fontSize: 27,
   },
 
   dishContent: {
@@ -412,6 +651,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#FFFFFF",
     justifyContent: "center",
     alignItems: "center",
+    paddingHorizontal: 30,
   },
 
   notFoundTitle: {
@@ -420,10 +660,24 @@ const styles = StyleSheet.create({
     fontWeight: "800",
   },
 
+  notFoundDescription: {
+    color: "#777777",
+    fontSize: 14,
+    textAlign: "center",
+    marginTop: 8,
+  },
+
+  goBackButton: {
+    backgroundColor: "#29A9EA",
+    paddingHorizontal: 20,
+    paddingVertical: 12,
+    borderRadius: 13,
+    marginTop: 18,
+  },
+
   goBack: {
-    color: "#29A9EA",
+    color: "#FFFFFF",
     fontSize: 14,
     fontWeight: "700",
-    marginTop: 18,
   },
 });
