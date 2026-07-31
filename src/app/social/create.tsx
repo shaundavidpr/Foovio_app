@@ -34,18 +34,12 @@ export default function CreatePost() {
   const [restaurants, setRestaurants] = useState<Restaurant[]>([]);
   const [dishes, setDishes] = useState<Dish[]>([]);
 
-  const [restaurantId, setRestaurantId] =
-    useState<string | null>(null);
-
-  const [dishId, setDishId] =
-    useState<string | null>(null);
+  const [restaurantId, setRestaurantId] = useState<string | null>(null);
+  const [dishId, setDishId] = useState<string | null>(null);
 
   const [rating, setRating] = useState(0);
   const [caption, setCaption] = useState("");
-
-  // Local image selected from phone
-  const [imageUri, setImageUri] =
-    useState<string | null>(null);
+  const [imageUri, setImageUri] = useState<string | null>(null);
 
   const [loading, setLoading] = useState(true);
   const [publishing, setPublishing] = useState(false);
@@ -53,6 +47,10 @@ export default function CreatePost() {
   useEffect(() => {
     loadFoodData();
   }, []);
+
+  // -----------------------------------
+  // LOAD RESTAURANTS + DISHES
+  // -----------------------------------
 
   const loadFoodData = async () => {
     try {
@@ -122,8 +120,7 @@ export default function CreatePost() {
   };
 
   const availableDishes = dishes.filter(
-    (dish) =>
-      dish.restaurant_id === restaurantId
+    (dish) => dish.restaurant_id === restaurantId
   );
 
   // -----------------------------------
@@ -132,17 +129,23 @@ export default function CreatePost() {
 
   const pickImage = async () => {
     try {
+      console.log("PHOTO BUTTON PRESSED");
+
       const permission =
         await ImagePicker.requestMediaLibraryPermissionsAsync();
+
+      console.log("PHOTO PERMISSION:", permission);
 
       if (!permission.granted) {
         Alert.alert(
           "Photo permission required",
-          "Allow Foovio to access your photos so you can add food pictures."
+          "Please allow Foovio to access your photos."
         );
 
         return;
       }
+
+      console.log("OPENING IMAGE LIBRARY");
 
       const result =
         await ImagePicker.launchImageLibraryAsync({
@@ -152,24 +155,30 @@ export default function CreatePost() {
           quality: 0.8,
         });
 
-      if (!result.canceled) {
+      console.log("IMAGE PICKER RESULT:", result);
+
+      if (!result.canceled && result.assets?.[0]) {
+        console.log(
+          "SELECTED IMAGE:",
+          result.assets[0].uri
+        );
+
         setImageUri(result.assets[0].uri);
       }
     } catch (error) {
-      console.error(
-        "Image picker error:",
-        error
-      );
+      console.error("IMAGE PICKER ERROR:", error);
 
       Alert.alert(
-        "Couldn't open photos",
-        "Please try again."
+        "Photo error",
+        error instanceof Error
+          ? error.message
+          : String(error)
       );
     }
   };
 
   // -----------------------------------
-  // UPLOAD IMAGE TO SUPABASE
+  // UPLOAD IMAGE
   // -----------------------------------
 
   const uploadImage = async (
@@ -190,12 +199,11 @@ export default function CreatePost() {
 
       const blob = await response.blob();
 
-      const extensionFromUri =
-        imageUri
-          .split(".")
-          .pop()
-          ?.split("?")[0]
-          ?.toLowerCase();
+      const extensionFromUri = imageUri
+        .split(".")
+        .pop()
+        ?.split("?")[0]
+        ?.toLowerCase();
 
       const extension =
         extensionFromUri &&
@@ -209,8 +217,7 @@ export default function CreatePost() {
         .toString(36)
         .substring(2, 10)}.${extension}`;
 
-      const filePath =
-        `${userId}/${fileName}`;
+      const filePath = `${userId}/${fileName}`;
 
       const contentType =
         blob.type ||
@@ -305,10 +312,13 @@ export default function CreatePost() {
         return;
       }
 
-      let uploadedImageUrl: string | null =
-        null;
+      console.log(
+        "CURRENT AUTH USER ID:",
+        user.id
+      );
 
-      // Upload photo first
+      let uploadedImageUrl: string | null = null;
+
       if (imageUri) {
         try {
           uploadedImageUrl =
@@ -323,10 +333,8 @@ export default function CreatePost() {
         }
       }
 
-      const cleanCaption =
-        caption.trim();
+      const cleanCaption = caption.trim();
 
-      // Create post
       const { error: postError } =
         await supabase
           .from("posts")
@@ -334,10 +342,8 @@ export default function CreatePost() {
             user_id: user.id,
             restaurant_id: restaurantId,
             dish_id: dishId,
-            caption:
-              cleanCaption || null,
-            image_url:
-              uploadedImageUrl,
+            caption: cleanCaption || null,
+            image_url: uploadedImageUrl,
             rating,
           });
 
@@ -403,8 +409,6 @@ export default function CreatePost() {
     >
       <StatusBar style="dark" />
 
-      {/* HEADER */}
-
       <View style={styles.header}>
         <Pressable
           style={styles.closeButton}
@@ -425,9 +429,7 @@ export default function CreatePost() {
       <ScrollView
         showsVerticalScrollIndicator={false}
         keyboardShouldPersistTaps="handled"
-        contentContainerStyle={
-          styles.content
-        }
+        contentContainerStyle={styles.content}
       >
         <Text style={styles.title}>
           Share what you{"\n"}just ate.
@@ -455,17 +457,13 @@ export default function CreatePost() {
               style={styles.imagePreview}
             />
 
-            <View
-              style={styles.photoActions}
-            >
+            <View style={styles.photoActions}>
               <Pressable
                 style={styles.changePhoto}
                 onPress={pickImage}
               >
                 <Text
-                  style={
-                    styles.changePhotoText
-                  }
+                  style={styles.changePhotoText}
                 >
                   Change photo
                 </Text>
@@ -473,14 +471,10 @@ export default function CreatePost() {
 
               <Pressable
                 style={styles.removePhoto}
-                onPress={() =>
-                  setImageUri(null)
-                }
+                onPress={() => setImageUri(null)}
               >
                 <Text
-                  style={
-                    styles.removePhotoText
-                  }
+                  style={styles.removePhotoText}
                 >
                   Remove
                 </Text>
@@ -489,13 +483,16 @@ export default function CreatePost() {
           </View>
         ) : (
           <Pressable
-            style={({ pressed }) => [
-              styles.photoPicker,
-              pressed &&
-                styles.photoPickerPressed,
-            ]}
-            onPress={pickImage}
-          >
+          style={({ pressed }) => [
+            styles.photoPicker,
+            pressed && styles.photoPickerPressed,
+          ]}
+          onPress={() => {
+            Alert.alert("Button works", "Android detected the tap.");
+            console.log("ANDROID PHOTO PRESS DETECTED");
+            pickImage();
+            }}
+            >
             <Text style={styles.photoIcon}>
               ＋
             </Text>
@@ -505,8 +502,7 @@ export default function CreatePost() {
             </Text>
 
             <Text style={styles.photoText}>
-              Pick a food photo from your
-              gallery
+              Pick a food photo from your gallery
             </Text>
           </Pressable>
         )}
@@ -522,39 +518,34 @@ export default function CreatePost() {
         </Text>
 
         <View style={styles.options}>
-          {restaurants.map(
-            (restaurant) => {
-              const selected =
-                restaurantId ===
-                restaurant.id;
+          {restaurants.map((restaurant) => {
+            const selected =
+              restaurantId === restaurant.id;
 
-              return (
-                <Pressable
-                  key={restaurant.id}
-                  onPress={() =>
-                    selectRestaurant(
-                      restaurant.id
-                    )
-                  }
+            return (
+              <Pressable
+                key={restaurant.id}
+                onPress={() =>
+                  selectRestaurant(restaurant.id)
+                }
+                style={[
+                  styles.option,
+                  selected &&
+                    styles.optionSelected,
+                ]}
+              >
+                <Text
                   style={[
-                    styles.option,
+                    styles.optionText,
                     selected &&
-                      styles.optionSelected,
+                      styles.optionTextSelected,
                   ]}
                 >
-                  <Text
-                    style={[
-                      styles.optionText,
-                      selected &&
-                        styles.optionTextSelected,
-                    ]}
-                  >
-                    {restaurant.name}
-                  </Text>
-                </Pressable>
-              );
-            }
-          )}
+                  {restaurant.name}
+                </Text>
+              </Pressable>
+            );
+          })}
         </View>
 
         {restaurants.length === 0 && (
@@ -577,44 +568,40 @@ export default function CreatePost() {
           <Text style={styles.helper}>
             Choose a restaurant first.
           </Text>
-        ) : availableDishes.length ===
-          0 ? (
+        ) : availableDishes.length === 0 ? (
           <Text style={styles.helper}>
-            No dishes found for this
-            restaurant.
+            No dishes found for this restaurant.
           </Text>
         ) : (
           <View style={styles.options}>
-            {availableDishes.map(
-              (dish) => {
-                const selected =
-                  dishId === dish.id;
+            {availableDishes.map((dish) => {
+              const selected =
+                dishId === dish.id;
 
-                return (
-                  <Pressable
-                    key={dish.id}
-                    onPress={() =>
-                      setDishId(dish.id)
-                    }
+              return (
+                <Pressable
+                  key={dish.id}
+                  onPress={() =>
+                    setDishId(dish.id)
+                  }
+                  style={[
+                    styles.option,
+                    selected &&
+                      styles.optionSelected,
+                  ]}
+                >
+                  <Text
                     style={[
-                      styles.option,
+                      styles.optionText,
                       selected &&
-                        styles.optionSelected,
+                        styles.optionTextSelected,
                     ]}
                   >
-                    <Text
-                      style={[
-                        styles.optionText,
-                        selected &&
-                          styles.optionTextSelected,
-                      ]}
-                    >
-                      {dish.name}
-                    </Text>
-                  </Pressable>
-                );
-              }
-            )}
+                    {dish.name}
+                  </Text>
+                </Pressable>
+              );
+            })}
           </View>
         )}
 
@@ -629,29 +616,23 @@ export default function CreatePost() {
         </Text>
 
         <View style={styles.stars}>
-          {[1, 2, 3, 4, 5].map(
-            (star) => (
-              <Pressable
-                key={star}
-                onPress={() =>
-                  setRating(star)
-                }
-                hitSlop={5}
+          {[1, 2, 3, 4, 5].map((star) => (
+            <Pressable
+              key={star}
+              onPress={() => setRating(star)}
+              hitSlop={5}
+            >
+              <Text
+                style={[
+                  styles.star,
+                  star <= rating &&
+                    styles.starSelected,
+                ]}
               >
-                <Text
-                  style={[
-                    styles.star,
-                    star <= rating &&
-                      styles.starSelected,
-                  ]}
-                >
-                  {star <= rating
-                    ? "★"
-                    : "☆"}
-                </Text>
-              </Pressable>
-            )
-          )}
+                {star <= rating ? "★" : "☆"}
+              </Text>
+            </Pressable>
+          ))}
         </View>
 
         {rating > 0 && (
@@ -680,16 +661,17 @@ export default function CreatePost() {
           style={styles.captionInput}
         />
 
-        <Text
-          style={styles.characterCount}
-        >
+        <Text style={styles.characterCount}>
           {caption.length}/500
         </Text>
       </ScrollView>
 
       {/* PUBLISH */}
 
-      <View style={styles.footer}>
+      <View
+      style={styles.footer}
+      pointerEvents="none"
+      >
         <Pressable
           disabled={publishing}
           onPress={publishPost}
@@ -703,26 +685,18 @@ export default function CreatePost() {
           ]}
         >
           {publishing ? (
-            <View
-              style={
-                styles.publishingContent
-              }
-            >
+            <View style={styles.publishingContent}>
               <ActivityIndicator
                 size="small"
                 color="#FFFFFF"
               />
 
-              <Text
-                style={styles.publishText}
-              >
+              <Text style={styles.publishText}>
                 Publishing...
               </Text>
             </View>
           ) : (
-            <Text
-              style={styles.publishText}
-            >
+            <Text style={styles.publishText}>
               Publish post
             </Text>
           )}

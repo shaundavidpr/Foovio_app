@@ -382,7 +382,7 @@ export default function Social() {
               pressed && styles.createButtonPressed,
             ]}
             onPress={() =>
-              router.push("/social/create")
+              router.push("/(tabs)/create")
             }
           >
             <Text style={styles.createButtonIcon}>
