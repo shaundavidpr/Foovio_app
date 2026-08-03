@@ -1,15 +1,32 @@
 import { StatusBar } from "expo-status-bar";
-import { useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import {
+  ActivityIndicator,
   Image,
   Pressable,
+  RefreshControl,
   ScrollView,
   StyleSheet,
   Text,
   View,
 } from "react-native";
+import { supabase } from "@/lib/supabase";
+import { useRouter } from "expo-router";
+import { useFocusEffect } from "expo-router";
+type Profile = {
+  id: string;
+  name: string | null;
+  username: string | null;
+  bio: string | null;
+  avatar_url: string | null;
+};
 
-const posts = [
+type Post = {
+  id: string;
+  image_url: string;
+};
+
+const demoPosts = [
   {
     id: "1",
     image:
@@ -34,12 +51,66 @@ const posts = [
 
 export default function Profile() {
   const [activeTab, setActiveTab] = useState<"posts" | "saved">("posts");
+  const router = useRouter();
+
+  const [profile, setProfile] = useState<Profile | null>(null);
+  const [posts, setPosts] = useState<Post[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
+useEffect(() => {
+  loadProfile();
+}, []);
+  const loadProfile = async () => {
+    try {
+      setLoading(true);
+
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+
+      if (!user) return;
+
+      const [{ data: profileData }, { data: postData }] =
+        await Promise.all([
+          supabase
+            .from("profiles")
+            .select("*")
+            .eq("id", user.id)
+            .single(),
+
+          supabase
+            .from("posts")
+            .select("id,image_url")
+            .eq("user_id", user.id)
+            .order("created_at", { ascending: false }),
+        ]);
+
+      setProfile(profileData);
+      setPosts(postData ?? []);
+    } catch (e) {
+      console.log(e);
+    } finally {
+      setLoading(false);
+      setRefreshing(false);
+    }
+  };
+
+  const onRefresh = () => {
+    setRefreshing(true);
+    loadProfile();
+  };
 
   return (
     <View style={styles.container}>
       <StatusBar style="dark" />
 
       <ScrollView
+      refreshControl={
+      <RefreshControl
+      refreshing={refreshing}
+      onRefresh={onRefresh}
+      />
+    }
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.content}
       >
@@ -54,29 +125,46 @@ export default function Profile() {
 
         {/* Profile */}
         <View style={styles.profileSection}>
-          <View style={styles.avatar}>
-            <Text style={styles.avatarText}>S</Text>
-          </View>
+          {profile?.avatar_url ? (
+            <Image
+              source={{ uri: profile.avatar_url }}
+              style={styles.avatar}
+            />
+          ) : (
+            <View style={styles.avatar}>
+              <Text style={styles.avatarText}>
+                 {profile?.name?.charAt(0).toUpperCase() ?? "?"}
+                 </Text>
+                 </View>
+                )}
 
-          <Text style={styles.name}>Shaun</Text>
+          <Text style={styles.name}>
+            {profile?.name || "No Name"}
+            </Text>
 
-          <Text style={styles.username}>@shaun</Text>
+          <Text style={styles.username}>
+            @{profile?.username || "username"}
+            </Text>
 
           <Text style={styles.bio}>
-            Finding food worth talking about.
-          </Text>
-
-          <Pressable style={styles.editButton}>
-            <Text style={styles.editButtonText}>
-              Edit profile
+            {profile?.bio || "No bio yet."}
             </Text>
-          </Pressable>
-        </View>
 
-        {/* Stats */}
-        <View style={styles.stats}>
+         <Pressable
+         style={styles.editButton}
+         onPress={() => router.push("/edit-profile")}
+         >
+          <Text style={styles.editButtonText}>
+            Edit profile
+            </Text>
+            </Pressable>
+            </View>
+            {/* Stats */}
+            <View style={styles.stats}>
           <Pressable style={styles.stat}>
-            <Text style={styles.statNumber}>12</Text>
+            <Text style={styles.statNumber}>
+              {posts.length}
+              </Text>
             <Text style={styles.statLabel}>Posts</Text>
           </Pressable>
 
@@ -162,10 +250,11 @@ export default function Profile() {
             {posts.map((post) => (
               <Pressable key={post.id} style={styles.gridItem}>
                 <Image
-                  source={{ uri: post.image }}
+                  source={{ uri: post.image_url }}
                   style={styles.gridImage}
                 />
               </Pressable>
+              
             ))}
           </View>
         ) : (

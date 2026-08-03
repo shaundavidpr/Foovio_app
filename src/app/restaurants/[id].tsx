@@ -319,6 +319,15 @@ export default function RestaurantDetails() {
                   )}
 
                   <View style={styles.dishContent}>
+                    <Pressable
+                    style={styles.addButton}
+                    onPress={(e) => {
+                      e.stopPropagation();
+                      console.log("Add to cart:", dish.id);
+                      }}
+                      >
+                        <Text style={styles.addButtonText}>ADD</Text>
+                        </Pressable>
                     <Text
                       style={styles.dishName}
                       numberOfLines={1}
@@ -578,6 +587,21 @@ const styles = StyleSheet.create({
 
   dishPlaceholderText: {
     fontSize: 27,
+  },
+
+  addButton: {
+    alignSelf: "flex-start",
+    backgroundColor: "#168CC5",
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 10,
+    marginBottom: 10,
+  },
+
+  addButtonText: {
+    color: "#FFFFFF",
+    fontSize: 12,
+    fontWeight: "700",
   },
 
   dishContent: {

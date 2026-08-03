@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import RatingStars from "../../components/RatingStars";
 import * as ImagePicker from "expo-image-picker";
 import PrimaryButton from "../../components/PrimaryButton";
-import LoadingView from "../../components/LoadingView";
+import LoadingSkeleton from "../../components/LoadingSkeleton";
 
 import {
   ActivityIndicator,
