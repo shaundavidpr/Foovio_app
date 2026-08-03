@@ -31,10 +31,23 @@ type Dish = {
   restaurants: Restaurant | null;
 };
 
+type DishPost = {
+  id: string;
+  caption: string | null;
+  image_url: string | null;
+  rating: number;
+  created_at: string;
+
+  profiles: {
+    name: string | null;
+  } | null;
+};
+
 export default function DishDetails() {
   const { id } = useLocalSearchParams<{ id: string }>();
 
   const [dish, setDish] = useState<Dish | null>(null);
+  const [posts, setPosts] = useState<DishPost[]>([]);
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState<string | null>(null);
 
@@ -85,6 +98,28 @@ export default function DishDetails() {
       }
 
       setDish(data as Dish);
+
+      const { data: postData, error: postError } =
+        await supabase
+          .from("posts")
+          .select(`
+            id,
+            caption,
+            image_url,
+            rating,
+            created_at,
+            profiles (
+              name
+            )
+          `)
+          .eq("dish_id", id)
+          .order("created_at", {
+            ascending: false,
+          });
+
+      if (!postError) {
+        setPosts(postData ?? []);
+      }
     } catch (error) {
       console.error("Dish details error:", error);
       setLoadError("We couldn't load this dish.");
@@ -140,6 +175,47 @@ export default function DishDetails() {
 
   const restaurantLocation =
     dish.restaurants?.location;
+
+  const averageRating =
+    posts.length > 0
+      ? (
+          posts.reduce(
+            (sum, post) =>
+              sum + Number(post.rating),
+            0
+          ) / posts.length
+        ).toFixed(1)
+      : dish.rating?.toFixed(1) ?? "—";
+
+  const totalReviews = posts.length;
+
+  const totalPhotos =
+    posts.filter(
+      (post) => post.image_url
+    ).length;
+
+  const formatDate = (date: string) => {
+    const created = new Date(date);
+    const now = new Date();
+
+    const diff =
+      Math.floor(
+        (now.getTime() - created.getTime()) /
+        1000
+      );
+
+    if (diff < 60) return "Just now";
+
+    if (diff < 3600)
+      return `${Math.floor(diff / 60)} min ago`;
+
+    if (diff < 86400)
+      return `${Math.floor(diff / 3600)} hr ago`;
+
+    if (diff < 172800) return "Yesterday";
+
+    return created.toLocaleDateString();
+  };
 
   return (
     <View style={styles.container}>
@@ -247,7 +323,7 @@ export default function DishDetails() {
           <View style={styles.scoreCard}>
             <View>
               <Text style={styles.score}>
-                {dish.rating ?? "—"}
+                {averageRating}
               </Text>
 
               <Text style={styles.reviewCount}>
@@ -266,66 +342,112 @@ export default function DishDetails() {
             </View>
           </View>
 
-          {/* Tags */}
+          {/* Stats */}
           <Text style={styles.sectionTitle}>
-            People mention
+            Community stats
           </Text>
 
           <View style={styles.tags}>
             <View style={styles.tag}>
               <Text style={styles.tagText}>
-                🔥 Great flavour
+                ⭐ {averageRating} Average Rating
               </Text>
             </View>
 
             <View style={styles.tag}>
               <Text style={styles.tagText}>
-                🍽️ Good portion
+                📝 {totalReviews} Reviews
               </Text>
             </View>
 
             <View style={styles.tag}>
               <Text style={styles.tagText}>
-                💰 Worth the price
-              </Text>
-            </View>
-
-            <View style={styles.tag}>
-              <Text style={styles.tagText}>
-                ✨ Recommended
+                📷 {totalPhotos} Photos
               </Text>
             </View>
           </View>
 
           {/* Community */}
           <Text style={styles.sectionTitle}>
-            From the community
+            Community Reviews
           </Text>
 
-          <View style={styles.review}>
-            <View style={styles.reviewHeader}>
-              <View style={styles.avatar}>
-                <Text style={styles.avatarText}>
-                  F
-                </Text>
-              </View>
+          {posts.length === 0 ? (
+            <View style={styles.review}>
+              <Text style={styles.imagePlaceholderText}>
+                🍽️
+              </Text>
 
-              <View>
-                <Text style={styles.username}>
-                  Foovio community
-                </Text>
+              <Text style={styles.username}>
+                No reviews yet
+              </Text>
 
-                <Text style={styles.reviewRating}>
-                  ★★★★★
-                </Text>
-              </View>
+              <Text style={styles.reviewText}>
+                Be the first foodie to share
+                your experience.
+              </Text>
             </View>
+          ) : (
+            posts.map((post) => (
+              <View
+                key={post.id}
+                style={styles.review}
+              >
+                <View style={styles.reviewHeader}>
+                  <View style={styles.avatar}>
+                    <Text style={styles.avatarText}>
+                      {(post.profiles?.name ?? "U")
+                        .charAt(0)
+                        .toUpperCase()}
+                    </Text>
+                  </View>
 
-            <Text style={styles.reviewText}>
-              Community reviews and food experiences
-              for {` ${dish.name}`} will appear here.
-            </Text>
-          </View>
+                  <View style={{ flex: 1 }}>
+                    <Text style={styles.username}>
+                      {post.profiles?.name ??
+                        "Foovio User"}
+                    </Text>
+
+                    <Text style={styles.reviewRating}>
+                      {"★".repeat(
+                        Math.round(post.rating)
+                      )}
+                    </Text>
+
+                    <Text
+                      style={{
+                        color: "#999",
+                        fontSize: 11,
+                        marginTop: 2,
+                      }}
+                    >
+                      {formatDate(post.created_at)}
+                    </Text>
+                  </View>
+                </View>
+
+                {post.caption ? (
+                  <Text style={styles.reviewText}>
+                    {post.caption}
+                  </Text>
+                ) : null}
+
+                {post.image_url ? (
+                  <Image
+                    source={{
+                      uri: post.image_url,
+                    }}
+                    style={{
+                      width: "100%",
+                      height: 180,
+                      borderRadius: 12,
+                      marginTop: 12,
+                    }}
+                  />
+                ) : null}
+              </View>
+            ))
+          )}
 
           {/* Restaurant */}
           <Pressable
@@ -342,7 +464,7 @@ export default function DishDetails() {
               </Text>
 
               <Text style={styles.restaurantButtonName}>
-                {restaurantName}
+                📍 {restaurantName}
               </Text>
 
               {restaurantLocation && (
@@ -352,6 +474,17 @@ export default function DishDetails() {
                   {restaurantLocation}
                 </Text>
               )}
+
+              <Text
+                style={{
+                  color: "#29A9EA",
+                  fontSize: 12,
+                  fontWeight: "700",
+                  marginTop: 6,
+                }}
+              >
+                Tap to view restaurant →
+              </Text>
             </View>
 
             <Text style={styles.arrow}>›</Text>
@@ -640,7 +773,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
   },
-
+  
   restaurantButtonContent: {
     flex: 1,
   },
