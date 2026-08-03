@@ -1,7 +1,10 @@
 import { router } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { useEffect, useState } from "react";
+import RatingStars from "../../components/RatingStars";
 import * as ImagePicker from "expo-image-picker";
+import PrimaryButton from "../../components/PrimaryButton";
+import LoadingView from "../../components/LoadingView";
 
 import {
   ActivityIndicator,
@@ -382,21 +385,13 @@ export default function CreatePost() {
   // -----------------------------------
 
   if (loading) {
-    return (
-      <View style={styles.loadingContainer}>
-        <StatusBar style="dark" />
-
-        <ActivityIndicator
-          size="large"
-          color="#29A9EA"
-        />
-
-        <Text style={styles.loadingText}>
-          Loading...
-        </Text>
-      </View>
-    );
-  }
+  return (
+    <>
+      <StatusBar style="dark" />
+      <LoadingView text="Loading food..." />
+    </>
+  );
+}
 
   return (
     <KeyboardAvoidingView
@@ -615,31 +610,12 @@ export default function CreatePost() {
           How was it?
         </Text>
 
-        <View style={styles.stars}>
-          {[1, 2, 3, 4, 5].map((star) => (
-            <Pressable
-              key={star}
-              onPress={() => setRating(star)}
-              hitSlop={5}
-            >
-              <Text
-                style={[
-                  styles.star,
-                  star <= rating &&
-                    styles.starSelected,
-                ]}
-              >
-                {star <= rating ? "★" : "☆"}
-              </Text>
-            </Pressable>
-          ))}
-        </View>
-
-        {rating > 0 && (
-          <Text style={styles.ratingText}>
-            {rating}.0 / 5
-          </Text>
-        )}
+       <RatingStars
+        rating={rating}
+        editable
+        onChange={setRating}
+        size={38}
+        />
 
         {/* CAPTION */}
 
@@ -668,39 +644,12 @@ export default function CreatePost() {
 
       {/* PUBLISH */}
 
-      <View
-      style={styles.footer}
-      pointerEvents="none"
-      >
-        <Pressable
-          disabled={publishing}
-          onPress={publishPost}
-          style={({ pressed }) => [
-            styles.publishButton,
-            publishing &&
-              styles.publishDisabled,
-            pressed &&
-              !publishing &&
-              styles.publishPressed,
-          ]}
-        >
-          {publishing ? (
-            <View style={styles.publishingContent}>
-              <ActivityIndicator
-                size="small"
-                color="#FFFFFF"
-              />
-
-              <Text style={styles.publishText}>
-                Publishing...
-              </Text>
-            </View>
-          ) : (
-            <Text style={styles.publishText}>
-              Publish post
-            </Text>
-          )}
-        </Pressable>
+     <View style={styles.footer}>
+       <PrimaryButton
+  title="Publish Post"
+  onPress={publishPost}
+  loading={publishing}
+/>
       </View>
     </KeyboardAvoidingView>
   );
@@ -710,19 +659,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#FFFFFF",
-  },
-
-  loadingContainer: {
-    flex: 1,
-    backgroundColor: "#FFFFFF",
-    justifyContent: "center",
-    alignItems: "center",
-  },
-
-  loadingText: {
-    color: "#888888",
-    fontSize: 13,
-    marginTop: 12,
   },
 
   header: {
@@ -911,20 +847,6 @@ const styles = StyleSheet.create({
     fontSize: 13,
   },
 
-  stars: {
-    flexDirection: "row",
-    gap: 9,
-  },
-
-  star: {
-    color: "#CCCCCC",
-    fontSize: 37,
-  },
-
-  starSelected: {
-    color: "#29A9EA",
-  },
-
   ratingText: {
     color: "#777777",
     fontSize: 12,
@@ -957,33 +879,5 @@ const styles = StyleSheet.create({
     borderTopWidth: 1,
     borderTopColor: "#EEEEEE",
     backgroundColor: "#FFFFFF",
-  },
-
-  publishButton: {
-    height: 56,
-    borderRadius: 16,
-    backgroundColor: "#29A9EA",
-    justifyContent: "center",
-    alignItems: "center",
-  },
-
-  publishPressed: {
-    opacity: 0.85,
-  },
-
-  publishDisabled: {
-    opacity: 0.6,
-  },
-
-  publishingContent: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 9,
-  },
-
-  publishText: {
-    color: "#FFFFFF",
-    fontSize: 16,
-    fontWeight: "800",
   },
 });

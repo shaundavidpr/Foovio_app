@@ -12,6 +12,7 @@ import {
 } from "react-native";
 
 import { supabase } from "../../lib/supabase";
+import Avatar from "../../components/Avatar";
 
 type Restaurant = {
   id: string;
@@ -389,54 +390,35 @@ export default function DishDetails() {
             </View>
           ) : (
             posts.map((post) => (
-              <View
-                key={post.id}
-                style={styles.review}
-              >
+              <View key={post.id} style={styles.review}>
                 <View style={styles.reviewHeader}>
-                  <View style={styles.avatar}>
-                    <Text style={styles.avatarText}>
-                      {(post.profiles?.name ?? "U")
-                        .charAt(0)
-                        .toUpperCase()}
-                    </Text>
-                  </View>
+                  <Avatar
+                    name={post.profiles?.name ?? undefined}
+                    size={40}
+                  />
 
                   <View style={{ flex: 1 }}>
                     <Text style={styles.username}>
-                      {post.profiles?.name ??
-                        "Foovio User"}
+                      {post.profiles?.name ?? "Foovio User"}
                     </Text>
 
                     <Text style={styles.reviewRating}>
-                      {"★".repeat(
-                        Math.round(post.rating)
-                      )}
+                      {"★".repeat(Math.round(post.rating))}
                     </Text>
 
-                    <Text
-                      style={{
-                        color: "#999",
-                        fontSize: 11,
-                        marginTop: 2,
-                      }}
-                    >
+                    <Text style={{ color: "#999", fontSize: 11, marginTop: 2 }}>
                       {formatDate(post.created_at)}
                     </Text>
                   </View>
                 </View>
 
                 {post.caption ? (
-                  <Text style={styles.reviewText}>
-                    {post.caption}
-                  </Text>
+                  <Text style={styles.reviewText}>{post.caption}</Text>
                 ) : null}
 
-                {post.image_url ? (
+                               {post.image_url ? (
                   <Image
-                    source={{
-                      uri: post.image_url,
-                    }}
+                    source={{ uri: post.image_url }}
                     style={{
                       width: "100%",
                       height: 180,
@@ -728,21 +710,6 @@ const styles = StyleSheet.create({
   reviewHeader: {
     flexDirection: "row",
     alignItems: "center",
-  },
-
-  avatar: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: "#EAF7FD",
-    justifyContent: "center",
-    alignItems: "center",
-    marginRight: 10,
-  },
-
-  avatarText: {
-    color: "#29A9EA",
-    fontWeight: "800",
   },
 
   username: {
