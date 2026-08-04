@@ -1,6 +1,7 @@
 import { router, useLocalSearchParams } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { useEffect, useState } from "react";
+import { useMealTray } from "@/context/MealTrayContext";
 import {
   ActivityIndicator,
   Image,
@@ -12,6 +13,9 @@ import {
 } from "react-native";
 
 import { supabase } from "../../lib/supabase";
+import SearchBar from "@/components/ordering/SearchBar";
+import CategoryPills from "@/components/ordering/CategoryPills";
+import DishCard from "@/components/ordering/DishCard";
 
 type Restaurant = {
   id: string;
@@ -37,11 +41,22 @@ type Dish = {
 
 export default function RestaurantDetails() {
   const { id } = useLocalSearchParams<{ id: string }>();
+  const {
+  addDish,
+  increaseQuantity,
+  decreaseQuantity,
+  getDishQuantity,
+  totalItems,
+  totalPrice,
+} = useMealTray();
 
   const [restaurant, setRestaurant] =
     useState<Restaurant | null>(null);
 
   const [menu, setMenu] = useState<Dish[]>([]);
+  const [search, setSearch] = useState("");
+  const [selectedCategory, setSelectedCategory] =
+  useState("All");
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState<string | null>(null);
 
@@ -59,6 +74,16 @@ export default function RestaurantDetails() {
     try {
       setLoading(true);
       setLoadError(null);
+
+  const categories = [
+  "All",
+  ...new Set(
+    menu
+      .map((dish) => dish.category)
+      .filter(Boolean)
+  ),
+];
+  
 
       // Fetch restaurant
       const {
@@ -283,80 +308,46 @@ export default function RestaurantDetails() {
           {/* Menu */}
 
           <Text style={styles.sectionTitle}>
-            Popular here
-          </Text>
+            Menu
+            </Text>
+
+            <SearchBar
+              value={search}
+              onChange={setSearch}
+           />
+           <CategoryPills
+  categories={categories as string[]}
+  selected={selectedCategory}
+  onSelect={setSelectedCategory}
+/>
 
           {menu.length > 0 ? (
             <View style={styles.menu}>
-              {menu.map((dish) => (
-                <Pressable
-                  key={dish.id}
-                  style={styles.dishCard}
-                  onPress={() =>
-                    router.push(`/dish/${dish.id}`)
-                  }
-                >
-                  {dish.image_url ? (
-                    <Image
-                      source={{ uri: dish.image_url }}
-                      style={styles.dishImage}
-                    />
-                  ) : (
-                    <View
-                      style={[
-                        styles.dishImage,
-                        styles.dishPlaceholder,
-                      ]}
-                    >
-                      <Text
-                        style={
-                          styles.dishPlaceholderText
-                        }
-                      >
-                        🍽️
-                      </Text>
-                    </View>
-                  )}
+              {menu
+  .filter((dish) => {
+    const matchesSearch =
+      dish.name
+        .toLowerCase()
+        .includes(search.toLowerCase());
 
-                  <View style={styles.dishContent}>
-                    <Pressable
-                    style={styles.addButton}
-                    onPress={(e) => {
-                      e.stopPropagation();
-                      console.log("Add to cart:", dish.id);
-                      }}
-                      >
-                        <Text style={styles.addButtonText}>ADD</Text>
-                        </Pressable>
-                    <Text
-                      style={styles.dishName}
-                      numberOfLines={1}
-                    >
-                      {dish.name}
-                    </Text>
+    const matchesCategory =
+      selectedCategory === "All" ||
+      dish.category === selectedCategory;
 
-                    {dish.category && (
-                      <Text style={styles.dishCategory}>
-                        {dish.category}
-                      </Text>
-                    )}
-
-                    <View style={styles.dishMeta}>
-                      <Text style={styles.dishPrice}>
-                        ₹{Number(dish.price).toFixed(0)}
-                      </Text>
-
-                      {dish.rating !== null && (
-                        <Text style={styles.dishRating}>
-                          ★ {dish.rating}
-                        </Text>
-                      )}
-                    </View>
-                  </View>
-
-                  <Text style={styles.arrow}>›</Text>
-                </Pressable>
-              ))}
+    return (
+      matchesSearch &&
+      matchesCategory
+    );
+  })
+  .map((dish) => (
+  <DishCard
+    key={dish.id}
+    dish={dish}
+    onPress={() =>
+      router.push(`/dish/${dish.id}`)
+    }
+  />
+))}
             </View>
           ) : (
             <Text style={styles.emptyMenu}>
@@ -383,6 +374,32 @@ export default function RestaurantDetails() {
           </View>
         </View>
       </ScrollView>
+
+      {totalItems > 0 && (
+        <Pressable
+          style={styles.mealTray}
+          onPress={() => {
+            console.log("Open Meal Tray");
+          }}
+        >
+          <View>
+            <Text style={styles.mealTitle}>
+              🍽️ Your Meal
+            </Text>
+
+            <Text style={styles.mealSubtitle}>
+              {totalItems}{" "}
+              {totalItems === 1 ? "Dish" : "Dishes"} • ₹
+              {totalPrice.toFixed(0)}
+            </Text>
+          </View>
+
+          <Text style={styles.reviewText}>
+            Review →
+          </Text>
+        </Pressable>
+      )}
+
     </View>
   );
 }
@@ -603,7 +620,32 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontWeight: "700",
   },
+quantityContainer: {
+  alignSelf: "flex-start",
+  flexDirection: "row",
+  alignItems: "center",
+  backgroundColor: "#168CC5",
+  borderRadius: 12,
+  paddingHorizontal: 10,
+  paddingVertical: 6,
+  marginBottom: 10,
+},
 
+quantityButton: {
+  color: "#FFFFFF",
+  fontSize: 20,
+  fontWeight: "700",
+  width: 28,
+  textAlign: "center",
+},
+
+quantityText: {
+  color: "#FFFFFF",
+  fontSize: 15,
+  fontWeight: "700",
+  minWidth: 24,
+  textAlign: "center",
+},
   dishContent: {
     flex: 1,
     marginLeft: 13,
@@ -704,4 +746,40 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: "700",
   },
+  mealTray: {
+  position: "absolute",
+  left: 20,
+  right: 20,
+  bottom: 24,
+
+  backgroundColor: "#111",
+
+  borderRadius: 22,
+
+  paddingHorizontal: 22,
+  paddingVertical: 18,
+
+  flexDirection: "row",
+  justifyContent: "space-between",
+  alignItems: "center",
+
+  elevation: 10,
+},
+
+mealTitle: {
+  color: "#FFF",
+  fontSize: 17,
+  fontWeight: "700",
+},
+
+mealSubtitle: {
+  color: "#CCC",
+  marginTop: 4,
+},
+
+reviewText: {
+  color: "#29A9EA",
+  fontSize: 16,
+  fontWeight: "700",
+},
 });

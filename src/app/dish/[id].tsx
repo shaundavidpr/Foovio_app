@@ -128,7 +128,14 @@ export default function DishDetails() {
       setLoading(false);
     }
   };
-
+const categories = [
+  "All",
+  ...new Set(
+    menu
+      .map((dish) => dish.category)
+      .filter(Boolean)
+  ),
+];
   if (loading) {
     return (
       <View style={styles.loadingContainer}>

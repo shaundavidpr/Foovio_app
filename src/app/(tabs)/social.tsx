@@ -7,6 +7,7 @@ import {
   Image,
   Pressable,
   ScrollView,
+  Share,
   StyleSheet,
   Text,
   View,
@@ -51,6 +52,7 @@ export default function Social() {
   const [loadError, setLoadError] = useState<string | null>(null);
 
   const [likedPosts, setLikedPosts] = useState<string[]>([]);
+  const [savedPosts, setSavedPosts] = useState<string[]>([]);
   const [likingPosts, setLikingPosts] = useState<string[]>([]);
   const [currentUserId, setCurrentUserId] = useState("");
   useEffect(() => {
@@ -167,6 +169,15 @@ export default function Social() {
             )
           );
         }
+
+        const { data: saved } = await supabase
+          .from("saved_posts")
+          .select("post_id")
+          .eq("user_id", user.id);
+
+        setSavedPosts(
+          (saved ?? []).map((item: any) => item.post_id)
+        );
       } else {
         setLikedPosts([]);
       }
@@ -192,7 +203,6 @@ export default function Social() {
         postId,
       ]);
 
-  
       const {
         data: { user },
         error: userError,
@@ -253,6 +263,15 @@ export default function Social() {
             })
             .select("id")
             .single();
+            const post = posts.find((p) => p.id === postId);
+            if (post && post.user_id !== user.id) {
+              await supabase.from("notifications").insert({
+                user_id: post.user_id,
+                actor_id: user.id,
+                post_id: postId,
+                type: "like",
+              });
+            }
 
         if (error) {
           console.error("Like error:", error);
@@ -291,6 +310,54 @@ export default function Social() {
       setLikingPosts((current) =>
         current.filter((id) => id !== postId)
       );
+    }
+  };
+
+  const toggleSave = async (postId: string) => {
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (!user) return;
+
+    const saved = savedPosts.includes(postId);
+
+    if (saved) {
+      await supabase
+        .from("saved_posts")
+        .delete()
+        .eq("post_id", postId)
+        .eq("user_id", user.id);
+
+      setSavedPosts((current) =>
+        current.filter((id) => id !== postId)
+      );
+    } else {
+      await supabase
+        .from("saved_posts")
+        .insert({
+          post_id: postId,
+          user_id: user.id,
+        });
+
+      setSavedPosts((current) => [
+        ...current,
+        postId,
+      ]);
+    }
+  };
+
+  const sharePost = async (post: Post) => {
+    try {
+      await Share.share({
+        message: `${post.caption ?? "Check out this food!"}
+
+⭐ ${post.rating ?? "-"}/5
+
+Shared from Foovio 🍽️`,
+      });
+    } catch (error) {
+      console.log(error);
     }
   };
 
@@ -410,7 +477,12 @@ export default function Social() {
               See what people are eating.
             </Text>
           </View>
-
+          <Pressable
+  onPress={() => router.push("/notifications")}
+  style={{ marginRight: 15 }}
+>
+  <Text style={{ fontSize: 24 }}>🔔</Text>
+</Pressable>
           {/* CREATE POST */}
 
           <Pressable
@@ -495,38 +567,41 @@ export default function Social() {
               likingPosts.includes(post.id);
 
             return (
-              <View
-                key={post.id}
-                style={styles.post}
+             <Pressable
+              key={post.id}
+              style={styles.post}
+              onPress={() => router.push(`/social/post/${post.id}`)}
               >
                 {/* User */}
 
                 <View style={styles.userRow}>
-                  <View style={styles.avatar}>
-                    <Text
-                      style={styles.avatarText}
-                    >
-                      {getInitial(name)}
-                    </Text>
-                  </View>
+                  <Pressable
+  style={{
+    flexDirection: "row",
+    alignItems: "center",
+    flex: 1,
+  }}
+  onPress={() => router.push(`/profile/${post.user_id}`)}
+>
+  <View style={styles.avatar}>
+    <Text style={styles.avatarText}>
+      {getInitial(name)}
+    </Text>
+  </View>
 
-                  <View style={styles.userInfo}>
-                    <Text
-                      style={styles.username}
-                    >
-                      {name}
-                    </Text>
+  <View style={styles.userInfo}>
+    <Text style={styles.username}>
+      {name}
+    </Text>
 
-                    <Text style={styles.time}>
-                      {formatTime(
-                        post.created_at
-                      )}
-
-                      {post.restaurants?.name
-                        ? ` · ${post.restaurants.name}`
-                        : ""}
-                    </Text>
-                  </View>
+    <Text style={styles.time}>
+      {formatTime(post.created_at)}
+      {post.restaurants?.name
+        ? ` · ${post.restaurants.name}`
+        : ""}
+    </Text>
+  </View>
+</Pressable>
 
                   {post.user_id === currentUserId ? (
                     <Pressable
@@ -634,76 +709,62 @@ export default function Social() {
 
                 {/* Actions */}
 
-                <View style={styles.actions}>
-                  <View
-                    style={styles.leftActions}
-                  >
-                    {/* LIKE */}
+               <View style={styles.actions}>
+  <View style={styles.leftActions}>
+    {/* LIKE */}
+    <Pressable
+      style={[
+        styles.action,
+        isLiking && styles.actionDisabled,
+      ]}
+      disabled={isLiking}
+      onPress={() => toggleLike(post.id)}
+    >
+      <Text
+        style={[
+          styles.actionIcon,
+          isLiked && styles.likedIcon,
+        ]}
+      >
+        {isLiked ? "♥" : "♡"}
+      </Text>
 
-                    <Pressable
-                      style={[
-                        styles.action,
-                        isLiking &&
-                          styles.actionDisabled,
-                      ]}
-                      disabled={isLiking}
-                      onPress={() =>
-                        toggleLike(post.id)
-                      }
-                    >
-                      <Text
-                        style={[
-                          styles.actionIcon,
-                          isLiked &&
-                            styles.likedIcon,
-                        ]}
-                      >
-                        {isLiked ? "♥" : "♡"}
-                      </Text>
+      <Text style={styles.actionCount}>
+        {likes}
+      </Text>
+    </Pressable>
 
-                      <Text
-                        style={styles.actionCount}
-                      >
-                        {likes}
-                      </Text>
-                    </Pressable>
+    {/* COMMENT */}
+    <Pressable
+      style={styles.action}
+      onPress={() =>
+        router.push(`/social/comments/${post.id}`)
+      }
+    >
+      <Text style={styles.commentIcon}>◯</Text>
 
-                    {/* COMMENT */}
+      <Text style={styles.actionCount}>
+        {comments}
+      </Text>
+    </Pressable>
+  </View>
 
-                    <Pressable
-                      style={styles.action}
-                      onPress={() =>
-                        router.push(
-                          `/social/comments/${post.id}`
-                        )
-                      }
-                    >
-                      <Text
-                        style={styles.commentIcon}
-                      >
-                        ◯
-                      </Text>
 
-                      <Text
-                        style={styles.actionCount}
-                      >
-                        {comments}
-                      </Text>
-                    </Pressable>
-                  </View>
+  <View style={{ flexDirection: "row", alignItems: "center", gap: 16 }}>
+    <Pressable onPress={() => sharePost(post)}>
+      <Text style={styles.save}>📤</Text>
+    </Pressable>
 
-                  {/* SAVE */}
-
-                  <Pressable>
-                    <Text style={styles.save}>
-                      ♧
-                    </Text>
-                  </Pressable>
-                </View>
-              </View>
-            );
-          })}
-
+    <Pressable onPress={() => toggleSave(post.id)}>
+      <Text style={styles.save}>
+        {savedPosts.includes(post.id) ? "🔖" : "📑"}
+      </Text>
+    </Pressable>
+  </View>
+</View>
+ </Pressable>
+ );
+})}
         {/* Empty feed */}
 
         {!loadError &&

@@ -175,6 +175,20 @@ export default function Comments() {
 
         return;
       }
+      const { data: post } = await supabase
+      .from("posts")
+      .select("user_id")
+      .eq("id", postId)
+      .single();
+
+if (post && post.user_id !== user.id) {
+  await supabase.from("notifications").insert({
+    user_id: post.user_id,
+    actor_id: user.id,
+    post_id: postId,
+    type: "comment",
+  });
+}
 
       setComment("");
 

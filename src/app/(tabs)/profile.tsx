@@ -57,6 +57,7 @@ export default function Profile() {
   const [posts, setPosts] = useState<Post[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
+  const [savedPosts, setSavedPosts] = useState<Post[]>([]);
 useEffect(() => {
   loadProfile();
 }, []);
@@ -87,6 +88,24 @@ useEffect(() => {
 
       setProfile(profileData);
       setPosts(postData ?? []);
+
+      const { data: savedData } = await supabase
+        .from("saved_posts")
+        .select(
+          `
+          posts (
+            id,
+            image_url
+          )
+        `
+        )
+        .eq("user_id", user.id);
+
+      setSavedPosts(
+        (savedData ?? [])
+          .map((item: any) => item.posts)
+          .filter(Boolean)
+      );
     } catch (e) {
       console.log(e);
     } finally {
@@ -99,6 +118,8 @@ useEffect(() => {
     setRefreshing(true);
     loadProfile();
   };
+
+  const displayPosts = activeTab === "posts" ? posts : savedPosts;
 
   return (
     <View style={styles.container}>
@@ -245,28 +266,33 @@ useEffect(() => {
         </View>
 
         {/* Posts */}
-        {activeTab === "posts" ? (
+        {displayPosts.length > 0 ? (
           <View style={styles.grid}>
-            {posts.map((post) => (
+            {displayPosts.map((post) => (
               <Pressable key={post.id} style={styles.gridItem}>
                 <Image
                   source={{ uri: post.image_url }}
                   style={styles.gridImage}
                 />
               </Pressable>
-              
             ))}
           </View>
         ) : (
           <View style={styles.empty}>
-            <Text style={styles.emptyIcon}>♡</Text>
+            <Text style={styles.emptyIcon}>
+              {activeTab === "posts" ? "▦" : "♡"}
+            </Text>
 
             <Text style={styles.emptyTitle}>
-              Nothing saved yet
+              {activeTab === "posts"
+                ? "No posts yet"
+                : "Nothing saved yet"}
             </Text>
 
             <Text style={styles.emptyText}>
-              Save dishes and restaurants you want to try.
+              {activeTab === "posts"
+                ? "Posts you share will show up here."
+                : "Save dishes and restaurants you want to try."}
             </Text>
           </View>
         )}
