@@ -1,6 +1,7 @@
 import { StatusBar } from "expo-status-bar";
 import { router } from "expo-router";
 import { useEffect, useState } from "react";
+import { Alert } from "react-native";
 import {
   ActivityIndicator,
   Image,
@@ -51,7 +52,7 @@ export default function Social() {
 
   const [likedPosts, setLikedPosts] = useState<string[]>([]);
   const [likingPosts, setLikingPosts] = useState<string[]>([]);
-
+  const [currentUserId, setCurrentUserId] = useState("");
   useEffect(() => {
     loadPosts();
   }, []);
@@ -64,6 +65,9 @@ export default function Social() {
       const {
         data: { user },
       } = await supabase.auth.getUser();
+      if (user) {
+        setCurrentUserId(user.id);
+      }
 
       const { data: postsData, error: postsError } =
         await supabase
@@ -188,6 +192,7 @@ export default function Social() {
         postId,
       ]);
 
+  
       const {
         data: { user },
         error: userError,
@@ -288,6 +293,38 @@ export default function Social() {
       );
     }
   };
+
+  const deletePost = async (postId: string) => {
+  Alert.alert(
+    "Delete Post",
+    "Are you sure you want to delete this post?",
+    [
+      {
+        text: "Cancel",
+        style: "cancel",
+      },
+      {
+        text: "Delete",
+        style: "destructive",
+        onPress: async () => {
+          const { error } = await supabase
+            .from("posts")
+            .delete()
+            .eq("id", postId);
+
+          if (error) {
+            Alert.alert("Error", error.message);
+            return;
+          }
+
+          setPosts((current) =>
+            current.filter((post) => post.id !== postId)
+          );
+        },
+      },
+    ]
+  );
+};
 
   const formatTime = (createdAt: string) => {
     const created = new Date(createdAt);
@@ -491,11 +528,30 @@ export default function Social() {
                     </Text>
                   </View>
 
-                  <Pressable>
-                    <Text style={styles.more}>
-                      •••
-                    </Text>
-                  </Pressable>
+                  {post.user_id === currentUserId ? (
+                    <Pressable
+                     onPress={() => deletePost(post.id)}
+                     style={{
+                      paddingHorizontal: 12,
+                      paddingVertical: 8,
+                      backgroundColor: "#FFE5E5",
+                      borderRadius: 8,
+                      }}
+                      >
+  <Text
+    style={{
+      color: "red",
+      fontWeight: "700",
+    }}
+  >
+    DELETE
+  </Text>
+</Pressable>
+                      ) : (
+                         <Pressable>
+                          <Text style={styles.more}>•••</Text>
+                          </Pressable>
+                        )}
                 </View>
 
                 {/* Caption */}
