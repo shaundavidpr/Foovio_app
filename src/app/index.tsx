@@ -65,7 +65,6 @@ export default function Index() {
     );
   }
 
-  // No session = show welcome screen.
   return (
     <View style={styles.container}>
       <StatusBar style="dark" />

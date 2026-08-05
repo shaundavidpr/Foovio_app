@@ -1,75 +1,38 @@
-import {
-  ScrollView,
-  Pressable,
-  StyleSheet,
-  Text,
-} from "react-native";
+import { StyleSheet, TextInput, View } from "react-native";
 
 type Props = {
-  categories: string[];
-  selected: string;
-  onSelect: (category: string) => void;
+  value: string;
+  onChange: (text: string) => void;
 };
 
-export default function CategoryPills({
-  categories,
-  selected,
-  onSelect,
+export default function SearchBar({
+  value,
+  onChange,
 }: Props) {
   return (
-    <ScrollView
-      horizontal
-      showsHorizontalScrollIndicator={false}
-      contentContainerStyle={styles.container}
-    >
-      {categories.map((category) => (
-        <Pressable
-          key={category}
-          onPress={() => onSelect(category)}
-          style={[
-            styles.pill,
-            selected === category &&
-              styles.selected,
-          ]}
-        >
-          <Text
-            style={[
-              styles.text,
-              selected === category &&
-                styles.selectedText,
-            ]}
-          >
-            {category}
-          </Text>
-        </Pressable>
-      ))}
-    </ScrollView>
+    <View style={styles.container}>
+      <TextInput
+        value={value}
+        onChangeText={onChange}
+        placeholder="Search dishes..."
+        placeholderTextColor="#999"
+        style={styles.input}
+      />
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    gap: 10,
-    paddingBottom: 16,
+    backgroundColor: "#F5F5F5",
+    borderRadius: 18,
+    paddingHorizontal: 16,
+    marginBottom: 18,
   },
 
-  pill: {
-    paddingHorizontal: 18,
-    paddingVertical: 10,
-    borderRadius: 20,
-    backgroundColor: "#F3F3F3",
-  },
-
-  selected: {
-    backgroundColor: "#29A9EA",
-  },
-
-  text: {
-    color: "#555",
-    fontWeight: "600",
-  },
-
-  selectedText: {
-    color: "#FFF",
+  input: {
+    height: 50,
+    fontSize: 15,
+    color: "#111",
   },
 });
