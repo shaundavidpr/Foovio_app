@@ -1,6 +1,6 @@
 import { router, useLocalSearchParams } from "expo-router";
 import { StatusBar } from "expo-status-bar";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useMealTray } from "@/context/MealTrayContext";
 import {
   ActivityIndicator,
@@ -16,7 +16,9 @@ import { supabase } from "../../lib/supabase";
 import SearchBar from "@/components/ordering/SearchBar";
 import CategoryPills from "@/components/ordering/CategoryPills";
 import DishCard from "@/components/ordering/DishCard";
-
+import MealTray from "@/components/ordering/MealTray";
+import MealTraySheet from "@/components/ordering/MealTraySheet";
+import { BottomSheetModal } from "@gorhom/bottom-sheet";
 type Restaurant = {
   id: string;
   name: string;
@@ -59,6 +61,7 @@ export default function RestaurantDetails() {
   useState("All");
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState<string | null>(null);
+  const mealTraySheetRef = useRef<BottomSheetModal>(null);
 
   useEffect(() => {
     if (!id) {
@@ -74,15 +77,6 @@ export default function RestaurantDetails() {
     try {
       setLoading(true);
       setLoadError(null);
-
-  const categories = [
-  "All",
-  ...new Set(
-    menu
-      .map((dish) => dish.category)
-      .filter(Boolean)
-  ),
-];
   
 
       // Fetch restaurant
@@ -162,6 +156,14 @@ export default function RestaurantDetails() {
       setLoading(false);
     }
   };
+  const categories = [
+  "All",
+  ...new Set(
+    menu
+      .map((dish) => dish.category)
+      .filter(Boolean)
+  ),
+];
 
   if (loading) {
     return (
@@ -375,30 +377,14 @@ export default function RestaurantDetails() {
         </View>
       </ScrollView>
 
-      {totalItems > 0 && (
-        <Pressable
-          style={styles.mealTray}
-          onPress={() => {
-            console.log("Open Meal Tray");
-          }}
-        >
-          <View>
-            <Text style={styles.mealTitle}>
-              🍽️ Your Meal
-            </Text>
-
-            <Text style={styles.mealSubtitle}>
-              {totalItems}{" "}
-              {totalItems === 1 ? "Dish" : "Dishes"} • ₹
-              {totalPrice.toFixed(0)}
-            </Text>
-          </View>
-
-          <Text style={styles.reviewText}>
-            Review →
-          </Text>
-        </Pressable>
-      )}
+<MealTray
+  onPress={() => {
+    mealTraySheetRef.current?.present();
+  }}
+/>
+<MealTraySheet
+  ref={mealTraySheetRef}
+/>
 
     </View>
   );

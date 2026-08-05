@@ -1,0 +1,37 @@
+import React from "react";
+import {
+  SafeAreaView,
+  StyleSheet,
+  ViewStyle,
+} from "react-native";
+
+import {
+  colors,
+  spacing,
+} from "@/theme";
+
+type Props = {
+  children: React.ReactNode;
+  style?: ViewStyle | ViewStyle[];
+};
+
+export default function AppContainer({
+  children,
+  style,
+}: Props) {
+  return (
+    <SafeAreaView
+      style={[styles.container, style]}
+    >
+      {children}
+    </SafeAreaView>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: colors.background,
+    paddingHorizontal: spacing.md,
+  },
+});
