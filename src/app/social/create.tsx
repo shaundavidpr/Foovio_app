@@ -388,7 +388,7 @@ export default function CreatePost() {
   return (
     <>
       <StatusBar style="dark" />
-      <LoadingView text="Loading food..." />
+      <LoadingSkeleton text="Loading food..." />
     </>
   );
 }

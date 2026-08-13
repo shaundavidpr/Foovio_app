@@ -71,7 +71,7 @@ export default function Home() {
         return;
       }
 
-      setFoods((data ?? []) as Dish[]);
+      setFoods((data ?? []) as unknown as Dish[]);
     } catch (error) {
       console.error("Home loading error:", error);
       setLoadError("Couldn't load dishes.");
