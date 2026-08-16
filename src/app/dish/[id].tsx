@@ -98,7 +98,7 @@ export default function DishDetails() {
         return;
       }
 
-      setDish(data as Dish);
+      setDish(data as unknown as Dish);
 
       const { data: postData, error: postError } =
         await supabase

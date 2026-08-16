@@ -43,7 +43,7 @@ export default function UserProfile() {
         ]);
 
       setProfile(profileData);
-      setPosts(postData ?? []);
+      setPosts((postData ?? []) as unknown as DishPost[]);
 
       const {
         data: { user },

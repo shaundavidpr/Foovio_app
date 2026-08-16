@@ -148,7 +148,7 @@ export default function Social() {
         };
       });
 
-      setPosts(postsWithProfiles as Post[]);
+      setPosts(postsWithProfiles as unknown as Post[]);
 
       if (user) {
         const { data: userLikes, error: likesError } =

@@ -10,7 +10,7 @@ type LoadingViewProps = {
   text?: string;
 };
 
-export default function LoadingView({
+export default function LoadingSkeleton({
   text = "Loading...",
 }: LoadingViewProps) {
   return (

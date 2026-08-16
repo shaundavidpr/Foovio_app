@@ -76,7 +76,7 @@ export default function Explore() {
         return;
       }
 
-      setDishes((data ?? []) as Dish[]);
+      setDishes((data ?? []) as unknown as Dish[]);
     } catch (error) {
       console.error("Explore error:", error);
       setLoadError("Couldn't load dishes.");
