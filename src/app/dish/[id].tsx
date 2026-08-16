@@ -119,7 +119,7 @@ export default function DishDetails() {
           });
 
       if (!postError) {
-        setPosts(postData ?? []);
+        setPosts((postData ?? []) as unknown as DishPost[]);
       }
     } catch (error) {
       console.error("Dish details error:", error);

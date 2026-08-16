@@ -13,7 +13,6 @@ import { supabase } from "../../lib/supabase";
 
 export default function UserProfile() {
   const { id } = useLocalSearchParams();
-
   const [loading, setLoading] = useState(true);
   const [profile, setProfile] = useState<any>(null);
   const [posts, setPosts] = useState<any[]>([]);
@@ -43,7 +42,7 @@ export default function UserProfile() {
         ]);
 
       setProfile(profileData);
-      setPosts((postData ?? []) as unknown as DishPost[]);
+      setPosts(postData ?? []);
 
       const {
         data: { user },
@@ -74,7 +73,7 @@ export default function UserProfile() {
           head: true,
         })
         .eq("follower_id", id);
-
+        
       setFollowers(followersCount ?? 0);
       setFollowing(followingCount ?? 0);
     } finally {

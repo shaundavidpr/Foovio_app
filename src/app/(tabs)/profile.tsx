@@ -87,7 +87,7 @@ useEffect(() => {
         ]);
 
       setProfile(profileData);
-      setPosts(postData ?? []);
+      setPosts((postData ?? []) as unknown as Post[]);
 
       const { data: savedData } = await supabase
         .from("saved_posts")

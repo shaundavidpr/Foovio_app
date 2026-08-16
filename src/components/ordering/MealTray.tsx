@@ -1,5 +1,6 @@
 import { Pressable, StyleSheet, Text, View } from "react-native";
 import { useMealTray } from "@/context/MealTrayContext";
+import { router } from "expo-router";
 
 type Props = {
   onPress: () => void;

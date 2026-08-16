@@ -3,11 +3,7 @@ import {
   BottomSheetView,
 } from "@gorhom/bottom-sheet";
 
-import {
-  ElementRef,
-  forwardRef,
-  useMemo,
-} from "react";
+import { forwardRef, useMemo } from "react";
 
 import {
   StyleSheet,
@@ -15,93 +11,130 @@ import {
   View,
   Pressable,
 } from "react-native";
+
 import { useMealTray } from "@/context/MealTrayContext";
-const MealTraySheet = forwardRef<
-  ElementRef<typeof BottomSheetModal>,
-  {}
->((props, ref) => {
-  const snapPoints = useMemo(
-    () => ["45%", "85%"],
-    []
-  );
+import { router } from "expo-router";
 
-  const {
-    meal,
-    totalPrice,
-    increaseQuantity,
-    decreaseQuantity,
-  } = useMealTray();
+const MealTraySheet = forwardRef<BottomSheetModal, {}>(
+  (_props, ref) => {
+    const snapPoints = useMemo(
+      () => ["45%", "85%"],
+      []
+    );
 
-  return (
-    <BottomSheetModal
-      ref={ref}
-      snapPoints={snapPoints}
-      backgroundStyle={styles.sheet}
-      handleIndicatorStyle={styles.handle}
-    >
-      <BottomSheetView style={styles.content}>
-        <Text style={styles.title}>
-          Your Meal
-        </Text>
+    const {
+      meal,
+      totalPrice,
+      increaseQuantity,
+      decreaseQuantity,
+    } = useMealTray();
 
-        {meal?.map((item) => (
-          <View
-            key={item.dishId}
-            style={styles.item}
-          >
-            <View style={{ flex: 1 }}>
-              <Text style={styles.name}>
-                {item.name}
-              </Text>
-
-              <Text style={styles.price}>
-                ₹{item.price}
-              </Text>
-            </View>
-
-            <View style={styles.quantityRow}>
-              <Pressable
-                onPress={() =>
-                  decreaseQuantity(item.dishId)
-                }
-                style={styles.buttonWrapper}
-              >
-                <Text style={styles.button}>
-                  −
-                </Text>
-              </Pressable>
-
-              <Text style={styles.quantity}>
-                {item.quantity}
-              </Text>
-
-              <Pressable
-                onPress={() =>
-                  increaseQuantity(item.dishId)
-                }
-                style={styles.buttonWrapper}
-              >
-                <Text style={styles.button}>
-                  +
-                </Text>
-              </Pressable>
-            </View>
-          </View>
-        ))}
-
-        <View style={styles.footer}>
-          <Text style={styles.total}>
-            Total
+    return (
+      <BottomSheetModal
+        ref={ref}
+        snapPoints={snapPoints}
+        backgroundStyle={styles.sheet}
+        handleIndicatorStyle={styles.handle}
+      >
+        <BottomSheetView style={styles.content}>
+          <Text style={styles.title}>
+            Your Meal
           </Text>
 
-          <Text style={styles.total}>
-            ₹{totalPrice}
-          </Text>
-        </View>
-      </BottomSheetView>
-    </BottomSheetModal>
-  );
+          {meal.length === 0 ? (
+            <Text style={styles.subtitle}>
+              Your meal tray is empty.
+            </Text>
+          ) : (
+            <>
+              {meal.map((item) => (
+                <View
+                  key={item.dishId}
+                  style={styles.item}
+                >
+                  <View style={{ flex: 1 }}>
+                    <Text style={styles.name}>
+                      {item.name}
+                    </Text>
+
+                    <Text style={styles.price}>
+                      ₹{item.price}
+                    </Text>
+                  </View>
+
+                  <View style={styles.quantityRow}>
+                    <Pressable
+                      onPress={() =>
+                        decreaseQuantity(item.dishId)
+                      }
+                      style={styles.buttonWrapper}
+                    >
+                      <Text style={styles.button}>
+                        −
+                      </Text>
+                    </Pressable>
+
+                    <Text style={styles.quantity}>
+                      {item.quantity}
+                    </Text>
+
+                    <Pressable
+                      onPress={() =>
+                        increaseQuantity(item.dishId)
+                      }
+                      style={styles.buttonWrapper}
+                    >
+                      <Text style={styles.button}>
+                        +
+                      </Text>
+                    </Pressable>
+                  </View>
+                </View>
+              ))}
+              <Pressable
+  onPress={() => {
+    ref && "current" in ref && ref.current?.dismiss();
+    router.push({
+  pathname: "/checkout",
 });
+  }}
+  style={{
+    marginTop: 30,
+    backgroundColor: "#29A9EA",
+    padding: 16,
+    borderRadius: 14,
+    alignItems: "center",
+  }}
+>
+  <Text
+    style={{
+      color: "#FFF",
+      fontWeight: "700",
+      fontSize: 16,
+    }}
+  >
+    Continue to Checkout
+  </Text>
+</Pressable>
+
+              <View style={styles.footer}>
+                <Text style={styles.total}>
+                  Total
+                </Text>
+
+                <Text style={styles.total}>
+                  ₹{totalPrice}
+                </Text>
+              </View>
+            </>
+          )}
+        </BottomSheetView>
+      </BottomSheetModal>
+    );
+  }
+);
+
+MealTraySheet.displayName = "MealTraySheet";
 
 export default MealTraySheet;
 
@@ -132,6 +165,7 @@ const styles = StyleSheet.create({
     color: "#666",
     fontSize: 15,
   },
+
   item: {
     flexDirection: "row",
     alignItems: "center",

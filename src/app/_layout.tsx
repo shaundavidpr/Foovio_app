@@ -11,7 +11,11 @@ export default function RootLayout() {
     <GestureHandlerRootView style={{ flex: 1 }}>
       <BottomSheetModalProvider>
         <MealTrayProvider>
-          <Stack />
+          <Stack
+            screenOptions={{
+              headerShown: false,
+            }}
+          />
         </MealTrayProvider>
       </BottomSheetModalProvider>
     </GestureHandlerRootView>
