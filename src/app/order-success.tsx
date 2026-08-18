@@ -31,38 +31,42 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    padding: 30,
-    backgroundColor: "#fff",
+    paddingHorizontal: 30,
+    backgroundColor: "#05080D",
   },
 
   emoji: {
-    fontSize: 80,
+    fontSize: 76,
   },
 
   title: {
+    color: "#F7FAFF",
     fontSize: 30,
-    fontWeight: "800",
+    fontWeight: "900",
     marginTop: 20,
+    letterSpacing: -0.5,
   },
 
   subtitle: {
     textAlign: "center",
-    color: "#666",
+    color: "#AAB4C2",
     marginTop: 12,
-    fontSize: 16,
+    fontSize: 12,
+    lineHeight: 20,
+    maxWidth: 300,
   },
 
   button: {
     marginTop: 40,
-    backgroundColor: "#29A9EA",
+    backgroundColor: "#2E9BFF",
     paddingHorizontal: 40,
     paddingVertical: 16,
-    borderRadius: 14,
+    borderRadius: 20,
   },
 
   buttonText: {
-    color: "#fff",
-    fontWeight: "700",
-    fontSize: 16,
+    color: "#F7FAFF",
+    fontWeight: "900",
+    fontSize: 13,
   },
 });

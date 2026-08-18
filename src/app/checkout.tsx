@@ -123,7 +123,7 @@ export default function Checkout() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <StatusBar style="dark" />
+      <StatusBar style="light" />
 
       <ScrollView
         contentContainerStyle={styles.content}
@@ -173,7 +173,7 @@ export default function Checkout() {
               setOrderType("pickup")
             }
           >
-            <Text>Pickup</Text>
+            <Text style={styles.optionText}>Pickup</Text>
           </Pressable>
 
           <Pressable
@@ -186,7 +186,7 @@ export default function Checkout() {
               setOrderType("delivery")
             }
           >
-            <Text>Delivery</Text>
+            <Text style={styles.optionText}>Delivery</Text>
           </Pressable>
         </View>
 
@@ -205,16 +205,16 @@ export default function Checkout() {
               setPaymentMethod("cash")
             }
           >
-            <Text>Cash</Text>
+            <Text style={styles.optionText}>Cash</Text>
           </Pressable>
 
           <Pressable
             style={styles.option}
             disabled
           >
-            <Text>
-              Online (Coming Soon)
-            </Text>
+            <Text style={styles.optionText}>
+  Online (Coming Soon)
+</Text>
           </Pressable>
         </View>
 
@@ -305,99 +305,145 @@ export default function Checkout() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#fff",
+    backgroundColor: "#05080D",
   },
 
   content: {
-    padding: 20,
-    paddingBottom: 40,
+    paddingHorizontal: 21,
+    paddingTop: 55,
+    paddingBottom: 50,
   },
 
   title: {
-    fontSize: 30,
-    fontWeight: "800",
-    marginBottom: 25,
+    color: "#F7FAFF",
+    fontSize: 34,
+    fontWeight: "900",
+    letterSpacing: -1,
+    marginBottom: 28,
   },
 
   section: {
-    marginTop: 20,
-    marginBottom: 10,
-    fontWeight: "700",
-    fontSize: 17,
+    color: "#F7FAFF",
+    marginTop: 24,
+    marginBottom: 11,
+    fontWeight: "900",
+    fontSize: 16,
   },
 
   item: {
     flexDirection: "row",
     justifyContent: "space-between",
-    marginBottom: 16,
+    alignItems: "center",
+    backgroundColor: "#0B111A",
+    borderRadius: 18,
+    borderWidth: 1,
+    borderColor: "rgba(255,255,255,0.055)",
+    padding: 16,
+    marginBottom: 10,
   },
 
   itemName: {
-    fontSize: 16,
-    fontWeight: "600",
+    color: "#F7FAFF",
+    fontSize: 14,
+    fontWeight: "800",
   },
 
   itemQty: {
-    color: "#666",
-    marginTop: 4,
+    color: "#7F8C9D",
+    fontSize: 10,
+    marginTop: 5,
   },
 
   itemPrice: {
-    fontWeight: "700",
+    color: "#73C7FF",
+    fontSize: 13,
+    fontWeight: "900",
   },
 
   row: {
     flexDirection: "row",
-    gap: 12,
+    gap: 10,
   },
 
   option: {
     flex: 1,
-    padding: 15,
+    minHeight: 52,
+    paddingHorizontal: 14,
+    paddingVertical: 14,
     borderWidth: 1,
-    borderColor: "#DDD",
-    borderRadius: 12,
+    borderColor: "rgba(255,255,255,0.08)",
+    backgroundColor: "#0B111A",
+    borderRadius: 16,
     alignItems: "center",
+    justifyContent: "center",
   },
 
   selected: {
-    borderColor: "#29A9EA",
-    backgroundColor: "#EAF8FF",
+    borderColor: "#2E9BFF",
+    backgroundColor: "rgba(46,155,255,0.12)",
+  },
+
+  optionText: {
+    color: "#DCE5F0",
+    fontSize: 11,
+    fontWeight: "800",
   },
 
   input: {
     borderWidth: 1,
-    borderColor: "#DDD",
-    borderRadius: 12,
-    padding: 14,
+    borderColor: "rgba(255,255,255,0.08)",
+    backgroundColor: "#0B111A",
+    borderRadius: 16,
+    paddingHorizontal: 15,
+    paddingVertical: 14,
+    color: "#F7FAFF",
+    fontSize: 12,
+    minHeight: 50,
   },
 
   summary: {
     marginTop: 30,
+    backgroundColor: "#0B111A",
+    borderRadius: 22,
+    borderWidth: 1,
+    borderColor: "rgba(255,255,255,0.055)",
+    padding: 19,
   },
 
   summaryRow: {
     flexDirection: "row",
     justifyContent: "space-between",
-    marginBottom: 12,
+    marginBottom: 13,
+  },
+
+  summaryRowText: {
+    color: "#7F8C9D",
+    fontSize: 11,
+  },
+
+  summaryValue: {
+    color: "#DCE5F0",
+    fontSize: 11,
+    fontWeight: "700",
   },
 
   total: {
-    fontSize: 18,
-    fontWeight: "800",
+    color: "#F7FAFF",
+    fontSize: 19,
+    fontWeight: "900",
   },
 
   button: {
-    marginTop: 30,
-    backgroundColor: "#29A9EA",
-    padding: 18,
-    borderRadius: 14,
+    marginTop: 24,
+    backgroundColor: "#2E9BFF",
+    paddingVertical: 17,
+    borderRadius: 20,
     alignItems: "center",
   },
 
   buttonText: {
-    color: "#FFF",
-    fontSize: 17,
-    fontWeight: "700",
+    color: "#F7FAFF",
+    fontSize: 14,
+    fontWeight: "900",
   },
 });

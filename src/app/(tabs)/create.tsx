@@ -391,7 +391,7 @@ export default function Create() {
   if (loading) {
     return (
       <View style={styles.loadingContainer}>
-        <StatusBar style="dark" />
+        <StatusBar style="light" />
 
         <ActivityIndicator
           size="large"
@@ -411,7 +411,7 @@ export default function Create() {
 
   return (
     <View style={styles.container}>
-      <StatusBar style="dark" />
+      <StatusBar style="light" />
 
       <ScrollView
         showsVerticalScrollIndicator={false}
@@ -676,63 +676,63 @@ export default function Create() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#FFFFFF",
+    backgroundColor: "#05080D",
   },
 
   loadingContainer: {
     flex: 1,
-    backgroundColor: "#FFFFFF",
+    backgroundColor: "#05080D",
     justifyContent: "center",
     alignItems: "center",
   },
 
   loadingText: {
-    color: "#888888",
-    fontSize: 13,
+    color: "#7F8C9D",
+    fontSize: 11,
     marginTop: 12,
   },
 
   content: {
-    paddingHorizontal: 22,
+    paddingHorizontal: 21,
     paddingTop: 55,
     paddingBottom: 50,
   },
 
   title: {
-    color: "#111111",
-    fontSize: 32,
-    fontWeight: "800",
+    color: "#F7FAFF",
+    fontSize: 34,
+    fontWeight: "900",
     letterSpacing: -1,
   },
 
   subtitle: {
-    color: "#777777",
-    fontSize: 15,
-    marginTop: 6,
+    color: "#7F8C9D",
+    fontSize: 11,
+    marginTop: 7,
     marginBottom: 30,
   },
 
   label: {
-    color: "#999999",
-    fontSize: 10,
-    fontWeight: "800",
+    color: "#73C7FF",
+    fontSize: 9,
+    fontWeight: "900",
     letterSpacing: 1.4,
     marginBottom: 12,
-    marginTop: 25,
+    marginTop: 27,
   },
 
   helperText: {
-    color: "#999999",
-    fontSize: 13,
+    color: "#7F8C9D",
+    fontSize: 10,
   },
 
   photoBox: {
     height: 190,
-    borderWidth: 1.5,
+    borderWidth: 1,
     borderStyle: "dashed",
-    borderColor: "#DADADA",
-    borderRadius: 20,
-    backgroundColor: "#FAFAFA",
+    borderColor: "rgba(113,199,255,0.18)",
+    borderRadius: 22,
+    backgroundColor: "#0B111A",
     justifyContent: "center",
     alignItems: "center",
   },
@@ -742,37 +742,37 @@ const styles = StyleSheet.create({
   },
 
   photoIcon: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
-    backgroundColor: "#EAF7FD",
+    width: 52,
+    height: 52,
+    borderRadius: 26,
+    backgroundColor: "rgba(46,155,255,0.12)",
     justifyContent: "center",
     alignItems: "center",
   },
 
   photoIconText: {
-    color: "#29A9EA",
-    fontSize: 27,
+    color: "#73C7FF",
+    fontSize: 28,
   },
 
   photoTitle: {
-    color: "#111111",
+    color: "#F7FAFF",
     fontSize: 15,
-    fontWeight: "700",
-    marginTop: 12,
+    fontWeight: "900",
+    marginTop: 13,
   },
 
   photoDescription: {
-    color: "#888888",
-    fontSize: 12,
+    color: "#7F8C9D",
+    fontSize: 10,
     marginTop: 5,
   },
 
   imagePreview: {
     width: "100%",
     height: 250,
-    borderRadius: 20,
-    backgroundColor: "#F2F2F2",
+    borderRadius: 22,
+    backgroundColor: "#101925",
   },
 
   photoActions: {
@@ -782,29 +782,33 @@ const styles = StyleSheet.create({
   },
 
   changePhotoButton: {
-    backgroundColor: "#EAF7FD",
+    backgroundColor: "rgba(46,155,255,0.12)",
     paddingHorizontal: 15,
     paddingVertical: 10,
-    borderRadius: 11,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: "rgba(113,199,255,0.1)",
   },
 
   changePhotoText: {
-    color: "#168CC5",
-    fontSize: 12,
-    fontWeight: "700",
+    color: "#73C7FF",
+    fontSize: 10,
+    fontWeight: "900",
   },
 
   removePhotoButton: {
-    backgroundColor: "#F5F5F5",
+    backgroundColor: "#0B111A",
     paddingHorizontal: 15,
     paddingVertical: 10,
-    borderRadius: 11,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: "rgba(255,255,255,0.055)",
   },
 
   removePhotoText: {
-    color: "#666666",
-    fontSize: 12,
-    fontWeight: "700",
+    color: "#7F8C9D",
+    fontSize: 10,
+    fontWeight: "800",
   },
 
   options: {
@@ -814,31 +818,33 @@ const styles = StyleSheet.create({
 
   option: {
     borderWidth: 1,
-    borderColor: "#E5E5E5",
+    borderColor: "rgba(255,255,255,0.055)",
     borderRadius: 100,
     paddingHorizontal: 16,
     paddingVertical: 11,
-    backgroundColor: "#FFFFFF",
+    backgroundColor: "#0B111A",
   },
 
   optionSelected: {
-    backgroundColor: "#29A9EA",
-    borderColor: "#29A9EA",
+    backgroundColor: "#2E9BFF",
+    borderColor: "#2E9BFF",
   },
 
   optionText: {
-    color: "#555555",
-    fontSize: 13,
-    fontWeight: "600",
+    color: "#7F8C9D",
+    fontSize: 10,
+    fontWeight: "800",
   },
 
   optionTextSelected: {
-    color: "#FFFFFF",
+    color: "#F7FAFF",
   },
 
   ratingContainer: {
-    backgroundColor: "#F7F7F7",
-    borderRadius: 17,
+    backgroundColor: "#0B111A",
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: "rgba(255,255,255,0.055)",
     padding: 18,
     flexDirection: "row",
     alignItems: "center",
@@ -851,41 +857,43 @@ const styles = StyleSheet.create({
   },
 
   star: {
-    color: "#D7D7D7",
+    color: "#4D5867",
     fontSize: 29,
   },
 
   starSelected: {
-    color: "#29A9EA",
+    color: "#FFD166",
   },
 
   ratingLabel: {
-    color: "#777777",
-    fontSize: 12,
-    fontWeight: "600",
+    color: "#7F8C9D",
+    fontSize: 10,
+    fontWeight: "700",
   },
 
   textArea: {
     minHeight: 140,
-    borderRadius: 17,
-    backgroundColor: "#F7F7F7",
+    borderRadius: 20,
+    backgroundColor: "#0B111A",
+    borderWidth: 1,
+    borderColor: "rgba(255,255,255,0.055)",
     paddingHorizontal: 16,
     paddingVertical: 15,
-    color: "#111111",
-    fontSize: 14,
+    color: "#F7FAFF",
+    fontSize: 13,
     lineHeight: 21,
   },
 
   characterCount: {
-    color: "#AAAAAA",
-    fontSize: 11,
+    color: "#4D5867",
+    fontSize: 9,
     textAlign: "right",
     marginTop: 7,
   },
 
   publishButton: {
-    backgroundColor: "#29A9EA",
-    borderRadius: 17,
+    backgroundColor: "#2E9BFF",
+    borderRadius: 22,
     paddingVertical: 18,
     alignItems: "center",
     justifyContent: "center",
@@ -894,7 +902,8 @@ const styles = StyleSheet.create({
   },
 
   publishButtonPressed: {
-    opacity: 0.85,
+    opacity: 0.82,
+    transform: [{ scale: 0.99 }],
   },
 
   publishButtonDisabled: {
@@ -908,8 +917,8 @@ const styles = StyleSheet.create({
   },
 
   publishText: {
-    color: "#FFFFFF",
-    fontSize: 16,
-    fontWeight: "800",
+    color: "#F7FAFF",
+    fontSize: 14,
+    fontWeight: "900",
   },
 });

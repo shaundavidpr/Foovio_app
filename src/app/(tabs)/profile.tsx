@@ -123,14 +123,16 @@ useEffect(() => {
 
   return (
     <View style={styles.container}>
-      <StatusBar style="dark" />
+      <StatusBar style="light" />
 
       <ScrollView
       refreshControl={
       <RefreshControl
-      refreshing={refreshing}
-      onRefresh={onRefresh}
-      />
+  refreshing={refreshing}
+  onRefresh={onRefresh}
+  tintColor="#73C7FF"
+  colors={["#73C7FF"]}
+/>
     }
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.content}
@@ -304,7 +306,7 @@ useEffect(() => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#FFFFFF",
+    backgroundColor: "#05080D",
   },
 
   content: {
@@ -313,97 +315,106 @@ const styles = StyleSheet.create({
   },
 
   topBar: {
-    paddingHorizontal: 22,
+    paddingHorizontal: 21,
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
   },
 
   pageTitle: {
-    color: "#111111",
-    fontSize: 30,
-    fontWeight: "800",
-    letterSpacing: -0.8,
+    color: "#F7FAFF",
+    fontSize: 34,
+    fontWeight: "900",
+    letterSpacing: -1,
   },
 
   settingsButton: {
-    width: 42,
-    height: 42,
-    borderRadius: 21,
-    backgroundColor: "#F5F5F5",
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: "#0B111A",
+    borderWidth: 1,
+    borderColor: "rgba(255,255,255,0.055)",
     justifyContent: "center",
     alignItems: "center",
   },
 
   settingsIcon: {
+    color: "#DCE5F0",
     fontSize: 19,
   },
 
   profileSection: {
     alignItems: "center",
-    paddingHorizontal: 22,
-    marginTop: 25,
+    paddingHorizontal: 21,
+    marginTop: 28,
   },
 
   avatar: {
     width: 94,
     height: 94,
     borderRadius: 47,
-    backgroundColor: "#EAF7FD",
+    backgroundColor: "rgba(46,155,255,0.13)",
+    borderWidth: 2,
+    borderColor: "rgba(113,199,255,0.16)",
     justifyContent: "center",
     alignItems: "center",
   },
 
   avatarText: {
-    color: "#29A9EA",
+    color: "#73C7FF",
     fontSize: 34,
-    fontWeight: "800",
+    fontWeight: "900",
   },
 
   name: {
-    color: "#111111",
+    color: "#F7FAFF",
     fontSize: 23,
-    fontWeight: "800",
+    fontWeight: "900",
     marginTop: 14,
   },
 
   username: {
-    color: "#888888",
-    fontSize: 13,
-    marginTop: 3,
+    color: "#7F8C9D",
+    fontSize: 11,
+    marginTop: 4,
   },
 
   bio: {
-    color: "#555555",
-    fontSize: 14,
+    color: "#AAB4C2",
+    fontSize: 12,
+    lineHeight: 19,
     textAlign: "center",
     marginTop: 12,
+    maxWidth: 320,
   },
 
   editButton: {
+    backgroundColor: "rgba(46,155,255,0.11)",
     borderWidth: 1,
-    borderColor: "#E2E2E2",
-    borderRadius: 12,
+    borderColor: "rgba(113,199,255,0.12)",
+    borderRadius: 18,
     paddingHorizontal: 22,
     paddingVertical: 10,
     marginTop: 17,
   },
 
   editButtonText: {
-    color: "#222222",
-    fontSize: 13,
-    fontWeight: "700",
+    color: "#73C7FF",
+    fontSize: 11,
+    fontWeight: "900",
   },
 
   stats: {
-    marginHorizontal: 22,
+    marginHorizontal: 21,
     marginTop: 28,
-    paddingVertical: 18,
+    paddingVertical: 19,
     flexDirection: "row",
     alignItems: "center",
-    borderTopWidth: 1,
-    borderBottomWidth: 1,
-    borderColor: "#EEEEEE",
+    backgroundColor: "#0B111A",
+    borderRadius: 22,
+    borderWidth: 1,
+    borderColor: "rgba(255,255,255,0.055)",
   },
 
   stat: {
@@ -412,29 +423,32 @@ const styles = StyleSheet.create({
   },
 
   statNumber: {
-    color: "#111111",
-    fontSize: 17,
-    fontWeight: "800",
+    color: "#F7FAFF",
+    fontSize: 18,
+    fontWeight: "900",
   },
 
   statLabel: {
-    color: "#888888",
-    fontSize: 11,
+    color: "#7F8C9D",
+    fontSize: 9,
+    fontWeight: "700",
     marginTop: 4,
   },
 
   statDivider: {
     width: 1,
     height: 30,
-    backgroundColor: "#EEEEEE",
+    backgroundColor: "rgba(255,255,255,0.08)",
   },
 
   activityCard: {
-    marginHorizontal: 22,
-    marginTop: 22,
-    backgroundColor: "#F7F7F7",
-    borderRadius: 18,
-    paddingVertical: 18,
+    marginHorizontal: 21,
+    marginTop: 17,
+    backgroundColor: "#0B111A",
+    borderRadius: 22,
+    borderWidth: 1,
+    borderColor: "rgba(255,255,255,0.055)",
+    paddingVertical: 20,
     flexDirection: "row",
   },
 
@@ -444,84 +458,98 @@ const styles = StyleSheet.create({
   },
 
   activityNumber: {
-    color: "#168CC5",
-    fontSize: 17,
-    fontWeight: "800",
+  color: "#2E9BFF",
+    fontSize: 18,
+    fontWeight: "900",
   },
 
   activityLabel: {
-    color: "#777777",
-    fontSize: 10,
+    color: "#7F8C9D",
+    fontSize: 9,
+    fontWeight: "700",
     marginTop: 4,
   },
 
   tabs: {
     flexDirection: "row",
+    marginHorizontal: 21,
     marginTop: 30,
-    borderBottomWidth: 1,
-    borderBottomColor: "#EEEEEE",
+    backgroundColor: "#0B111A",
+    borderRadius: 18,
+    padding: 4,
+    borderWidth: 1,
+    borderColor: "rgba(255,255,255,0.055)",
   },
 
   tab: {
     flex: 1,
-    paddingVertical: 14,
+    paddingVertical: 11,
     alignItems: "center",
+    borderRadius: 14,
   },
 
   activeTab: {
-    borderBottomWidth: 2,
-    borderBottomColor: "#29A9EA",
+    backgroundColor: "#2E9BFF",
   },
 
   tabText: {
-    color: "#999999",
-    fontSize: 13,
-    fontWeight: "700",
+    color: "#7F8C9D",
+    fontSize: 10,
+    fontWeight: "800",
   },
 
   activeTabText: {
-    color: "#111111",
+    color: "#F7FAFF",
+    fontWeight: "900",
   },
 
   grid: {
     flexDirection: "row",
     flexWrap: "wrap",
-    paddingTop: 2,
+    paddingHorizontal: 16,
+    paddingTop: 17,
   },
 
   gridItem: {
     width: "33.333%",
     aspectRatio: 1,
-    padding: 1,
+    padding: 2,
   },
 
-  gridImage: {
-    width: "100%",
-    height: "100%",
-    backgroundColor: "#EEEEEE",
-  },
+gridImage: {
+  width: "100%",
+  height: "100%",
+  backgroundColor: "#101925",
+  borderRadius: 12,
+},
 
   empty: {
+    marginHorizontal: 21,
     alignItems: "center",
     paddingHorizontal: 30,
-    paddingTop: 65,
+    paddingVertical: 45,
+    marginTop: 17,
+    backgroundColor: "#0B111A",
+    borderRadius: 22,
+    borderWidth: 1,
+    borderColor: "rgba(255,255,255,0.055)",
   },
 
   emptyIcon: {
-    color: "#BBBBBB",
+    color: "#73C7FF",
     fontSize: 38,
   },
 
   emptyTitle: {
-    color: "#111111",
+    color: "#F7FAFF",
     fontSize: 17,
-    fontWeight: "800",
+    fontWeight: "900",
     marginTop: 13,
   },
 
   emptyText: {
-    color: "#888888",
-    fontSize: 13,
+    color: "#7F8C9D",
+    fontSize: 10,
     lineHeight: 19,
     textAlign: "center",
     marginTop: 7,

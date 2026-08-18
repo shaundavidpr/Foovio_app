@@ -263,7 +263,7 @@ if (post && post.user_id !== user.id) {
           : undefined
       }
     >
-      <StatusBar style="dark" />
+      <StatusBar style="light" />
 
       {/* Header */}
 
@@ -287,9 +287,9 @@ if (post && post.user_id !== user.id) {
       {loading ? (
         <View style={styles.loading}>
           <ActivityIndicator
-            size="large"
-            color="#29A9EA"
-          />
+  size="large"
+  color="#73C7FF"
+/>
         </View>
       ) : (
         <ScrollView
@@ -402,7 +402,7 @@ if (post && post.user_id !== user.id) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#FFFFFF",
+    backgroundColor: "#05080D",
   },
 
   header: {
@@ -410,7 +410,7 @@ const styles = StyleSheet.create({
     paddingBottom: 15,
     paddingHorizontal: 20,
     borderBottomWidth: 1,
-    borderBottomColor: "#EEEEEE",
+    borderBottomColor: "rgba(255,255,255,0.055)",
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
@@ -419,19 +419,24 @@ const styles = StyleSheet.create({
   backButton: {
     width: 40,
     height: 40,
+    borderRadius: 20,
+    backgroundColor: "#0B111A",
+    borderWidth: 1,
+    borderColor: "rgba(255,255,255,0.08)",
     justifyContent: "center",
+    alignItems: "center",
   },
 
   back: {
-    color: "#111111",
-    fontSize: 34,
-    lineHeight: 36,
+    color: "#F7FAFF",
+    fontSize: 29,
+    lineHeight: 32,
   },
 
   title: {
-    color: "#111111",
+    color: "#F7FAFF",
     fontSize: 18,
-    fontWeight: "800",
+    fontWeight: "900",
   },
 
   headerSpace: {
@@ -442,6 +447,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
+    backgroundColor: "#05080D",
   },
 
   commentList: {
@@ -449,122 +455,134 @@ const styles = StyleSheet.create({
   },
 
   commentContent: {
-    paddingHorizontal: 20,
-    paddingTop: 20,
-    paddingBottom: 30,
+    paddingHorizontal: 18,
+    paddingTop: 18,
+    paddingBottom: 25,
   },
 
   commentRow: {
     flexDirection: "row",
-    marginBottom: 22,
+    marginBottom: 18,
   },
 
   avatar: {
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: "#EAF7FD",
+    backgroundColor: "rgba(46,155,255,0.13)",
+    borderWidth: 1,
+    borderColor: "rgba(113,199,255,0.10)",
     justifyContent: "center",
     alignItems: "center",
   },
 
   avatarText: {
-    color: "#29A9EA",
-    fontSize: 14,
-    fontWeight: "800",
+    color: "#73C7FF",
+    fontSize: 13,
+    fontWeight: "900",
   },
 
   commentBody: {
     flex: 1,
-    marginLeft: 11,
+    marginLeft: 12,
+    backgroundColor: "#0B111A",
+    borderRadius: 17,
+    borderWidth: 1,
+    borderColor: "rgba(255,255,255,0.055)",
+    paddingHorizontal: 14,
+    paddingVertical: 12,
   },
 
   commentHeader: {
     flexDirection: "row",
     alignItems: "center",
+    justifyContent: "space-between",
   },
 
   username: {
-    color: "#111111",
-    fontSize: 13,
-    fontWeight: "800",
+    color: "#F7FAFF",
+    fontSize: 12,
+    fontWeight: "900",
   },
 
   time: {
-    color: "#AAAAAA",
-    fontSize: 11,
-    marginLeft: 8,
+    color: "#6F7B8B",
+    fontSize: 9,
   },
 
   commentText: {
-    color: "#333333",
-    fontSize: 14,
-    lineHeight: 20,
-    marginTop: 4,
+    color: "#AAB4C2",
+    fontSize: 12,
+    lineHeight: 19,
+    marginTop: 7,
   },
 
   empty: {
     alignItems: "center",
     paddingTop: 100,
+    paddingHorizontal: 30,
   },
 
   emptyIcon: {
-    fontSize: 36,
+    fontSize: 42,
   },
 
   emptyTitle: {
-    color: "#111111",
-    fontSize: 18,
-    fontWeight: "700",
-    marginTop: 12,
+    color: "#F7FAFF",
+    fontSize: 16,
+    fontWeight: "900",
+    marginTop: 15,
   },
 
   emptyText: {
-    color: "#888888",
-    fontSize: 13,
-    marginTop: 5,
+    color: "#6F7B8B",
+    fontSize: 11,
+    marginTop: 6,
+    textAlign: "center",
   },
 
   inputArea: {
-    borderTopWidth: 1,
-    borderTopColor: "#EEEEEE",
-    paddingHorizontal: 16,
-    paddingTop: 11,
-    paddingBottom: 20,
     flexDirection: "row",
     alignItems: "flex-end",
+    paddingHorizontal: 16,
+    paddingTop: 10,
+    paddingBottom: 15,
+    backgroundColor: "#060A10",
+    borderTopWidth: 1,
+    borderTopColor: "rgba(255,255,255,0.055)",
     gap: 10,
-    backgroundColor: "#FFFFFF",
   },
 
   input: {
     flex: 1,
-    minHeight: 46,
+    minHeight: 48,
     maxHeight: 110,
-    backgroundColor: "#F5F5F5",
-    borderRadius: 23,
-    paddingHorizontal: 17,
+    backgroundColor: "#0D131C",
+    borderWidth: 1,
+    borderColor: "rgba(255,255,255,0.08)",
+    borderRadius: 18,
+    paddingHorizontal: 15,
     paddingVertical: 12,
-    color: "#111111",
-    fontSize: 14,
+    color: "#F7FAFF",
+    fontSize: 12,
   },
 
   sendButton: {
-    width: 46,
-    height: 46,
-    borderRadius: 23,
-    backgroundColor: "#29A9EA",
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    backgroundColor: "#2E9BFF",
     justifyContent: "center",
     alignItems: "center",
   },
 
   sendDisabled: {
-    opacity: 0.4,
+    opacity: 0.35,
   },
 
   sendText: {
-    color: "#FFFFFF",
+    color: "#F7FAFF",
     fontSize: 23,
-    fontWeight: "800",
+    fontWeight: "900",
   },
 });

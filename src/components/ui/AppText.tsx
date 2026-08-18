@@ -39,34 +39,37 @@ export default function AppText({
 const styles = StyleSheet.create({
   hero: {
     fontSize: typography.hero,
-    fontWeight: "700",
-    color: colors.textPrimary,
+    fontWeight: "900",
+    color: colors.white,
   },
 
   title: {
     fontSize: typography.title,
-    fontWeight: "700",
-    color: colors.textPrimary,
+    fontWeight: "900",
+    color: colors.white,
   },
 
   heading: {
     fontSize: typography.heading,
-    fontWeight: "600",
-    color: colors.textPrimary,
+    fontWeight: "800",
+    color: colors.white,
   },
 
   body: {
     fontSize: typography.body,
-    color: colors.textPrimary,
+    fontWeight: "600",
+    color: colors.text,
   },
 
   small: {
     fontSize: typography.small,
-    color: colors.textSecondary,
+    fontWeight: "700",
+    color: colors.muted,
   },
 
   caption: {
     fontSize: typography.caption,
-    color: colors.textMuted,
+    fontWeight: "800",
+    color: colors.muted,
   },
 });

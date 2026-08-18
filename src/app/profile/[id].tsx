@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useLocalSearchParams , router} from "expo-router";
+import { useLocalSearchParams, router } from "expo-router";
 import {
   SafeAreaView,
   View,
@@ -8,6 +8,7 @@ import {
   ScrollView,
   ActivityIndicator,
   Pressable,
+  StyleSheet,
 } from "react-native";
 import { supabase } from "../../lib/supabase";
 
@@ -73,7 +74,7 @@ export default function UserProfile() {
           head: true,
         })
         .eq("follower_id", id);
-        
+
       setFollowers(followersCount ?? 0);
       setFollowing(followingCount ?? 0);
     } finally {
@@ -104,11 +105,12 @@ export default function UserProfile() {
           follower_id: user.id,
           following_id: id,
         });
-        await supabase.from("notifications").insert({
-  user_id: id,
-  actor_id: user.id,
-  type: "follow",
-});
+
+      await supabase.from("notifications").insert({
+        user_id: id,
+        actor_id: user.id,
+        type: "follow",
+      });
 
       setIsFollowing(true);
       setFollowers((c) => c + 1);
@@ -117,147 +119,472 @@ export default function UserProfile() {
 
   if (loading) {
     return (
-      <View
-        style={{
-          flex: 1,
-          justifyContent: "center",
-          alignItems: "center",
-        }}
-      >
-        <ActivityIndicator size="large" />
+      <View style={styles.loading}>
+        <ActivityIndicator
+          size="large"
+          color="#73C7FF"
+        />
       </View>
     );
   }
 
+  if (!profile) {
+    return (
+      <SafeAreaView style={styles.container}>
+        <View style={styles.notFound}>
+          <Text style={styles.notFoundIcon}>?</Text>
+
+          <Text style={styles.notFoundTitle}>
+            User not found
+          </Text>
+
+          <Text style={styles.notFoundText}>
+            This profile may no longer be available.
+          </Text>
+
+          <Pressable
+            style={styles.backHomeButton}
+            onPress={() => router.back()}
+          >
+            <Text style={styles.backHomeText}>
+              Go Back
+            </Text>
+          </Pressable>
+        </View>
+      </SafeAreaView>
+    );
+  }
+
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: "#fff" }}>
-      <ScrollView>
-
-        <View
-          style={{
-            alignItems: "center",
-            marginTop: 30,
-          }}
+    <SafeAreaView style={styles.container}>
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={styles.content}
+      >
+        {/* Back */}
+        <Pressable
+          style={styles.backButton}
+          onPress={() => router.back()}
         >
-          <Image
-            source={{
-              uri: profile?.avatar_url,
-            }}
-            style={{
-              width: 100,
-              height: 100,
-              borderRadius: 50,
-              backgroundColor: "#eee",
-            }}
-          />
+          <Text style={styles.backText}>‹</Text>
+        </Pressable>
 
-          <Text
-            style={{
-              fontSize: 24,
-              fontWeight: "700",
-              marginTop: 15,
-            }}
-          >
-            {profile?.name}
+        {/* Profile */}
+        <View style={styles.profileSection}>
+          {profile?.avatar_url ? (
+            <Image
+              source={{
+                uri: profile.avatar_url,
+              }}
+              style={styles.avatar}
+            />
+          ) : (
+            <View style={styles.avatar}>
+              <Text style={styles.avatarText}>
+                {profile?.name
+                  ?.charAt(0)
+                  .toUpperCase() ?? "?"}
+              </Text>
+            </View>
+          )}
+
+          <Text style={styles.name}>
+            {profile?.name || "No Name"}
           </Text>
 
-          <Text
-            style={{
-              color: "#666",
-              marginTop: 5,
-            }}
-          >
-            @{profile?.username}
+          <Text style={styles.username}>
+            @{profile?.username || "username"}
           </Text>
 
-          <Text
-            style={{
-              marginTop: 15,
-              paddingHorizontal: 30,
-              textAlign: "center",
-            }}
-          >
-            {profile?.bio}
-          </Text>
+          {profile?.bio ? (
+            <Text style={styles.bio}>
+              {profile.bio}
+            </Text>
+          ) : null}
 
-          <View
-            style={{
-              flexDirection: "row",
-              justifyContent: "space-evenly",
-              marginTop: 25,
-              width: "100%",
-            }}
-          >
-            <View style={{ alignItems: "center" }}>
-              <Text style={{ fontWeight: "700", fontSize: 18 }}>
+          {/* Stats */}
+          <View style={styles.stats}>
+            <View style={styles.stat}>
+              <Text style={styles.statNumber}>
                 {posts.length}
               </Text>
-              <Text>Posts</Text>
+
+              <Text style={styles.statLabel}>
+                Posts
+              </Text>
             </View>
 
-            <View style={{ alignItems: "center" }}>
-              <Text style={{ fontWeight: "700", fontSize: 18 }}>
+            <View style={styles.divider} />
+
+            <View style={styles.stat}>
+              <Text style={styles.statNumber}>
                 {followers}
               </Text>
-              <Text>Followers</Text>
+
+              <Text style={styles.statLabel}>
+                Followers
+              </Text>
             </View>
 
-            <View style={{ alignItems: "center" }}>
-              <Text style={{ fontWeight: "700", fontSize: 18 }}>
+            <View style={styles.divider} />
+
+            <View style={styles.stat}>
+              <Text style={styles.statNumber}>
                 {following}
               </Text>
-              <Text>Following</Text>
+
+              <Text style={styles.statLabel}>
+                Following
+              </Text>
             </View>
           </View>
 
+          {/* Follow */}
           <Pressable
             onPress={toggleFollow}
-            style={{
-              marginTop: 25,
-              backgroundColor: isFollowing ? "#DDD" : "#29A9EA",
-              paddingHorizontal: 40,
-              paddingVertical: 12,
-              borderRadius: 12,
-            }}
+            style={[
+              styles.followButton,
+              isFollowing &&
+                styles.followingButton,
+            ]}
           >
             <Text
-              style={{
-                color: isFollowing ? "#111" : "#FFF",
-                fontWeight: "700",
-              }}
+              style={[
+                styles.followText,
+                isFollowing &&
+                  styles.followingText,
+              ]}
             >
-              {isFollowing ? "Following" : "Follow"}
+              {isFollowing
+                ? "Following"
+                : "Follow"}
             </Text>
           </Pressable>
-
-          <View
-  style={{
-    marginTop: 25,
-    paddingHorizontal: 15,
-  }}
->
- {posts.map((post) => (
-  <Pressable
-    key={post.id}
-    onPress={() => router.push(`/social/post/${post.id}`)}
-  >
-    <Image
-      source={{ uri: post.image_url }}
-      style={{
-        width: "100%",
-        height: 250,
-        borderRadius: 15,
-        marginBottom: 15,
-        backgroundColor: "#EEE",
-      }}
-      resizeMode="cover"
-    />
-  </Pressable>
-))}
-</View>
         </View>
 
+        {/* Posts */}
+        <View style={styles.postsSection}>
+          <Text style={styles.sectionTitle}>
+            Posts
+          </Text>
+
+          {posts.length > 0 ? (
+            <View style={styles.grid}>
+              {posts.map((post) => (
+                <Pressable
+                  key={post.id}
+                  onPress={() =>
+                    router.push(
+                      `/social/post/${post.id}`
+                    )
+                  }
+                  style={styles.gridItem}
+                >
+                  <Image
+                    source={{
+                      uri: post.image_url,
+                    }}
+                    style={styles.gridImage}
+                    resizeMode="cover"
+                  />
+                </Pressable>
+              ))}
+            </View>
+          ) : (
+            <View style={styles.empty}>
+              <Text style={styles.emptyIcon}>
+                ▦
+              </Text>
+
+              <Text style={styles.emptyTitle}>
+                No posts yet
+              </Text>
+
+              <Text style={styles.emptyText}>
+                Posts shared by this user will
+                appear here.
+              </Text>
+            </View>
+          )}
+        </View>
       </ScrollView>
     </SafeAreaView>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: "#05080D",
+  },
+
+  loading: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "#05080D",
+  },
+
+  content: {
+    paddingTop: 18,
+    paddingBottom: 50,
+  },
+
+  /* Back */
+
+  backButton: {
+    marginLeft: 18,
+    width: 42,
+    height: 42,
+    borderRadius: 21,
+    backgroundColor: "#0B111A",
+    borderWidth: 1,
+    borderColor:
+      "rgba(255,255,255,0.055)",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+
+  backText: {
+    color: "#F7FAFF",
+    fontSize: 32,
+    lineHeight: 34,
+    marginTop: -3,
+  },
+
+  /* Profile */
+
+  profileSection: {
+    alignItems: "center",
+    paddingHorizontal: 21,
+    marginTop: 18,
+  },
+
+  avatar: {
+    width: 100,
+    height: 100,
+    borderRadius: 50,
+    backgroundColor:
+      "rgba(46,155,255,0.13)",
+    borderWidth: 2,
+    borderColor:
+      "rgba(113,199,255,0.16)",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+
+  avatarText: {
+    color: "#73C7FF",
+    fontSize: 36,
+    fontWeight: "900",
+  },
+
+  name: {
+    color: "#F7FAFF",
+    fontSize: 24,
+    fontWeight: "900",
+    marginTop: 15,
+  },
+
+  username: {
+    color: "#7F8C9D",
+    fontSize: 11,
+    marginTop: 4,
+  },
+
+  bio: {
+    color: "#AAB4C2",
+    fontSize: 12,
+    lineHeight: 19,
+    textAlign: "center",
+    marginTop: 12,
+    maxWidth: 320,
+  },
+
+  /* Stats */
+
+  stats: {
+    width: "100%",
+    marginTop: 25,
+    paddingVertical: 19,
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#0B111A",
+    borderRadius: 22,
+    borderWidth: 1,
+    borderColor:
+      "rgba(255,255,255,0.055)",
+  },
+
+  stat: {
+    flex: 1,
+    alignItems: "center",
+  },
+
+  statNumber: {
+    color: "#F7FAFF",
+    fontSize: 18,
+    fontWeight: "900",
+  },
+
+  statLabel: {
+    color: "#7F8C9D",
+    fontSize: 9,
+    fontWeight: "700",
+    marginTop: 4,
+  },
+
+  divider: {
+    width: 1,
+    height: 30,
+    backgroundColor:
+      "rgba(255,255,255,0.08)",
+  },
+
+  /* Follow */
+
+  followButton: {
+    marginTop: 20,
+    minWidth: 150,
+    backgroundColor: "#2E9BFF",
+    borderRadius: 19,
+    paddingHorizontal: 30,
+    paddingVertical: 13,
+    alignItems: "center",
+  },
+
+  followingButton: {
+    backgroundColor: "#0B111A",
+    borderWidth: 1,
+    borderColor:
+      "rgba(255,255,255,0.10)",
+  },
+
+  followText: {
+    color: "#F7FAFF",
+    fontSize: 12,
+    fontWeight: "900",
+  },
+
+  followingText: {
+    color: "#AAB4C2",
+  },
+
+  /* Posts */
+
+  postsSection: {
+    marginTop: 32,
+  },
+
+  sectionTitle: {
+    color: "#F7FAFF",
+    fontSize: 18,
+    fontWeight: "900",
+    marginHorizontal: 21,
+    marginBottom: 12,
+  },
+
+  grid: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    paddingHorizontal: 16,
+  },
+
+  gridItem: {
+    width: "33.333%",
+    aspectRatio: 1,
+    padding: 2,
+  },
+
+  gridImage: {
+    width: "100%",
+    height: "100%",
+    borderRadius: 10,
+    backgroundColor: "#101925",
+  },
+
+  /* Empty */
+
+  empty: {
+    marginHorizontal: 21,
+    paddingVertical: 45,
+    paddingHorizontal: 30,
+    alignItems: "center",
+    backgroundColor: "#0B111A",
+    borderRadius: 22,
+    borderWidth: 1,
+    borderColor:
+      "rgba(255,255,255,0.055)",
+  },
+
+  emptyIcon: {
+    color: "#73C7FF",
+    fontSize: 38,
+  },
+
+  emptyTitle: {
+    color: "#F7FAFF",
+    fontSize: 17,
+    fontWeight: "900",
+    marginTop: 13,
+  },
+
+  emptyText: {
+    color: "#7F8C9D",
+    fontSize: 10,
+    textAlign: "center",
+    lineHeight: 18,
+    marginTop: 7,
+  },
+
+  /* Not Found */
+
+  notFound: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    paddingHorizontal: 30,
+  },
+
+  notFoundIcon: {
+    width: 58,
+    height: 58,
+    borderRadius: 29,
+    backgroundColor:
+      "rgba(46,155,255,0.13)",
+    color: "#73C7FF",
+    fontSize: 28,
+    fontWeight: "900",
+    textAlign: "center",
+    textAlignVertical: "center",
+    paddingTop: 12,
+  },
+
+  notFoundTitle: {
+    color: "#F7FAFF",
+    fontSize: 20,
+    fontWeight: "900",
+    marginTop: 16,
+  },
+
+  notFoundText: {
+    color: "#7F8C9D",
+    fontSize: 11,
+    textAlign: "center",
+    marginTop: 7,
+  },
+
+  backHomeButton: {
+    marginTop: 22,
+    backgroundColor: "#2E9BFF",
+    borderRadius: 18,
+    paddingHorizontal: 28,
+    paddingVertical: 12,
+  },
+
+  backHomeText: {
+    color: "#F7FAFF",
+    fontSize: 12,
+    fontWeight: "900",
+  },
+});

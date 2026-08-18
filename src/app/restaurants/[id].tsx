@@ -168,7 +168,7 @@ export default function RestaurantDetails() {
   if (loading) {
     return (
       <View style={styles.loadingContainer}>
-        <StatusBar style="dark" />
+        <StatusBar style="light" />
 
         <ActivityIndicator
           size="large"
@@ -185,7 +185,7 @@ export default function RestaurantDetails() {
   if (!restaurant || loadError) {
     return (
       <View style={styles.notFound}>
-        <StatusBar style="dark" />
+        <StatusBar style="light" />
 
         <Text style={styles.notFoundTitle}>
           Restaurant not found
@@ -393,19 +393,19 @@ export default function RestaurantDetails() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#FFFFFF",
+    backgroundColor: "#05080D",
   },
 
   loadingContainer: {
     flex: 1,
-    backgroundColor: "#FFFFFF",
+    backgroundColor: "#05080D",
     justifyContent: "center",
     alignItems: "center",
   },
 
   loadingText: {
-    color: "#888888",
-    fontSize: 13,
+    color: "#7F8C9D",
+    fontSize: 11,
     marginTop: 12,
   },
 
@@ -417,7 +417,7 @@ const styles = StyleSheet.create({
   heroImage: {
     width: "100%",
     height: "100%",
-    backgroundColor: "#EEEEEE",
+    backgroundColor: "#0B111A",
   },
 
   heroPlaceholder: {
@@ -436,14 +436,16 @@ const styles = StyleSheet.create({
     width: 42,
     height: 42,
     borderRadius: 21,
-    backgroundColor: "rgba(255,255,255,0.92)",
+    backgroundColor: "rgba(5,8,13,0.72)",
+    borderWidth: 1,
+    borderColor: "rgba(255,255,255,0.08)",
     justifyContent: "center",
     alignItems: "center",
   },
 
   backText: {
-    color: "#111111",
-    fontSize: 32,
+    color: "#F7FAFF",
+    fontSize: 30,
     lineHeight: 34,
   },
 
@@ -454,318 +456,167 @@ const styles = StyleSheet.create({
     width: 42,
     height: 42,
     borderRadius: 21,
-    backgroundColor: "rgba(255,255,255,0.92)",
+    backgroundColor: "rgba(5,8,13,0.72)",
+    borderWidth: 1,
+    borderColor: "rgba(255,255,255,0.08)",
     justifyContent: "center",
     alignItems: "center",
   },
 
   saveText: {
-    color: "#111111",
-    fontSize: 23,
+    color: "#F7FAFF",
+    fontSize: 21,
   },
 
-  content: {
-    paddingHorizontal: 22,
-    paddingTop: 23,
-    paddingBottom: 50,
+  info: {
+    marginTop: -25,
+    marginHorizontal: 16,
+    padding: 21,
+    borderRadius: 25,
+    backgroundColor: "#0B111A",
+    borderWidth: 1,
+    borderColor: "rgba(255,255,255,0.055)",
   },
 
-  name: {
-    color: "#111111",
-    fontSize: 29,
-    fontWeight: "800",
+  restaurantName: {
+    color: "#F7FAFF",
+    fontSize: 27,
+    fontWeight: "900",
+    letterSpacing: -0.5,
   },
 
-  cuisine: {
-    color: "#666666",
-    fontSize: 14,
-    marginTop: 6,
-  },
-
-  meta: {
+  ratingRow: {
     flexDirection: "row",
     alignItems: "center",
-    marginTop: 13,
+    marginTop: 9,
   },
 
   rating: {
-    color: "#168CC5",
-    fontSize: 14,
-    fontWeight: "800",
+    color: "#FFD166",
+    fontSize: 12,
+    fontWeight: "900",
   },
 
-  metaText: {
-    color: "#777777",
-    fontSize: 13,
-  },
-
-  locationRow: {
-    backgroundColor: "#F7F7F7",
-    borderRadius: 17,
-    padding: 16,
-    marginTop: 23,
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-  },
-
-  locationContent: {
-    flex: 1,
-    marginRight: 12,
-  },
-
-  locationLabel: {
-    color: "#999999",
-    fontSize: 9,
-    fontWeight: "800",
-    letterSpacing: 1,
+  ratingCount: {
+    color: "#7F8C9D",
+    fontSize: 10,
+    marginLeft: 6,
   },
 
   location: {
-    color: "#222222",
-    fontSize: 14,
-    fontWeight: "600",
-    marginTop: 4,
+    color: "#AAB4C2",
+    fontSize: 10,
+    marginTop: 9,
   },
 
   directionsButton: {
-    backgroundColor: "#EAF7FD",
-    paddingHorizontal: 13,
-    paddingVertical: 9,
-    borderRadius: 11,
+    alignSelf: "flex-start",
+    marginTop: 12,
+    backgroundColor: "rgba(46,155,255,0.11)",
+    borderWidth: 1,
+    borderColor: "rgba(113,199,255,0.12)",
+    borderRadius: 17,
+    paddingHorizontal: 14,
+    paddingVertical: 8,
   },
 
   directionsText: {
-    color: "#168CC5",
-    fontSize: 12,
-    fontWeight: "700",
+    color: "#73C7FF",
+    fontSize: 10,
+    fontWeight: "900",
   },
 
   description: {
-    color: "#555555",
-    fontSize: 15,
-    lineHeight: 23,
-    marginTop: 22,
+    color: "#AAB4C2",
+    fontSize: 12,
+    lineHeight: 20,
+    marginHorizontal: 21,
+    marginTop: 19,
   },
 
   divider: {
     height: 1,
-    backgroundColor: "#EEEEEE",
-    marginVertical: 27,
+    backgroundColor: "rgba(255,255,255,0.055)",
+    marginHorizontal: 21,
+    marginTop: 25,
   },
 
   sectionTitle: {
-    color: "#111111",
-    fontSize: 20,
-    fontWeight: "800",
-    marginBottom: 16,
-    marginTop: 5,
+    color: "#F7FAFF",
+    fontSize: 21,
+    fontWeight: "900",
+    marginHorizontal: 21,
+    marginTop: 25,
   },
 
   menu: {
-    gap: 14,
-    marginBottom: 30,
-  },
-
-  dishCard: {
-    borderWidth: 1,
-    borderColor: "#EEEEEE",
-    borderRadius: 17,
-    padding: 10,
-    flexDirection: "row",
-    alignItems: "center",
-  },
-
-  dishImage: {
-    width: 82,
-    height: 82,
-    borderRadius: 13,
-    backgroundColor: "#EEEEEE",
-  },
-
-  dishPlaceholder: {
-    justifyContent: "center",
-    alignItems: "center",
-  },
-
-  dishPlaceholderText: {
-    fontSize: 27,
-  },
-
-  addButton: {
-    alignSelf: "flex-start",
-    backgroundColor: "#168CC5",
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    borderRadius: 10,
-    marginBottom: 10,
-  },
-
-  addButtonText: {
-    color: "#FFFFFF",
-    fontSize: 12,
-    fontWeight: "700",
-  },
-quantityContainer: {
-  alignSelf: "flex-start",
-  flexDirection: "row",
-  alignItems: "center",
-  backgroundColor: "#168CC5",
-  borderRadius: 12,
-  paddingHorizontal: 10,
-  paddingVertical: 6,
-  marginBottom: 10,
-},
-
-quantityButton: {
-  color: "#FFFFFF",
-  fontSize: 20,
-  fontWeight: "700",
-  width: 28,
-  textAlign: "center",
-},
-
-quantityText: {
-  color: "#FFFFFF",
-  fontSize: 15,
-  fontWeight: "700",
-  minWidth: 24,
-  textAlign: "center",
-},
-  dishContent: {
-    flex: 1,
-    marginLeft: 13,
-  },
-
-  dishName: {
-    color: "#111111",
-    fontSize: 15,
-    fontWeight: "700",
-  },
-
-  dishCategory: {
-    color: "#888888",
-    fontSize: 12,
-    marginTop: 4,
-  },
-
-  dishMeta: {
-    flexDirection: "row",
-    gap: 13,
-    marginTop: 8,
-  },
-
-  dishPrice: {
-    color: "#333333",
-    fontSize: 12,
-    fontWeight: "700",
-  },
-
-  dishRating: {
-    color: "#168CC5",
-    fontSize: 12,
-    fontWeight: "700",
-  },
-
-  arrow: {
-    color: "#AAAAAA",
-    fontSize: 27,
-    marginHorizontal: 5,
+    marginHorizontal: 16,
+    marginTop: 14,
   },
 
   emptyMenu: {
-    color: "#888888",
-    fontSize: 14,
-    marginBottom: 30,
+    color: "#7F8C9D",
+    fontSize: 11,
+    marginHorizontal: 21,
+    marginTop: 14,
   },
 
   communityCard: {
-    backgroundColor: "#F7F7F7",
-    borderRadius: 18,
-    padding: 18,
+    marginHorizontal: 16,
+    marginTop: 14,
+    padding: 20,
+    borderRadius: 22,
+    backgroundColor: "#0B111A",
+    borderWidth: 1,
+    borderColor: "rgba(255,255,255,0.055)",
   },
 
   communityTitle: {
-    color: "#111111",
+    color: "#F7FAFF",
     fontSize: 15,
-    fontWeight: "700",
+    fontWeight: "900",
   },
 
   communityText: {
-    color: "#666666",
-    fontSize: 13,
-    lineHeight: 20,
+    color: "#7F8C9D",
+    fontSize: 10,
+    lineHeight: 18,
     marginTop: 7,
   },
 
   notFound: {
     flex: 1,
-    backgroundColor: "#FFFFFF",
+    backgroundColor: "#05080D",
     justifyContent: "center",
     alignItems: "center",
     paddingHorizontal: 30,
   },
 
   notFoundTitle: {
-    color: "#111111",
+    color: "#F7FAFF",
     fontSize: 22,
-    fontWeight: "800",
+    fontWeight: "900",
   },
 
   notFoundDescription: {
-    color: "#777777",
-    fontSize: 14,
+    color: "#7F8C9D",
+    fontSize: 11,
     textAlign: "center",
     marginTop: 8,
+    lineHeight: 18,
   },
 
-  goBackButton: {
-    backgroundColor: "#29A9EA",
-    paddingHorizontal: 20,
+  retryButton: {
+    marginTop: 20,
+    backgroundColor: "#2E9BFF",
+    paddingHorizontal: 22,
     paddingVertical: 12,
-    borderRadius: 13,
-    marginTop: 18,
+    borderRadius: 20,
   },
 
-  goBack: {
-    color: "#FFFFFF",
-    fontSize: 14,
-    fontWeight: "700",
+  retryText: {
+    color: "#F7FAFF",
+    fontSize: 11,
+    fontWeight: "900",
   },
-  mealTray: {
-  position: "absolute",
-  left: 20,
-  right: 20,
-  bottom: 24,
-
-  backgroundColor: "#111",
-
-  borderRadius: 22,
-
-  paddingHorizontal: 22,
-  paddingVertical: 18,
-
-  flexDirection: "row",
-  justifyContent: "space-between",
-  alignItems: "center",
-
-  elevation: 10,
-},
-
-mealTitle: {
-  color: "#FFF",
-  fontSize: 17,
-  fontWeight: "700",
-},
-
-mealSubtitle: {
-  color: "#CCC",
-  marginTop: 4,
-},
-
-reviewText: {
-  color: "#29A9EA",
-  fontSize: 16,
-  fontWeight: "700",
-},
 });

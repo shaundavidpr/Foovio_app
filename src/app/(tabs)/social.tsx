@@ -443,7 +443,7 @@ Shared from Foovio 🍽️`,
   if (loading) {
     return (
       <View style={styles.loadingContainer}>
-        <StatusBar style="dark" />
+        <StatusBar style="light" />
 
         <ActivityIndicator
           size="large"
@@ -459,7 +459,7 @@ Shared from Foovio 🍽️`,
 
   return (
     <View style={styles.container}>
-      <StatusBar style="dark" />
+      <StatusBar style="light" />
 
       <ScrollView
         showsVerticalScrollIndicator={false}
@@ -792,7 +792,7 @@ Shared from Foovio 🍽️`,
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#FFFFFF",
+    backgroundColor: "#05080D",
   },
 
   content: {
@@ -802,71 +802,74 @@ const styles = StyleSheet.create({
 
   loadingContainer: {
     flex: 1,
-    backgroundColor: "#FFFFFF",
+    backgroundColor: "#05080D",
     justifyContent: "center",
     alignItems: "center",
   },
 
   loadingText: {
-    color: "#888888",
-    fontSize: 13,
+    color: "#7F8C9D",
+    fontSize: 11,
     marginTop: 12,
   },
 
   header: {
-    paddingHorizontal: 22,
+    paddingHorizontal: 21,
     flexDirection: "row",
-    justifyContent: "space-between",
     alignItems: "center",
   },
 
   title: {
-    color: "#111111",
+    color: "#F7FAFF",
     fontSize: 34,
-    fontWeight: "800",
+    fontWeight: "900",
     letterSpacing: -1,
   },
 
   subtitle: {
-    color: "#777777",
-    fontSize: 14,
-    marginTop: 4,
+    color: "#7F8C9D",
+    fontSize: 11,
+    marginTop: 6,
   },
 
   createButton: {
-    width: 42,
-    height: 42,
-    borderRadius: 21,
-    backgroundColor: "#29A9EA",
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: "#2E9BFF",
     justifyContent: "center",
     alignItems: "center",
+    marginLeft: 10,
   },
 
   createButtonPressed: {
     opacity: 0.8,
+    transform: [{ scale: 0.96 }],
   },
 
   createButtonIcon: {
-    color: "#FFFFFF",
+    color: "#F7FAFF",
     fontSize: 25,
     fontWeight: "600",
     lineHeight: 27,
   },
 
   feedSelector: {
-    marginHorizontal: 22,
+    marginHorizontal: 21,
     marginTop: 25,
     marginBottom: 10,
-    backgroundColor: "#F5F5F5",
-    borderRadius: 14,
+    backgroundColor: "#0B111A",
+    borderRadius: 18,
     padding: 4,
     flexDirection: "row",
+    borderWidth: 1,
+    borderColor: "rgba(255,255,255,0.055)",
   },
 
   feedActive: {
     flex: 1,
-    backgroundColor: "#FFFFFF",
-    borderRadius: 11,
+    backgroundColor: "#2E9BFF",
+    borderRadius: 14,
     paddingVertical: 11,
     alignItems: "center",
   },
@@ -878,23 +881,25 @@ const styles = StyleSheet.create({
   },
 
   feedActiveText: {
-    color: "#111111",
-    fontSize: 13,
-    fontWeight: "700",
+    color: "#F7FAFF",
+    fontSize: 11,
+    fontWeight: "900",
   },
 
   feedInactiveText: {
-    color: "#888888",
-    fontSize: 13,
-    fontWeight: "600",
+    color: "#7F8C9D",
+    fontSize: 11,
+    fontWeight: "800",
   },
 
   post: {
-    paddingHorizontal: 22,
-    paddingTop: 25,
-    paddingBottom: 25,
-    borderBottomWidth: 1,
-    borderBottomColor: "#EEEEEE",
+    marginHorizontal: 16,
+    marginTop: 17,
+    padding: 19,
+    borderRadius: 23,
+    backgroundColor: "#0B111A",
+    borderWidth: 1,
+    borderColor: "rgba(255,255,255,0.055)",
   },
 
   userRow: {
@@ -906,15 +911,15 @@ const styles = StyleSheet.create({
     width: 43,
     height: 43,
     borderRadius: 22,
-    backgroundColor: "#EAF7FD",
+    backgroundColor: "rgba(46,155,255,0.13)",
     justifyContent: "center",
     alignItems: "center",
   },
 
   avatarText: {
-    color: "#29A9EA",
+    color: "#73C7FF",
     fontSize: 15,
-    fontWeight: "800",
+    fontWeight: "900",
   },
 
   userInfo: {
@@ -923,26 +928,26 @@ const styles = StyleSheet.create({
   },
 
   username: {
-    color: "#111111",
+    color: "#F7FAFF",
     fontSize: 14,
-    fontWeight: "700",
+    fontWeight: "900",
   },
 
   time: {
-    color: "#999999",
-    fontSize: 11,
-    marginTop: 3,
+    color: "#7F8C9D",
+    fontSize: 9,
+    marginTop: 4,
   },
 
   more: {
-    color: "#777777",
+    color: "#7F8C9D",
     fontSize: 14,
     letterSpacing: 1,
   },
 
   postText: {
-    color: "#333333",
-    fontSize: 14,
+    color: "#DCE5F0",
+    fontSize: 13,
     lineHeight: 21,
     marginTop: 15,
   },
@@ -951,7 +956,7 @@ const styles = StyleSheet.create({
     width: "100%",
     height: 290,
     borderRadius: 20,
-    backgroundColor: "#EEEEEE",
+    backgroundColor: "#101925",
     marginTop: 15,
   },
 
@@ -975,30 +980,30 @@ const styles = StyleSheet.create({
   },
 
   dishLabel: {
-    color: "#999999",
-    fontSize: 9,
-    fontWeight: "800",
+    color: "#7F8C9D",
+    fontSize: 8,
+    fontWeight: "900",
     letterSpacing: 1,
   },
 
   dishName: {
-    color: "#111111",
+    color: "#F7FAFF",
     fontSize: 15,
-    fontWeight: "700",
+    fontWeight: "900",
     marginTop: 3,
   },
 
   rating: {
-    backgroundColor: "#EAF7FD",
+    backgroundColor: "rgba(255,209,102,0.10)",
     borderRadius: 10,
     paddingHorizontal: 10,
     paddingVertical: 7,
   },
 
   ratingText: {
-    color: "#168CC5",
-    fontSize: 12,
-    fontWeight: "800",
+    color: "#FFD166",
+    fontSize: 11,
+    fontWeight: "900",
   },
 
   actions: {
@@ -1024,66 +1029,77 @@ const styles = StyleSheet.create({
   },
 
   actionIcon: {
-    color: "#222222",
-    fontSize: 22,
+    color: "#7F8C9D",
+    fontSize: 23,
   },
 
   likedIcon: {
-    color: "#29A9EA",
+    color: "#73C7FF",
   },
 
   commentIcon: {
-    color: "#222222",
-    fontSize: 18,
+    color: "#7F8C9D",
+    fontSize: 19,
   },
 
   actionCount: {
-    color: "#555555",
-    fontSize: 12,
-    fontWeight: "600",
+    color: "#7F8C9D",
+    fontSize: 10,
+    fontWeight: "800",
   },
 
   save: {
-    color: "#222222",
+    color: "#DCE5F0",
     fontSize: 20,
   },
 
   error: {
-    marginHorizontal: 22,
+    marginHorizontal: 21,
     marginTop: 45,
+    padding: 22,
     alignItems: "center",
+    backgroundColor: "#0B111A",
+    borderRadius: 22,
+    borderWidth: 1,
+    borderColor: "rgba(255,255,255,0.055)",
   },
 
   errorTitle: {
-    color: "#111111",
-    fontSize: 18,
-    fontWeight: "700",
+    color: "#F7FAFF",
+    fontSize: 17,
+    fontWeight: "900",
   },
 
   errorText: {
-    color: "#888888",
-    fontSize: 13,
-    marginTop: 6,
+    color: "#7F8C9D",
+    fontSize: 10,
+    marginTop: 7,
+    textAlign: "center",
   },
 
   retryButton: {
-    backgroundColor: "#29A9EA",
-    paddingHorizontal: 18,
-    paddingVertical: 11,
-    borderRadius: 12,
+    backgroundColor: "#2E9BFF",
+    paddingHorizontal: 20,
+    paddingVertical: 12,
+    borderRadius: 20,
     marginTop: 17,
   },
 
   retryText: {
-    color: "#FFFFFF",
-    fontSize: 13,
-    fontWeight: "700",
+    color: "#F7FAFF",
+    fontSize: 10,
+    fontWeight: "900",
   },
 
   empty: {
     alignItems: "center",
-    paddingHorizontal: 30,
-    paddingTop: 70,
+    marginHorizontal: 21,
+    padding: 30,
+    marginTop: 30,
+    backgroundColor: "#0B111A",
+    borderRadius: 22,
+    borderWidth: 1,
+    borderColor: "rgba(255,255,255,0.055)",
   },
 
   emptyIcon: {
@@ -1091,15 +1107,15 @@ const styles = StyleSheet.create({
   },
 
   emptyTitle: {
-    color: "#111111",
+    color: "#F7FAFF",
     fontSize: 19,
-    fontWeight: "700",
+    fontWeight: "900",
     marginTop: 14,
   },
 
   emptyText: {
-    color: "#888888",
-    fontSize: 14,
+    color: "#7F8C9D",
+    fontSize: 10,
     lineHeight: 20,
     textAlign: "center",
     marginTop: 7,

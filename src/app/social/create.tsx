@@ -387,7 +387,7 @@ export default function CreatePost() {
   if (loading) {
   return (
     <>
-      <StatusBar style="dark" />
+      <StatusBar style="light" />
       <LoadingSkeleton text="Loading food..." />
     </>
   );
@@ -402,7 +402,7 @@ export default function CreatePost() {
           : undefined
       }
     >
-      <StatusBar style="dark" />
+      <StatusBar style="light" />
 
       <View style={styles.header}>
         <Pressable
@@ -658,7 +658,7 @@ export default function CreatePost() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#FFFFFF",
+    backgroundColor: "#05080D",
   },
 
   header: {
@@ -666,7 +666,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingBottom: 14,
     borderBottomWidth: 1,
-    borderBottomColor: "#EEEEEE",
+    borderBottomColor: "rgba(255,255,255,0.055)",
+    backgroundColor: "#05080D",
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
@@ -676,18 +677,19 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     justifyContent: "center",
+    alignItems: "center",
   },
 
   closeText: {
-    color: "#111111",
+    color: "#F7FAFF",
     fontSize: 31,
     lineHeight: 33,
   },
 
   headerTitle: {
-    color: "#111111",
+    color: "#F7FAFF",
     fontSize: 17,
-    fontWeight: "800",
+    fontWeight: "900",
   },
 
   headerSpace: {
@@ -695,50 +697,50 @@ const styles = StyleSheet.create({
   },
 
   content: {
-    paddingHorizontal: 22,
+    paddingHorizontal: 21,
     paddingTop: 30,
     paddingBottom: 40,
   },
 
   title: {
-    color: "#111111",
+    color: "#F7FAFF",
     fontSize: 34,
     lineHeight: 40,
-    fontWeight: "800",
+    fontWeight: "900",
     letterSpacing: -1,
   },
 
   description: {
-    color: "#777777",
-    fontSize: 15,
-    lineHeight: 22,
+    color: "#7F8C9D",
+    fontSize: 13,
+    lineHeight: 21,
     marginTop: 10,
     marginBottom: 8,
   },
 
   label: {
-    color: "#29A9EA",
-    fontSize: 10,
-    fontWeight: "800",
+    color: "#73C7FF",
+    fontSize: 9,
+    fontWeight: "900",
     letterSpacing: 1.4,
     marginTop: 28,
   },
 
   sectionTitle: {
-    color: "#111111",
+    color: "#F7FAFF",
     fontSize: 18,
-    fontWeight: "700",
+    fontWeight: "900",
     marginTop: 6,
     marginBottom: 14,
   },
 
   photoPicker: {
     height: 190,
-    borderWidth: 1.5,
+    borderWidth: 1,
     borderStyle: "dashed",
-    borderColor: "#D8D8D8",
+    borderColor: "rgba(113,199,255,0.18)",
     borderRadius: 20,
-    backgroundColor: "#FAFAFA",
+    backgroundColor: "#0B111A",
     justifyContent: "center",
     alignItems: "center",
     paddingHorizontal: 20,
@@ -749,21 +751,21 @@ const styles = StyleSheet.create({
   },
 
   photoIcon: {
-    color: "#29A9EA",
+    color: "#73C7FF",
     fontSize: 34,
     fontWeight: "500",
   },
 
   photoTitle: {
-    color: "#111111",
+    color: "#F7FAFF",
     fontSize: 15,
-    fontWeight: "700",
+    fontWeight: "800",
     marginTop: 7,
   },
 
   photoText: {
-    color: "#999999",
-    fontSize: 12,
+    color: "#6F7B8B",
+    fontSize: 11,
     marginTop: 5,
     textAlign: "center",
   },
@@ -772,7 +774,7 @@ const styles = StyleSheet.create({
     width: "100%",
     height: 240,
     borderRadius: 20,
-    backgroundColor: "#EEEEEE",
+    backgroundColor: "#0B111A",
   },
 
   photoActions: {
@@ -782,28 +784,32 @@ const styles = StyleSheet.create({
   },
 
   changePhoto: {
-    backgroundColor: "#EAF7FD",
+    backgroundColor: "rgba(46,155,255,0.12)",
+    borderWidth: 1,
+    borderColor: "rgba(113,199,255,0.10)",
     paddingHorizontal: 15,
     paddingVertical: 10,
     borderRadius: 11,
   },
 
   changePhotoText: {
-    color: "#168CC5",
-    fontSize: 12,
-    fontWeight: "700",
+    color: "#73C7FF",
+    fontSize: 11,
+    fontWeight: "800",
   },
 
   removePhoto: {
-    backgroundColor: "#F5F5F5",
+    backgroundColor: "#111A25",
+    borderWidth: 1,
+    borderColor: "rgba(255,255,255,0.07)",
     paddingHorizontal: 15,
     paddingVertical: 10,
     borderRadius: 11,
   },
 
   removePhotoText: {
-    color: "#666666",
-    fontSize: 12,
+    color: "#AAB4C2",
+    fontSize: 11,
     fontWeight: "700",
   },
 
@@ -814,60 +820,63 @@ const styles = StyleSheet.create({
   },
 
   option: {
-    borderWidth: 1.5,
-    borderColor: "#E5E5E5",
+    borderWidth: 1,
+    borderColor: "rgba(255,255,255,0.08)",
     borderRadius: 100,
     paddingHorizontal: 16,
     paddingVertical: 11,
-    backgroundColor: "#FFFFFF",
+    backgroundColor: "#0B111A",
   },
 
   optionSelected: {
-    backgroundColor: "#29A9EA",
-    borderColor: "#29A9EA",
+    backgroundColor: "#2E9BFF",
+    borderColor: "#2E9BFF",
   },
 
   optionText: {
-    color: "#444444",
-    fontSize: 13,
-    fontWeight: "600",
+    color: "#AAB4C2",
+    fontSize: 12,
+    fontWeight: "700",
   },
 
   optionTextSelected: {
-    color: "#FFFFFF",
+    color: "#F7FAFF",
+    fontWeight: "900",
   },
 
   helper: {
-    color: "#999999",
-    fontSize: 13,
+    color: "#6F7B8B",
+    fontSize: 12,
   },
 
   emptyText: {
-    color: "#999999",
-    fontSize: 13,
+    color: "#6F7B8B",
+    fontSize: 12,
   },
 
   ratingText: {
-    color: "#777777",
-    fontSize: 12,
+    color: "#7F8C9D",
+    fontSize: 11,
     marginTop: 6,
   },
 
   captionInput: {
     minHeight: 125,
-    backgroundColor: "#F6F6F6",
+    backgroundColor: "#0B111A",
+    borderWidth: 1,
+    borderColor: "rgba(255,255,255,0.08)",
     borderRadius: 17,
     paddingHorizontal: 16,
     paddingVertical: 15,
-    color: "#111111",
-    fontSize: 14,
+    color: "#F7FAFF",
+    fontSize: 13,
     lineHeight: 21,
     textAlignVertical: "top",
   },
 
   characterCount: {
-    color: "#AAAAAA",
-    fontSize: 11,
+    color: "#6F7B8B",
+    fontSize: 10,
     textAlign: "right",
     marginTop: 6,
   },
@@ -877,7 +886,7 @@ const styles = StyleSheet.create({
     paddingTop: 12,
     paddingBottom: 28,
     borderTopWidth: 1,
-    borderTopColor: "#EEEEEE",
-    backgroundColor: "#FFFFFF",
+    borderTopColor: "rgba(255,255,255,0.055)",
+    backgroundColor: "#060A10",
   },
 });

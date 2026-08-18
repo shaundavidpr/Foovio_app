@@ -6,6 +6,8 @@ import {
   Text,
 } from "react-native";
 
+import { colors, radius, spacing } from "@/theme";
+
 type PrimaryButtonProps = {
   title: string;
   onPress: () => void;
@@ -19,27 +21,22 @@ export default function PrimaryButton({
   loading = false,
   disabled = false,
 }: PrimaryButtonProps) {
+  const isDisabled = loading || disabled;
+
   return (
     <Pressable
       onPress={onPress}
-      disabled={loading || disabled}
+      disabled={isDisabled}
       style={({ pressed }) => [
         styles.button,
-        (loading || disabled) &&
-          styles.disabled,
-        pressed &&
-          !loading &&
-          styles.pressed,
+        isDisabled && styles.disabled,
+        pressed && !isDisabled && styles.pressed,
       ]}
     >
       {loading ? (
-        <ActivityIndicator
-          color="#FFFFFF"
-        />
+        <ActivityIndicator color="#FFFFFF" />
       ) : (
-        <Text style={styles.text}>
-          {title}
-        </Text>
+        <Text style={styles.text}>{title}</Text>
       )}
     </Pressable>
   );
@@ -47,24 +44,26 @@ export default function PrimaryButton({
 
 const styles = StyleSheet.create({
   button: {
-    height: 56,
-    backgroundColor: "#29A9EA",
-    borderRadius: 16,
+    minHeight: 54,
+    backgroundColor: colors.accent,
+    borderRadius: radius.md,
+    paddingHorizontal: spacing.lg,
     justifyContent: "center",
     alignItems: "center",
   },
 
   pressed: {
-    opacity: 0.85,
+    opacity: 0.82,
+    transform: [{ scale: 0.98 }],
   },
 
   disabled: {
-    opacity: 0.6,
+    opacity: 0.45,
   },
 
   text: {
     color: "#FFFFFF",
-    fontSize: 16,
-    fontWeight: "800",
+    fontSize: 15,
+    fontWeight: "700",
   },
 });

@@ -1,27 +1,43 @@
 export const colors = {
-  background: "#F8FAFC",
+  // Main surfaces — matches Home
+  background: "#05080D",
+  surface: "#0B111A",
+  surfaceSecondary: "#101925",
 
-  surface: "#FFFFFF",
+  // Brand
+  primary: "#F7FAFF",
+  accent: "#2E9BFF",
+  accentLight: "#73C7FF",
 
-  surfaceSecondary: "#F3F6FA",
+  // Text
+  textPrimary: "#F7FAFF",
+  textSecondary: "#DCE5F0",
+  textMuted: "#7F8C9D",
 
-  primary: "#111827",
+  // Borders
+  border: "rgba(255,255,255,0.055)",
+  borderStrong: "rgba(255,255,255,0.10)",
 
-  accent: "#29A9EA",
-
-  textPrimary: "#111827",
-
-  textSecondary: "#6B7280",
-
-  textMuted: "#9CA3AF",
-
-  border: "#EEF2F7",
-
-  success: "#22C55E",
-
-  warning: "#F59E0B",
-
+  // States
+  success: "#4ADE80",
+  warning: "#FFD166",
   danger: "#EF4444",
 
-  overlay: "rgba(17,24,39,0.08)",
+  // Accent variants
+  accentSoft: "rgba(46,155,255,0.10)",
+  accentMedium: "rgba(46,155,255,0.20)",
+
+  // Overlay
+  overlay: "rgba(5,8,13,0.68)",
+
+  // Home-specific
+  gold: "#FFD166",
+
+  // Compatibility aliases
+  white: "#F7FAFF",
+  text: "#DCE5F0",
+  muted: "#7F8C9D",
+  blue: "#2E9BFF",
+  blueLight: "#73C7FF",
+  surface2: "#101925",
 };

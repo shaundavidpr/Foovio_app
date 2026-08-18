@@ -41,21 +41,23 @@ export default function AppButton({
 
 const styles = StyleSheet.create({
   button: {
-    backgroundColor: colors.primary,
+    backgroundColor: colors.blue,
     borderRadius: radius.pill,
-    paddingVertical: spacing.md,
+    minHeight: 48,
+    paddingVertical: spacing.sm,
+    paddingHorizontal: spacing.lg,
     alignItems: "center",
     justifyContent: "center",
   },
 
   pressed: {
-    opacity: 0.85,
+    opacity: 0.82,
     transform: [{ scale: 0.98 }],
   },
 
   text: {
-    color: "#FFF",
-    fontWeight: "700",
-    fontSize: 16,
+    color: colors.white,
+    fontWeight: "900",
+    fontSize: 14,
   },
 });

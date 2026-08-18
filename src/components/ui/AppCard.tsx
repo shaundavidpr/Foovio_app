@@ -1,6 +1,7 @@
 import React from "react";
 import { View, StyleSheet, ViewStyle } from "react-native";
-import { colors, radius, shadows, spacing } from "@/theme";
+
+import { colors, radius, spacing } from "@/theme";
 
 type Props = {
   children: React.ReactNode;
@@ -21,9 +22,9 @@ export default function AppCard({
 const styles = StyleSheet.create({
   card: {
     backgroundColor: colors.surface,
-    borderRadius: radius.xl,
+    borderRadius: radius.lg,
+    borderWidth: 1,
+    borderColor: colors.border,
     padding: spacing.md,
-
-    ...shadows.card,
   },
 });

@@ -406,7 +406,11 @@ export default function DishDetails() {
                       {"★".repeat(Math.round(post.rating))}
                     </Text>
 
-                    <Text style={{ color: "#999", fontSize: 11, marginTop: 2 }}>
+                    <Text style={{
+  color: "#7F8C9D",
+  fontSize: 10,
+  marginTop: 3,
+}}>
                       {formatDate(post.created_at)}
                     </Text>
                   </View>
@@ -459,11 +463,11 @@ export default function DishDetails() {
 
               <Text
                 style={{
-                  color: "#29A9EA",
-                  fontSize: 12,
-                  fontWeight: "700",
-                  marginTop: 6,
-                }}
+  color: "#73C7FF",
+  fontSize: 10,
+  fontWeight: "900",
+  marginTop: 8,
+}}
               >
                 Tap to view restaurant →
               </Text>
@@ -480,23 +484,23 @@ export default function DishDetails() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#FFFFFF",
+    backgroundColor: "#05080D",
   },
 
   scrollContent: {
-    paddingBottom: 30,
+    paddingBottom: 50,
   },
 
   loadingContainer: {
     flex: 1,
-    backgroundColor: "#FFFFFF",
+    backgroundColor: "#05080D",
     justifyContent: "center",
     alignItems: "center",
   },
 
   loadingText: {
-    color: "#888888",
-    fontSize: 13,
+    color: "#7F8C9D",
+    fontSize: 11,
     marginTop: 12,
   },
 
@@ -508,7 +512,7 @@ const styles = StyleSheet.create({
   image: {
     width: "100%",
     height: "100%",
-    backgroundColor: "#EEEEEE",
+    backgroundColor: "#0B111A",
   },
 
   imagePlaceholder: {
@@ -527,13 +531,15 @@ const styles = StyleSheet.create({
     width: 42,
     height: 42,
     borderRadius: 21,
-    backgroundColor: "rgba(255,255,255,0.92)",
+    backgroundColor: "rgba(5,8,13,0.72)",
+    borderWidth: 1,
+    borderColor: "rgba(255,255,255,0.08)",
     justifyContent: "center",
     alignItems: "center",
   },
 
   backText: {
-    color: "#111111",
+    color: "#F7FAFF",
     fontSize: 32,
     lineHeight: 34,
   },
@@ -545,18 +551,20 @@ const styles = StyleSheet.create({
     width: 42,
     height: 42,
     borderRadius: 21,
-    backgroundColor: "rgba(255,255,255,0.92)",
+    backgroundColor: "rgba(5,8,13,0.72)",
+    borderWidth: 1,
+    borderColor: "rgba(255,255,255,0.08)",
     justifyContent: "center",
     alignItems: "center",
   },
 
   saveText: {
-    color: "#111111",
+    color: "#F7FAFF",
     fontSize: 23,
   },
 
   content: {
-    paddingHorizontal: 22,
+    paddingHorizontal: 21,
     paddingTop: 23,
     paddingBottom: 50,
   },
@@ -573,28 +581,31 @@ const styles = StyleSheet.create({
   },
 
   title: {
-    color: "#111111",
+    color: "#F7FAFF",
     fontSize: 28,
-    fontWeight: "800",
+    fontWeight: "900",
+    letterSpacing: -0.5,
   },
 
   restaurant: {
-    color: "#666666",
-    fontSize: 15,
+    color: "#7F8C9D",
+    fontSize: 12,
     marginTop: 5,
   },
 
   rating: {
-    backgroundColor: "#EAF7FD",
+    backgroundColor: "rgba(46,155,255,0.11)",
+    borderWidth: 1,
+    borderColor: "rgba(113,199,255,0.12)",
     borderRadius: 12,
     paddingHorizontal: 12,
     paddingVertical: 8,
   },
 
   ratingText: {
-    color: "#168CC5",
-    fontSize: 14,
-    fontWeight: "800",
+    color: "#73C7FF",
+    fontSize: 12,
+    fontWeight: "900",
   },
 
   meta: {
@@ -605,61 +616,63 @@ const styles = StyleSheet.create({
   },
 
   price: {
-    color: "#111111",
-    fontSize: 15,
-    fontWeight: "800",
+    color: "#F7FAFF",
+    fontSize: 16,
+    fontWeight: "900",
   },
 
   dot: {
-    color: "#BBBBBB",
+    color: "#4D5867",
     marginHorizontal: 9,
   },
 
   metaText: {
-    color: "#777777",
-    fontSize: 13,
+    color: "#7F8C9D",
+    fontSize: 11,
   },
 
   description: {
-    color: "#555555",
-    fontSize: 15,
-    lineHeight: 23,
+    color: "#AAB4C2",
+    fontSize: 13,
+    lineHeight: 22,
     marginTop: 20,
   },
 
   divider: {
     height: 1,
-    backgroundColor: "#EEEEEE",
+    backgroundColor: "rgba(255,255,255,0.055)",
     marginVertical: 27,
   },
 
   sectionTitle: {
-    color: "#111111",
+    color: "#F7FAFF",
     fontSize: 20,
-    fontWeight: "800",
+    fontWeight: "900",
     marginBottom: 15,
     marginTop: 8,
   },
 
   scoreCard: {
-    backgroundColor: "#F7F7F7",
-    borderRadius: 18,
-    padding: 18,
+    backgroundColor: "#0B111A",
+    borderRadius: 22,
+    borderWidth: 1,
+    borderColor: "rgba(255,255,255,0.055)",
+    padding: 19,
     flexDirection: "row",
     alignItems: "center",
     marginBottom: 27,
   },
 
   score: {
-    color: "#111111",
+    color: "#F7FAFF",
     fontSize: 34,
-    fontWeight: "800",
+    fontWeight: "900",
   },
 
   reviewCount: {
-    color: "#888888",
-    fontSize: 11,
-    marginTop: 2,
+    color: "#7F8C9D",
+    fontSize: 9,
+    marginTop: 3,
   },
 
   scoreInfo: {
@@ -668,14 +681,14 @@ const styles = StyleSheet.create({
   },
 
   scoreLabel: {
-    color: "#111111",
-    fontSize: 15,
-    fontWeight: "700",
+    color: "#F7FAFF",
+    fontSize: 14,
+    fontWeight: "900",
   },
 
   scoreSubtext: {
-    color: "#777777",
-    fontSize: 12,
+    color: "#7F8C9D",
+    fontSize: 10,
     lineHeight: 17,
     marginTop: 4,
   },
@@ -688,23 +701,27 @@ const styles = StyleSheet.create({
   },
 
   tag: {
-    backgroundColor: "#F4F4F4",
+    backgroundColor: "rgba(46,155,255,0.10)",
+    borderWidth: 1,
+    borderColor: "rgba(113,199,255,0.10)",
     borderRadius: 100,
     paddingHorizontal: 13,
     paddingVertical: 9,
   },
 
   tagText: {
-    color: "#444444",
-    fontSize: 12,
-    fontWeight: "600",
+    color: "#73C7FF",
+    fontSize: 10,
+    fontWeight: "800",
   },
 
   review: {
-    backgroundColor: "#F7F7F7",
-    borderRadius: 18,
+    backgroundColor: "#0B111A",
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: "rgba(255,255,255,0.055)",
     padding: 17,
-    marginBottom: 28,
+    marginBottom: 16,
   },
 
   reviewHeader: {
@@ -713,96 +730,98 @@ const styles = StyleSheet.create({
   },
 
   username: {
-    color: "#111111",
+    color: "#F7FAFF",
     fontSize: 13,
-    fontWeight: "700",
+    fontWeight: "900",
   },
 
   reviewRating: {
-    color: "#111111",
+    color: "#FFD166",
     fontSize: 11,
-    marginTop: 2,
+    marginTop: 3,
   },
 
   reviewText: {
-    color: "#444444",
-    fontSize: 14,
+    color: "#AAB4C2",
+    fontSize: 13,
     lineHeight: 21,
     marginTop: 14,
   },
 
   restaurantButton: {
+    backgroundColor: "#0B111A",
     borderWidth: 1,
-    borderColor: "#E8E8E8",
-    borderRadius: 18,
-    padding: 17,
+    borderColor: "rgba(255,255,255,0.055)",
+    borderRadius: 22,
+    padding: 19,
+    marginTop: 12,
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
   },
-  
+
   restaurantButtonContent: {
     flex: 1,
   },
 
   restaurantButtonLabel: {
-    color: "#999999",
-    fontSize: 9,
-    fontWeight: "800",
+    color: "#7F8C9D",
+    fontSize: 8,
+    fontWeight: "900",
     letterSpacing: 1.2,
   },
 
   restaurantButtonName: {
-    color: "#111111",
+    color: "#F7FAFF",
     fontSize: 15,
-    fontWeight: "700",
-    marginTop: 4,
+    fontWeight: "900",
+    marginTop: 5,
   },
 
   restaurantButtonDistance: {
-    color: "#888888",
-    fontSize: 12,
-    marginTop: 3,
+    color: "#7F8C9D",
+    fontSize: 10,
+    marginTop: 4,
   },
 
   arrow: {
-    color: "#AAAAAA",
+    color: "#73C7FF",
     fontSize: 28,
     marginLeft: 10,
   },
 
   notFoundContainer: {
     flex: 1,
-    backgroundColor: "#FFFFFF",
+    backgroundColor: "#05080D",
     justifyContent: "center",
     alignItems: "center",
     paddingHorizontal: 30,
   },
 
   notFoundTitle: {
-    color: "#111111",
+    color: "#F7FAFF",
     fontSize: 24,
-    fontWeight: "800",
+    fontWeight: "900",
   },
 
   notFoundText: {
-    color: "#777777",
-    fontSize: 14,
+    color: "#7F8C9D",
+    fontSize: 11,
     marginTop: 8,
     textAlign: "center",
   },
 
   goBackButton: {
-    backgroundColor: "#29A9EA",
-    borderRadius: 14,
+    backgroundColor: "#2E9BFF",
+    borderRadius: 20,
     paddingHorizontal: 22,
     paddingVertical: 13,
     marginTop: 22,
   },
 
   goBackText: {
-    color: "#FFFFFF",
-    fontSize: 14,
-    fontWeight: "700",
+    color: "#F7FAFF",
+    fontSize: 11,
+    fontWeight: "900",
   },
-});
+}); 

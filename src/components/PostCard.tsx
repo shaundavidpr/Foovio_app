@@ -7,6 +7,8 @@ import {
   View,
 } from "react-native";
 
+import { colors, radius, spacing } from "@/theme";
+
 export type PostCardPost = {
   id: string;
   user_id: string;
@@ -76,9 +78,7 @@ export default function PostCard({
       difference / (1000 * 60)
     );
 
-    if (minutes < 1) {
-      return "now";
-    }
+    if (minutes < 1) return "now";
 
     if (minutes < 60) {
       return `${minutes}m`;
@@ -100,9 +100,7 @@ export default function PostCard({
   };
 
   const getInitial = (value?: string | null) => {
-    if (!value) {
-      return "F";
-    }
+    if (!value) return "F";
 
     return value.trim().charAt(0).toUpperCase();
   };
@@ -249,7 +247,7 @@ export default function PostCard({
             }
           >
             <Text style={styles.commentIcon}>
-              ◯
+              ○
             </Text>
 
             <Text style={styles.actionCount}>
@@ -264,7 +262,7 @@ export default function PostCard({
             onPress={() => onShare(post)}
           >
             <Text style={styles.save}>
-              📤
+              ↗
             </Text>
           </Pressable>
 
@@ -272,7 +270,7 @@ export default function PostCard({
             onPress={() => onSave(post.id)}
           >
             <Text style={styles.save}>
-              {isSaved ? "🔖" : "📑"}
+              {isSaved ? "🔖" : "♡"}
             </Text>
           </Pressable>
         </View>
@@ -283,11 +281,12 @@ export default function PostCard({
 
 const styles = StyleSheet.create({
   post: {
-    paddingHorizontal: 22,
-    paddingTop: 25,
-    paddingBottom: 25,
+    paddingHorizontal: spacing.lg,
+    paddingTop: spacing.lg,
+    paddingBottom: spacing.lg,
+    backgroundColor: colors.background,
     borderBottomWidth: 1,
-    borderBottomColor: "#EEEEEE",
+    borderBottomColor: colors.border,
   },
 
   userRow: {
@@ -305,65 +304,66 @@ const styles = StyleSheet.create({
     width: 43,
     height: 43,
     borderRadius: 22,
-    backgroundColor: "#EAF7FD",
+    backgroundColor: colors.accentSoft,
     justifyContent: "center",
     alignItems: "center",
   },
 
   avatarText: {
-    color: "#29A9EA",
+    color: colors.accent,
     fontSize: 15,
     fontWeight: "800",
   },
 
   userInfo: {
     flex: 1,
-    marginLeft: 11,
+    marginLeft: spacing.sm,
   },
 
   username: {
-    color: "#111111",
+    color: colors.textPrimary,
     fontSize: 14,
     fontWeight: "700",
   },
 
   time: {
-    color: "#999999",
+    color: colors.textMuted,
     fontSize: 11,
     marginTop: 3,
   },
 
   deleteButton: {
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    backgroundColor: "#FFE5E5",
-    borderRadius: 8,
+    paddingHorizontal: spacing.sm,
+    paddingVertical: spacing.xs,
+    backgroundColor: "rgba(239,68,68,0.12)",
+    borderRadius: radius.sm,
   },
 
   deleteText: {
-    color: "red",
+    color: colors.danger,
     fontWeight: "700",
+    fontSize: 11,
   },
 
   more: {
-    color: "#777777",
+    color: colors.textMuted,
     fontSize: 14,
     letterSpacing: 1,
   },
 
   postText: {
-    color: "#333333",
+    color: colors.textPrimary,
     fontSize: 14,
     lineHeight: 21,
-    marginTop: 15,
+    marginTop: spacing.md,
   },
 
   postImage: {
     width: "100%",
     height: 290,
-    borderRadius: 20,
-    backgroundColor: "#EEEEEE",
-    marginTop: 15,
+    borderRadius: radius.xl,
+    backgroundColor: colors.surfaceSecondary,
+    marginTop: spacing.md,
   },
 
   imagePlaceholder: {
@@ -372,13 +372,18 @@ const styles = StyleSheet.create({
   },
 
   imagePlaceholderText: {
-    fontSize: 45,
+    fontSize: 42,
   },
 
   dishRow: {
     flexDirection: "row",
     alignItems: "center",
-    marginTop: 14,
+    marginTop: spacing.md,
+    padding: spacing.sm,
+    backgroundColor: colors.surface,
+    borderRadius: radius.md,
+    borderWidth: 1,
+    borderColor: colors.border,
   },
 
   dishInfo: {
@@ -386,33 +391,33 @@ const styles = StyleSheet.create({
   },
 
   dishLabel: {
-    color: "#999999",
+    color: colors.textMuted,
     fontSize: 9,
     fontWeight: "800",
   },
 
   dishName: {
-    color: "#111111",
+    color: colors.textPrimary,
     fontSize: 14,
     fontWeight: "700",
     marginTop: 3,
   },
 
   rating: {
-    backgroundColor: "#FFF7E5",
+    backgroundColor: colors.accentSoft,
     paddingHorizontal: 9,
     paddingVertical: 5,
-    borderRadius: 8,
+    borderRadius: radius.sm,
   },
 
   ratingText: {
-    color: "#C88A00",
+    color: colors.accent,
     fontSize: 12,
     fontWeight: "800",
   },
 
   actions: {
-    marginTop: 16,
+    marginTop: spacing.md,
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
@@ -421,19 +426,19 @@ const styles = StyleSheet.create({
   leftActions: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 18,
+    gap: spacing.lg,
   },
 
   rightActions: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 16,
+    gap: spacing.md,
   },
 
   action: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 5,
+    gap: spacing.xs,
   },
 
   actionDisabled: {
@@ -441,27 +446,28 @@ const styles = StyleSheet.create({
   },
 
   actionIcon: {
-    color: "#555555",
+    color: colors.textSecondary,
     fontSize: 27,
     lineHeight: 28,
   },
 
   likedIcon: {
-    color: "#E53935",
+    color: colors.danger,
   },
 
   actionCount: {
-    color: "#777777",
+    color: colors.textMuted,
     fontSize: 12,
     fontWeight: "600",
   },
 
   commentIcon: {
-    color: "#555555",
+    color: colors.textSecondary,
     fontSize: 22,
   },
 
   save: {
+    color: colors.textSecondary,
     fontSize: 20,
   },
 });

@@ -214,7 +214,7 @@ export default function Home() {
       setLoadError(null);
 
       const { data, error } = await supabase
-        .from("foods")
+        .from("dishes")
         .select(
           `
           id,
