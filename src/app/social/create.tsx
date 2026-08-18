@@ -7,7 +7,6 @@ import PrimaryButton from "../../components/PrimaryButton";
 import LoadingSkeleton from "../../components/LoadingSkeleton";
 
 import {
-  ActivityIndicator,
   Alert,
   Image,
   KeyboardAvoidingView,
@@ -33,16 +32,32 @@ type Dish = {
   restaurant_id: string;
 };
 
+const COLORS = {
+  background: "#05080D",
+  surface: "#0B111A",
+  surface2: "#101925",
+  blue: "#2E9BFF",
+  blueLight: "#73C7FF",
+  white: "#F7FAFF",
+  text: "#DCE5F0",
+  muted: "#7F8C9D",
+  border: "rgba(255,255,255,0.055)",
+  borderStrong: "rgba(255,255,255,0.10)",
+};
+
 export default function CreatePost() {
   const [restaurants, setRestaurants] = useState<Restaurant[]>([]);
   const [dishes, setDishes] = useState<Dish[]>([]);
 
-  const [restaurantId, setRestaurantId] = useState<string | null>(null);
-  const [dishId, setDishId] = useState<string | null>(null);
+  const [restaurantId, setRestaurantId] =
+    useState<string | null>(null);
+  const [dishId, setDishId] =
+    useState<string | null>(null);
 
   const [rating, setRating] = useState(0);
   const [caption, setCaption] = useState("");
-  const [imageUri, setImageUri] = useState<string | null>(null);
+  const [imageUri, setImageUri] =
+    useState<string | null>(null);
 
   const [loading, setLoading] = useState(true);
   const [publishing, setPublishing] = useState(false);
@@ -50,10 +65,6 @@ export default function CreatePost() {
   useEffect(() => {
     loadFoodData();
   }, []);
-
-  // -----------------------------------
-  // LOAD RESTAURANTS + DISHES
-  // -----------------------------------
 
   const loadFoodData = async () => {
     try {
@@ -123,21 +134,14 @@ export default function CreatePost() {
   };
 
   const availableDishes = dishes.filter(
-    (dish) => dish.restaurant_id === restaurantId
+    (dish) =>
+      dish.restaurant_id === restaurantId
   );
-
-  // -----------------------------------
-  // PICK IMAGE FROM PHONE
-  // -----------------------------------
 
   const pickImage = async () => {
     try {
-      console.log("PHOTO BUTTON PRESSED");
-
       const permission =
         await ImagePicker.requestMediaLibraryPermissionsAsync();
-
-      console.log("PHOTO PERMISSION:", permission);
 
       if (!permission.granted) {
         Alert.alert(
@@ -148,8 +152,6 @@ export default function CreatePost() {
         return;
       }
 
-      console.log("OPENING IMAGE LIBRARY");
-
       const result =
         await ImagePicker.launchImageLibraryAsync({
           mediaTypes: ["images"],
@@ -158,18 +160,17 @@ export default function CreatePost() {
           quality: 0.8,
         });
 
-      console.log("IMAGE PICKER RESULT:", result);
-
-      if (!result.canceled && result.assets?.[0]) {
-        console.log(
-          "SELECTED IMAGE:",
-          result.assets[0].uri
-        );
-
+      if (
+        !result.canceled &&
+        result.assets?.[0]
+      ) {
         setImageUri(result.assets[0].uri);
       }
     } catch (error) {
-      console.error("IMAGE PICKER ERROR:", error);
+      console.error(
+        "IMAGE PICKER ERROR:",
+        error
+      );
 
       Alert.alert(
         "Photo error",
@@ -179,10 +180,6 @@ export default function CreatePost() {
       );
     }
   };
-
-  // -----------------------------------
-  // UPLOAD IMAGE
-  // -----------------------------------
 
   const uploadImage = async (
     userId: string
@@ -262,10 +259,6 @@ export default function CreatePost() {
     }
   };
 
-  // -----------------------------------
-  // PUBLISH POST
-  // -----------------------------------
-
   const publishPost = async () => {
     if (publishing) {
       return;
@@ -315,12 +308,8 @@ export default function CreatePost() {
         return;
       }
 
-      console.log(
-        "CURRENT AUTH USER ID:",
-        user.id
-      );
-
-      let uploadedImageUrl: string | null = null;
+      let uploadedImageUrl: string | null =
+        null;
 
       if (imageUri) {
         try {
@@ -336,7 +325,8 @@ export default function CreatePost() {
         }
       }
 
-      const cleanCaption = caption.trim();
+      const cleanCaption =
+        caption.trim();
 
       const { error: postError } =
         await supabase
@@ -345,8 +335,10 @@ export default function CreatePost() {
             user_id: user.id,
             restaurant_id: restaurantId,
             dish_id: dishId,
-            caption: cleanCaption || null,
-            image_url: uploadedImageUrl,
+            caption:
+              cleanCaption || null,
+            image_url:
+              uploadedImageUrl,
             rating,
           });
 
@@ -380,18 +372,14 @@ export default function CreatePost() {
     }
   };
 
-  // -----------------------------------
-  // LOADING
-  // -----------------------------------
-
   if (loading) {
-  return (
-    <>
-      <StatusBar style="light" />
-      <LoadingSkeleton text="Loading food..." />
-    </>
-  );
-}
+    return (
+      <>
+        <StatusBar style="light" />
+        <LoadingSkeleton text="Loading food..." />
+      </>
+    );
+  }
 
   return (
     <KeyboardAvoidingView
@@ -404,6 +392,8 @@ export default function CreatePost() {
     >
       <StatusBar style="light" />
 
+      {/* HEADER */}
+
       <View style={styles.header}>
         <Pressable
           style={styles.closeButton}
@@ -414,9 +404,15 @@ export default function CreatePost() {
           </Text>
         </Pressable>
 
-        <Text style={styles.headerTitle}>
-          Create post
-        </Text>
+        <View style={styles.headerCenter}>
+          <Text style={styles.headerEyebrow}>
+            FOOVIO
+          </Text>
+
+          <Text style={styles.headerTitle}>
+            Create post
+          </Text>
+        </View>
 
         <View style={styles.headerSpace} />
       </View>
@@ -426,230 +422,301 @@ export default function CreatePost() {
         keyboardShouldPersistTaps="handled"
         contentContainerStyle={styles.content}
       >
-        <Text style={styles.title}>
-          Share what you{"\n"}just ate.
-        </Text>
+        {/* INTRO */}
 
-        <Text style={styles.description}>
-          Help people discover food worth
-          trying.
-        </Text>
+        <View style={styles.intro}>
+          <Text style={styles.introNumber}>
+            01 / SHARE
+          </Text>
+
+          <Text style={styles.title}>
+            Share what you{"\n"}just ate.
+          </Text>
+
+          <Text style={styles.description}>
+            Help people discover food worth
+            remembering.
+          </Text>
+        </View>
 
         {/* PHOTO */}
 
-        <Text style={styles.label}>
-          PHOTO
-        </Text>
+        <View style={styles.section}>
+          <Text style={styles.label}>
+            PHOTO
+          </Text>
 
-        <Text style={styles.sectionTitle}>
-          Show us the food
-        </Text>
+          <Text style={styles.sectionTitle}>
+            Show us the food
+          </Text>
 
-        {imageUri ? (
-          <View>
-            <Image
-              source={{ uri: imageUri }}
-              style={styles.imagePreview}
-            />
+          {imageUri ? (
+            <View>
+              <Image
+                source={{
+                  uri: imageUri,
+                }}
+                style={styles.imagePreview}
+                resizeMode="cover"
+              />
 
-            <View style={styles.photoActions}>
-              <Pressable
-                style={styles.changePhoto}
-                onPress={pickImage}
-              >
-                <Text
-                  style={styles.changePhotoText}
+              <View style={styles.photoActions}>
+                <Pressable
+                  style={styles.changePhoto}
+                  onPress={pickImage}
                 >
-                  Change photo
-                </Text>
-              </Pressable>
+                  <Text
+                    style={
+                      styles.changePhotoText
+                    }
+                  >
+                    Change photo
+                  </Text>
+                </Pressable>
 
-              <Pressable
-                style={styles.removePhoto}
-                onPress={() => setImageUri(null)}
-              >
-                <Text
-                  style={styles.removePhotoText}
+                <Pressable
+                  style={styles.removePhoto}
+                  onPress={() =>
+                    setImageUri(null)
+                  }
                 >
-                  Remove
-                </Text>
-              </Pressable>
+                  <Text
+                    style={
+                      styles.removePhotoText
+                    }
+                  >
+                    Remove
+                  </Text>
+                </Pressable>
+              </View>
             </View>
-          </View>
-        ) : (
-          <Pressable
-          style={({ pressed }) => [
-            styles.photoPicker,
-            pressed && styles.photoPickerPressed,
-          ]}
-          onPress={() => {
-            Alert.alert("Button works", "Android detected the tap.");
-            console.log("ANDROID PHOTO PRESS DETECTED");
-            pickImage();
-            }}
+          ) : (
+            <Pressable
+              style={({ pressed }) => [
+                styles.photoPicker,
+                pressed &&
+                  styles.photoPickerPressed,
+              ]}
+              onPress={pickImage}
             >
-            <Text style={styles.photoIcon}>
-              ＋
-            </Text>
+              <View
+                style={styles.photoIconCircle}
+              >
+                <Text
+                  style={styles.photoIcon}
+                >
+                  +
+                </Text>
+              </View>
 
-            <Text style={styles.photoTitle}>
-              Choose a photo
-            </Text>
+              <Text style={styles.photoTitle}>
+                Choose a photo
+              </Text>
 
-            <Text style={styles.photoText}>
-              Pick a food photo from your gallery
-            </Text>
-          </Pressable>
-        )}
+              <Text style={styles.photoText}>
+                Pick a food photo from your
+                gallery
+              </Text>
+            </Pressable>
+          )}
+        </View>
 
         {/* RESTAURANT */}
 
-        <Text style={styles.label}>
-          RESTAURANT
-        </Text>
-
-        <Text style={styles.sectionTitle}>
-          Where did you eat?
-        </Text>
-
-        <View style={styles.options}>
-          {restaurants.map((restaurant) => {
-            const selected =
-              restaurantId === restaurant.id;
-
-            return (
-              <Pressable
-                key={restaurant.id}
-                onPress={() =>
-                  selectRestaurant(restaurant.id)
-                }
-                style={[
-                  styles.option,
-                  selected &&
-                    styles.optionSelected,
-                ]}
-              >
-                <Text
-                  style={[
-                    styles.optionText,
-                    selected &&
-                      styles.optionTextSelected,
-                  ]}
-                >
-                  {restaurant.name}
-                </Text>
-              </Pressable>
-            );
-          })}
-        </View>
-
-        {restaurants.length === 0 && (
-          <Text style={styles.emptyText}>
-            No restaurants available.
+        <View style={styles.section}>
+          <Text style={styles.label}>
+            RESTAURANT
           </Text>
-        )}
+
+          <Text style={styles.sectionTitle}>
+            Where did you eat?
+          </Text>
+
+          <View style={styles.options}>
+            {restaurants.map(
+              (restaurant) => {
+                const selected =
+                  restaurantId ===
+                  restaurant.id;
+
+                return (
+                  <Pressable
+                    key={restaurant.id}
+                    onPress={() =>
+                      selectRestaurant(
+                        restaurant.id
+                      )
+                    }
+                    style={[
+                      styles.option,
+                      selected &&
+                        styles.optionSelected,
+                    ]}
+                  >
+                    {selected && (
+                      <View
+                        style={
+                          styles.optionDot
+                        }
+                      />
+                    )}
+
+                    <Text
+                      style={[
+                        styles.optionText,
+                        selected &&
+                          styles.optionTextSelected,
+                      ]}
+                    >
+                      {restaurant.name}
+                    </Text>
+                  </Pressable>
+                );
+              }
+            )}
+          </View>
+
+          {restaurants.length === 0 && (
+            <Text style={styles.helper}>
+              No restaurants available.
+            </Text>
+          )}
+        </View>
 
         {/* DISH */}
 
-        <Text style={styles.label}>
-          DISH
-        </Text>
-
-        <Text style={styles.sectionTitle}>
-          What did you eat?
-        </Text>
-
-        {!restaurantId ? (
-          <Text style={styles.helper}>
-            Choose a restaurant first.
+        <View style={styles.section}>
+          <Text style={styles.label}>
+            DISH
           </Text>
-        ) : availableDishes.length === 0 ? (
-          <Text style={styles.helper}>
-            No dishes found for this restaurant.
-          </Text>
-        ) : (
-          <View style={styles.options}>
-            {availableDishes.map((dish) => {
-              const selected =
-                dishId === dish.id;
 
-              return (
-                <Pressable
-                  key={dish.id}
-                  onPress={() =>
-                    setDishId(dish.id)
-                  }
-                  style={[
-                    styles.option,
-                    selected &&
-                      styles.optionSelected,
-                  ]}
-                >
-                  <Text
-                    style={[
-                      styles.optionText,
-                      selected &&
-                        styles.optionTextSelected,
-                    ]}
-                  >
-                    {dish.name}
-                  </Text>
-                </Pressable>
-              );
-            })}
-          </View>
-        )}
+          <Text style={styles.sectionTitle}>
+            What did you eat?
+          </Text>
+
+          {!restaurantId ? (
+            <View style={styles.helperBox}>
+              <Text style={styles.helper}>
+                Choose a restaurant first.
+              </Text>
+            </View>
+          ) : availableDishes.length ===
+            0 ? (
+            <View style={styles.helperBox}>
+              <Text style={styles.helper}>
+                No dishes found for this
+                restaurant.
+              </Text>
+            </View>
+          ) : (
+            <View style={styles.options}>
+              {availableDishes.map(
+                (dish) => {
+                  const selected =
+                    dishId === dish.id;
+
+                  return (
+                    <Pressable
+                      key={dish.id}
+                      onPress={() =>
+                        setDishId(dish.id)
+                      }
+                      style={[
+                        styles.option,
+                        selected &&
+                          styles.optionSelected,
+                      ]}
+                    >
+                      {selected && (
+                        <View
+                          style={
+                            styles.optionDot
+                          }
+                        />
+                      )}
+
+                      <Text
+                        style={[
+                          styles.optionText,
+                          selected &&
+                            styles.optionTextSelected,
+                        ]}
+                      >
+                        {dish.name}
+                      </Text>
+                    </Pressable>
+                  );
+                }
+              )}
+            </View>
+          )}
+        </View>
 
         {/* RATING */}
 
-        <Text style={styles.label}>
-          RATING
-        </Text>
+        <View style={styles.section}>
+          <Text style={styles.label}>
+            RATING
+          </Text>
 
-        <Text style={styles.sectionTitle}>
-          How was it?
-        </Text>
+          <Text style={styles.sectionTitle}>
+            How was it?
+          </Text>
 
-       <RatingStars
-        rating={rating}
-        editable
-        onChange={setRating}
-        size={38}
-        />
+          <View style={styles.ratingCard}>
+            <RatingStars
+              rating={rating}
+              editable
+              onChange={setRating}
+              size={38}
+            />
+
+            <Text style={styles.ratingHint}>
+              {rating === 0
+                ? "Tap the stars to rate"
+                : `${rating}/5 — thanks for sharing`}
+            </Text>
+          </View>
+        </View>
 
         {/* CAPTION */}
 
-        <Text style={styles.label}>
-          CAPTION
-        </Text>
+        <View style={styles.section}>
+          <Text style={styles.label}>
+            CAPTION
+          </Text>
 
-        <Text style={styles.sectionTitle}>
-          Tell people about it
-        </Text>
+          <Text style={styles.sectionTitle}>
+            Tell people about it
+          </Text>
 
-        <TextInput
-          value={caption}
-          onChangeText={setCaption}
-          placeholder="What did you think of the food?"
-          placeholderTextColor="#999999"
-          multiline
-          maxLength={500}
-          style={styles.captionInput}
-        />
+          <TextInput
+            value={caption}
+            onChangeText={setCaption}
+            placeholder="What did you think of the food?"
+            placeholderTextColor="#566273"
+            multiline
+            maxLength={500}
+            style={styles.captionInput}
+            selectionColor={COLORS.blueLight}
+          />
 
-        <Text style={styles.characterCount}>
-          {caption.length}/500
-        </Text>
+          <Text
+            style={styles.characterCount}
+          >
+            {caption.length}/500
+          </Text>
+        </View>
       </ScrollView>
 
-      {/* PUBLISH */}
+      {/* FOOTER */}
 
-     <View style={styles.footer}>
-       <PrimaryButton
-  title="Publish Post"
-  onPress={publishPost}
-  loading={publishing}
-/>
+      <View style={styles.footer}>
+        <PrimaryButton
+          title="Publish Post"
+          onPress={publishPost}
+          loading={publishing}
+        />
       </View>
     </KeyboardAvoidingView>
   );
@@ -658,235 +725,348 @@ export default function CreatePost() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#05080D",
+    backgroundColor:
+      COLORS.background,
   },
 
+  /* HEADER */
+
   header: {
-    paddingTop: 50,
+    paddingTop: 48,
     paddingHorizontal: 20,
-    paddingBottom: 14,
+    paddingBottom: 15,
+    backgroundColor:
+      COLORS.background,
     borderBottomWidth: 1,
-    borderBottomColor: "rgba(255,255,255,0.055)",
-    backgroundColor: "#05080D",
+    borderBottomColor:
+      COLORS.border,
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
   },
 
   closeButton: {
-    width: 40,
-    height: 40,
+    width: 42,
+    height: 42,
+    borderRadius: 21,
+    backgroundColor:
+      COLORS.surface,
+    borderWidth: 1,
+    borderColor:
+      COLORS.border,
     justifyContent: "center",
     alignItems: "center",
   },
 
   closeText: {
-    color: "#F7FAFF",
-    fontSize: 31,
-    lineHeight: 33,
+    color: COLORS.white,
+    fontSize: 30,
+    lineHeight: 32,
+    marginTop: -2,
+  },
+
+  headerCenter: {
+    alignItems: "center",
+  },
+
+  headerEyebrow: {
+    color: COLORS.blueLight,
+    fontSize: 7,
+    fontWeight: "900",
+    letterSpacing: 1.8,
+    marginBottom: 3,
   },
 
   headerTitle: {
-    color: "#F7FAFF",
-    fontSize: 17,
+    color: COLORS.white,
+    fontSize: 16,
     fontWeight: "900",
   },
 
   headerSpace: {
-    width: 40,
+    width: 42,
   },
 
+  /* CONTENT */
+
   content: {
-    paddingHorizontal: 21,
+    paddingHorizontal: 20,
     paddingTop: 30,
-    paddingBottom: 40,
+    paddingBottom: 45,
+  },
+
+  intro: {
+    marginBottom: 4,
+  },
+
+  introNumber: {
+    color: COLORS.blueLight,
+    fontSize: 8,
+    fontWeight: "900",
+    letterSpacing: 1.5,
+    marginBottom: 9,
   },
 
   title: {
-    color: "#F7FAFF",
+    color: COLORS.white,
     fontSize: 34,
-    lineHeight: 40,
+    lineHeight: 39,
     fontWeight: "900",
     letterSpacing: -1,
   },
 
   description: {
-    color: "#7F8C9D",
-    fontSize: 13,
-    lineHeight: 21,
+    color: COLORS.muted,
+    fontSize: 12,
+    lineHeight: 19,
     marginTop: 10,
-    marginBottom: 8,
+    maxWidth: 300,
+  },
+
+  /* SECTIONS */
+
+  section: {
+    marginTop: 29,
   },
 
   label: {
-    color: "#73C7FF",
-    fontSize: 9,
+    color: COLORS.blueLight,
+    fontSize: 8,
     fontWeight: "900",
-    letterSpacing: 1.4,
-    marginTop: 28,
+    letterSpacing: 1.5,
   },
 
   sectionTitle: {
-    color: "#F7FAFF",
-    fontSize: 18,
+    color: COLORS.white,
+    fontSize: 17,
     fontWeight: "900",
-    marginTop: 6,
-    marginBottom: 14,
+    marginTop: 5,
+    marginBottom: 13,
   },
+
+  /* PHOTO */
 
   photoPicker: {
     height: 190,
     borderWidth: 1,
     borderStyle: "dashed",
-    borderColor: "rgba(113,199,255,0.18)",
-    borderRadius: 20,
-    backgroundColor: "#0B111A",
+    borderColor:
+      "rgba(113,199,255,0.16)",
+    borderRadius: 21,
+    backgroundColor:
+      COLORS.surface,
     justifyContent: "center",
     alignItems: "center",
-    paddingHorizontal: 20,
   },
 
   photoPickerPressed: {
-    opacity: 0.7,
+    opacity: 0.68,
+    transform: [
+      { scale: 0.99 },
+    ],
+  },
+
+  photoIconCircle: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    backgroundColor:
+      "rgba(46,155,255,0.12)",
+    borderWidth: 1,
+    borderColor:
+      "rgba(113,199,255,0.12)",
+    justifyContent: "center",
+    alignItems: "center",
   },
 
   photoIcon: {
-    color: "#73C7FF",
-    fontSize: 34,
-    fontWeight: "500",
+    color: COLORS.blueLight,
+    fontSize: 27,
+    fontWeight: "400",
+    lineHeight: 29,
   },
 
   photoTitle: {
-    color: "#F7FAFF",
-    fontSize: 15,
-    fontWeight: "800",
-    marginTop: 7,
+    color: COLORS.white,
+    fontSize: 14,
+    fontWeight: "900",
+    marginTop: 10,
   },
 
   photoText: {
-    color: "#6F7B8B",
-    fontSize: 11,
+    color: COLORS.muted,
+    fontSize: 10,
     marginTop: 5,
-    textAlign: "center",
   },
 
   imagePreview: {
     width: "100%",
-    height: 240,
-    borderRadius: 20,
-    backgroundColor: "#0B111A",
+    height: 235,
+    borderRadius: 21,
+    backgroundColor:
+      COLORS.surface,
   },
 
   photoActions: {
     flexDirection: "row",
-    gap: 10,
+    gap: 9,
     marginTop: 10,
   },
 
   changePhoto: {
-    backgroundColor: "rgba(46,155,255,0.12)",
+    backgroundColor:
+      "rgba(46,155,255,0.11)",
     borderWidth: 1,
-    borderColor: "rgba(113,199,255,0.10)",
+    borderColor:
+      "rgba(113,199,255,0.10)",
     paddingHorizontal: 15,
     paddingVertical: 10,
     borderRadius: 11,
   },
 
   changePhotoText: {
-    color: "#73C7FF",
-    fontSize: 11,
-    fontWeight: "800",
+    color: COLORS.blueLight,
+    fontSize: 10,
+    fontWeight: "900",
   },
 
   removePhoto: {
-    backgroundColor: "#111A25",
+    backgroundColor:
+      COLORS.surface2,
     borderWidth: 1,
-    borderColor: "rgba(255,255,255,0.07)",
+    borderColor:
+      COLORS.border,
     paddingHorizontal: 15,
     paddingVertical: 10,
     borderRadius: 11,
   },
 
   removePhotoText: {
-    color: "#AAB4C2",
-    fontSize: 11,
+    color: COLORS.text,
+    fontSize: 10,
     fontWeight: "700",
   },
+
+  /* OPTIONS */
 
   options: {
     flexDirection: "row",
     flexWrap: "wrap",
-    gap: 9,
+    gap: 8,
   },
 
   option: {
+    flexDirection: "row",
+    alignItems: "center",
     borderWidth: 1,
-    borderColor: "rgba(255,255,255,0.08)",
+    borderColor:
+      COLORS.borderStrong,
     borderRadius: 100,
-    paddingHorizontal: 16,
-    paddingVertical: 11,
-    backgroundColor: "#0B111A",
+    paddingHorizontal: 15,
+    paddingVertical: 10,
+    backgroundColor:
+      COLORS.surface,
   },
 
   optionSelected: {
-    backgroundColor: "#2E9BFF",
-    borderColor: "#2E9BFF",
+    backgroundColor:
+      COLORS.blue,
+    borderColor:
+      COLORS.blue,
+  },
+
+  optionDot: {
+    width: 5,
+    height: 5,
+    borderRadius: 3,
+    backgroundColor:
+      COLORS.white,
+    marginRight: 7,
   },
 
   optionText: {
     color: "#AAB4C2",
-    fontSize: 12,
+    fontSize: 11,
     fontWeight: "700",
   },
 
   optionTextSelected: {
-    color: "#F7FAFF",
+    color: COLORS.white,
     fontWeight: "900",
   },
 
+  helperBox: {
+    paddingHorizontal: 15,
+    paddingVertical: 13,
+    borderRadius: 14,
+    backgroundColor:
+      COLORS.surface,
+    borderWidth: 1,
+    borderColor:
+      COLORS.border,
+  },
+
   helper: {
-    color: "#6F7B8B",
-    fontSize: 12,
+    color: COLORS.muted,
+    fontSize: 10,
+    lineHeight: 16,
   },
 
-  emptyText: {
-    color: "#6F7B8B",
-    fontSize: 12,
+  /* RATING */
+
+  ratingCard: {
+    paddingVertical: 18,
+    paddingHorizontal: 16,
+    borderRadius: 19,
+    backgroundColor:
+      COLORS.surface,
+    borderWidth: 1,
+    borderColor:
+      COLORS.border,
+    alignItems: "center",
   },
 
-  ratingText: {
-    color: "#7F8C9D",
-    fontSize: 11,
-    marginTop: 6,
+  ratingHint: {
+    color: COLORS.muted,
+    fontSize: 9,
+    marginTop: 9,
   },
+
+  /* CAPTION */
 
   captionInput: {
     minHeight: 125,
-    backgroundColor: "#0B111A",
+    backgroundColor:
+      COLORS.surface,
     borderWidth: 1,
-    borderColor: "rgba(255,255,255,0.08)",
-    borderRadius: 17,
-    paddingHorizontal: 16,
-    paddingVertical: 15,
-    color: "#F7FAFF",
-    fontSize: 13,
-    lineHeight: 21,
+    borderColor:
+      COLORS.borderStrong,
+    borderRadius: 18,
+    paddingHorizontal: 15,
+    paddingVertical: 14,
+    color: COLORS.white,
+    fontSize: 12,
+    lineHeight: 20,
     textAlignVertical: "top",
   },
 
   characterCount: {
-    color: "#6F7B8B",
-    fontSize: 10,
+    color: COLORS.muted,
+    fontSize: 9,
     textAlign: "right",
     marginTop: 6,
   },
 
+  /* FOOTER */
+
   footer: {
-    paddingHorizontal: 22,
+    paddingHorizontal: 21,
     paddingTop: 12,
-    paddingBottom: 28,
+    paddingBottom: 25,
+    backgroundColor:
+      "#060A10",
     borderTopWidth: 1,
-    borderTopColor: "rgba(255,255,255,0.055)",
-    backgroundColor: "#060A10",
+    borderTopColor:
+      COLORS.border,
   },
 });
