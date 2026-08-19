@@ -364,7 +364,7 @@ export default function Create() {
       setImageUri(null);
 
       Alert.alert(
-        "Posted 🎉",
+        "Posted",
         "Your food post is now on Foovio."
       );
     } catch (error) {

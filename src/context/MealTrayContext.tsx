@@ -13,6 +13,10 @@ type MealTrayContextType = {
 
   addDish: (dish: MealItem) => void;
 
+  updateDish: (dishId: string, updates: Partial<MealItem>) => void;
+
+  setDishQuantity: (dishId: string, quantity: number) => void;
+
   removeDish: (dishId: string) => void;
 
   increaseQuantity: (dishId: string) => void;
@@ -40,23 +44,67 @@ export function MealTrayProvider({
 
   function addDish(dish: MealItem) {
     setMeal((current) => {
+      const normalizedDish = {
+        ...dish,
+        quantity: Math.max(1, dish.quantity || 1),
+      };
+
       const existing = current.find(
-        (item) => item.dishId === dish.dishId
+        (item) => item.dishId === normalizedDish.dishId
       );
 
       if (existing) {
         return current.map((item) =>
-          item.dishId === dish.dishId
+          item.dishId === normalizedDish.dishId
             ? {
                 ...item,
-                quantity: item.quantity + 1,
+                ...normalizedDish,
+                quantity: item.quantity + normalizedDish.quantity,
+                customizations: {
+                  ...item.customizations,
+                  ...normalizedDish.customizations,
+                },
               }
             : item
         );
       }
 
-      return [...current, dish];
+      return [...current, normalizedDish];
     });
+  }
+
+  function updateDish(dishId: string, updates: Partial<MealItem>) {
+    setMeal((current) =>
+      current.map((item) => {
+        if (item.dishId !== dishId) {
+          return item;
+        }
+
+        return {
+          ...item,
+          ...updates,
+          customizations: {
+            ...item.customizations,
+            ...updates.customizations,
+          },
+        };
+      })
+    );
+  }
+
+  function setDishQuantity(dishId: string, quantity: number) {
+    setMeal((current) =>
+      current
+        .map((item) =>
+          item.dishId === dishId
+            ? {
+                ...item,
+                quantity: Math.max(0, quantity),
+              }
+            : item
+        )
+        .filter((item) => item.quantity > 0)
+    );
   }
 
   function removeDish(dishId: string) {
@@ -107,8 +155,11 @@ export function MealTrayProvider({
   const totalPrice = useMemo(
     () =>
       meal.reduce(
-        (sum, item) =>
-          sum + item.price * item.quantity,
+        (sum, item) => {
+          const unitPrice =
+            item.customizations?.unitPrice ?? item.price;
+          return sum + unitPrice * item.quantity;
+        },
         0
       ),
     [meal]
@@ -126,18 +177,18 @@ export function MealTrayProvider({
   return (
     <MealTrayContext.Provider
       value={{
-  meal,
-  addDish,
-  removeDish,
-  increaseQuantity,
-  decreaseQuantity,
-  clearMeal,
-
-  getDishQuantity,
-
-  totalItems,
-  totalPrice,
-}}
+        meal,
+        addDish,
+        updateDish,
+        setDishQuantity,
+        removeDish,
+        increaseQuantity,
+        decreaseQuantity,
+        clearMeal,
+        getDishQuantity,
+        totalItems,
+        totalPrice,
+      }}
     >
       {children}
     </MealTrayContext.Provider>

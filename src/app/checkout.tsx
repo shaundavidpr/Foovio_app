@@ -2,300 +2,266 @@ import { StatusBar } from "expo-status-bar";
 import { router } from "expo-router";
 import { useState } from "react";
 import {
+  ActivityIndicator,
+  Pressable,
   SafeAreaView,
   ScrollView,
   StyleSheet,
   Text,
-  View,
-  Pressable,
   TextInput,
-  Alert,
+  View,
 } from "react-native";
 
 import { supabase } from "@/lib/supabase";
 import { useMealTray } from "@/context/MealTrayContext";
 
 export default function Checkout() {
-  const {
-    meal,
-    totalPrice,
-    clearMeal,
-  } = useMealTray();
+  const { meal, totalPrice, clearMeal } = useMealTray();
 
   const [loading, setLoading] = useState(false);
-
-  const [orderType, setOrderType] = useState<
-    "pickup" | "delivery"
-  >("pickup");
-
-  const [paymentMethod, setPaymentMethod] = useState<
-    "cash" | "online"
-  >("cash");
-
+  const [orderType, setOrderType] = useState<"pickup" | "delivery">("pickup");
+  const [paymentMethod, setPaymentMethod] = useState<"cash" | "online">("cash");
   const [address, setAddress] = useState("");
-
   const [phone, setPhone] = useState("");
-
   const [notes, setNotes] = useState("");
+  const [fieldErrors, setFieldErrors] = useState({
+    meal: "",
+    address: "",
+    phone: "",
+    submit: "",
+  });
 
-  const deliveryFee =
-    orderType === "delivery" ? 40 : 0;
-
+  const deliveryFee = orderType === "delivery" ? 40 : 0;
   const total = totalPrice + deliveryFee;
 
-  async function placeOrder() {
-  try {
+  function validateForm() {
+    const nextErrors = {
+      meal: "",
+      address: "",
+      phone: "",
+      submit: "",
+    };
+
     if (meal.length === 0) {
-      Alert.alert("Your meal is empty.");
-      return;
+      nextErrors.meal = "Add a dish before placing the order.";
     }
 
     if (orderType === "delivery") {
       if (!address.trim()) {
-        Alert.alert("Please enter a delivery address.");
-        return;
+        nextErrors.address = "Enter a delivery address.";
       }
-
       if (!phone.trim()) {
-        Alert.alert("Please enter a phone number.");
-        return;
+        nextErrors.phone = "Enter a phone number.";
       }
     }
 
-    setLoading(true);
+    setFieldErrors(nextErrors);
+    return !nextErrors.meal && !nextErrors.address && !nextErrors.phone;
+  }
 
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-
-    if (!user) {
-      Alert.alert("Please login first.");
+  async function placeOrder() {
+    if (!validateForm()) {
       return;
     }
 
-    const restaurantId = meal[0].restaurantId;
+    setLoading(true);
+    setFieldErrors((current) => ({ ...current, submit: "" }));
 
-    const { data: order, error: orderError } = await supabase
-      .from("orders")
-      .insert({
-        user_id: user.id,
-        restaurant_id: restaurantId,
-        subtotal: totalPrice,
-        delivery_fee: deliveryFee,
-        total,
-        payment_method: paymentMethod,
-        order_type: orderType,
-        delivery_address:
-          orderType === "delivery" ? address : null,
-        customer_phone:
-          orderType === "delivery" ? phone : null,
-        notes,
-      })
-      .select()
-      .single();
+    try {
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
 
-    if (orderError) throw orderError;
+      if (!user) {
+        setFieldErrors((current) => ({
+          ...current,
+          submit: "Please sign in before placing the order.",
+        }));
+        return;
+      }
 
-    const items = meal.map((item) => ({
-      order_id: order.id,
-      dish_id: item.dishId,
-      quantity: item.quantity,
-      price: item.price,
-    }));
+      // Build the items payload to verify prices on the server
+      const itemsPayload = meal.map((item) => ({ dish_id: item.dishId, quantity: item.quantity }));
 
-    const { error: itemsError } = await supabase
-      .from("order_items")
-      .insert(items);
+      // Call Supabase Edge Function to verify prices and compute authoritative total
+      const fnResponse = await supabase.functions.invoke("verify-order", {
+        body: JSON.stringify({ items: itemsPayload, delivery_fee: deliveryFee }),
+      });
 
-    if (itemsError) throw itemsError;
+      if (fnResponse.error) {
+        throw new Error(fnResponse.error.message || "Price verification failed");
+      }
 
-    clearMeal();
+      const verification = fnResponse.data as any;
+      if (!verification || !verification.valid) {
+        throw new Error(verification?.error || "Price verification failed");
+      }
 
-    router.replace({
-  pathname: "/order-success",
-});
-  } catch (e: any) {
-    Alert.alert("Order failed", e.message);
-  } finally {
-    setLoading(false);
+      // Generate an idempotency key to avoid duplicate orders
+      const idempotencyKey = `${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
+
+      // Call server function to create the order (service-role creates order and items atomically)
+      const createResp = await supabase.functions.invoke("create-order", {
+        body: JSON.stringify({
+          user_id: user.id,
+          items: meal.map((it) => ({ dish_id: it.dishId, quantity: it.quantity, restaurant_id: it.restaurantId })),
+          idempotency_key: idempotencyKey,
+          delivery_fee: deliveryFee,
+          order_type: orderType,
+          payment_method: paymentMethod,
+          delivery_address: orderType === "delivery" ? address : null,
+          customer_phone: orderType === "delivery" ? phone : null,
+          notes,
+        }),
+      });
+
+      if (createResp.error) {
+        throw new Error(createResp.error.message || "Order creation failed");
+      }
+
+      const createData = createResp.data as any;
+      if (createData?.success !== true) {
+        throw new Error(createData?.error || "Order creation failed");
+      }
+
+      clearMeal();
+      router.replace({ pathname: "/order-success" });
+    } catch (error: any) {
+      console.error("placeOrder error", error);
+      setFieldErrors((current) => ({
+        ...current,
+        submit: error?.message || "The order could not be placed right now.",
+      }));
+    } finally {
+      setLoading(false);
+    }
   }
-}
 
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar style="light" />
 
-      <ScrollView
-        contentContainerStyle={styles.content}
-      >
-        <Text style={styles.title}>
-          Checkout
-        </Text>
+      <ScrollView contentContainerStyle={styles.content}>
+        <Text style={styles.title}>Checkout</Text>
 
-        <Text style={styles.section}>
-          Your Meal
-        </Text>
+        <Text style={styles.section}>Your meal</Text>
 
-        {meal.map((item) => (
-          <View
-            key={item.dishId}
-            style={styles.item}
-          >
-            <View>
-              <Text style={styles.itemName}>
-                {item.name}
-              </Text>
+        {meal.length === 0 ? (
+          <Text style={styles.emptyState}>Add dishes to start your order.</Text>
+        ) : (
+          meal.map((item) => (
+<View key={item.dishId} style={styles.item}>
+  <View>
+    <Text style={styles.itemName}>{item.name}</Text>
+    <Text style={styles.itemQty}>Qty {item.quantity}</Text>
+  </View>
 
-              <Text style={styles.itemQty}>
-                Qty {item.quantity}
-              </Text>
-            </View>
+  <Text style={styles.itemPrice}>₹{((item.customizations?.unitPrice ?? item.price) * item.quantity).toFixed(0)}</Text>
+</View>
+          ))
+        )}
 
-            <Text style={styles.itemPrice}>
-              ₹
-              {(item.price * item.quantity).toFixed(0)}
-            </Text>
-          </View>
-        ))}
+        {fieldErrors.meal ? <Text style={styles.errorText}>{fieldErrors.meal}</Text> : null}
 
-        <Text style={styles.section}>
-          Order Type
-        </Text>
+        <Text style={styles.section}>Order type</Text>
 
         <View style={styles.row}>
           <Pressable
-            style={[
-              styles.option,
-              orderType === "pickup" &&
-                styles.selected,
-            ]}
-            onPress={() =>
-              setOrderType("pickup")
-            }
+style={[styles.option, orderType === "pickup" && styles.selected]}
+onPress={() => setOrderType("pickup")}
           >
-            <Text style={styles.optionText}>Pickup</Text>
+<Text style={styles.optionText}>Pickup</Text>
           </Pressable>
 
           <Pressable
-            style={[
-              styles.option,
-              orderType === "delivery" &&
-                styles.selected,
-            ]}
-            onPress={() =>
-              setOrderType("delivery")
-            }
+style={[styles.option, orderType === "delivery" && styles.selected]}
+onPress={() => setOrderType("delivery")}
           >
-            <Text style={styles.optionText}>Delivery</Text>
+<Text style={styles.optionText}>Delivery</Text>
           </Pressable>
         </View>
 
-        <Text style={styles.section}>
-          Payment
-        </Text>
-
+        <Text style={styles.section}>Payment</Text>
         <View style={styles.row}>
           <Pressable
-            style={[
-              styles.option,
-              paymentMethod === "cash" &&
-                styles.selected,
-            ]}
-            onPress={() =>
-              setPaymentMethod("cash")
-            }
+style={[styles.option, paymentMethod === "cash" && styles.selected]}
+onPress={() => setPaymentMethod("cash")}
           >
-            <Text style={styles.optionText}>Cash</Text>
+<Text style={styles.optionText}>Cash</Text>
           </Pressable>
 
-          <Pressable
-            style={styles.option}
-            disabled
-          >
-            <Text style={styles.optionText}>
-  Online (Coming Soon)
-</Text>
+          <Pressable style={styles.option} disabled>
+<Text style={styles.optionText}>Online (coming soon)</Text>
           </Pressable>
         </View>
 
         {orderType === "delivery" && (
           <>
-            <Text style={styles.section}>
-              Delivery Address
-            </Text>
+<Text style={styles.section}>Delivery address</Text>
+<TextInput
+  value={address}
+  onChangeText={setAddress}
+  placeholder="Enter address"
+  style={[styles.input, fieldErrors.address && styles.inputError]}
+  placeholderTextColor="#7f8c9d"
+/>
+{fieldErrors.address ? <Text style={styles.errorText}>{fieldErrors.address}</Text> : null}
 
-            <TextInput
-              value={address}
-              onChangeText={setAddress}
-              placeholder="Enter address"
-              style={styles.input}
-            />
-
-            <Text style={styles.section}>
-              Phone Number
-            </Text>
-
-            <TextInput
-              value={phone}
-              onChangeText={setPhone}
-              keyboardType="phone-pad"
-              placeholder="Enter phone number"
-              style={styles.input}
-            />
+<Text style={styles.section}>Phone number</Text>
+<TextInput
+  value={phone}
+  onChangeText={setPhone}
+  keyboardType="phone-pad"
+  placeholder="Enter phone number"
+  style={[styles.input, fieldErrors.phone && styles.inputError]}
+  placeholderTextColor="#7f8c9d"
+/>
+{fieldErrors.phone ? <Text style={styles.errorText}>{fieldErrors.phone}</Text> : null}
           </>
         )}
 
-        <Text style={styles.section}>
-          Notes
-        </Text>
-
+        <Text style={styles.section}>Notes</Text>
         <TextInput
           value={notes}
           onChangeText={setNotes}
           placeholder="Any instructions?"
           multiline
-          style={[
-            styles.input,
-            { height: 100 },
-          ]}
+          style={[styles.input, { height: 100 }]}
+          placeholderTextColor="#7f8c9d"
         />
 
         <View style={styles.summary}>
           <View style={styles.summaryRow}>
-            <Text>Subtotal</Text>
-            <Text>
-              ₹{totalPrice.toFixed(0)}
-            </Text>
+<Text style={styles.summaryText}>Subtotal</Text>
+<Text style={styles.summaryValue}>₹{totalPrice.toFixed(0)}</Text>
           </View>
 
           <View style={styles.summaryRow}>
-            <Text>Delivery</Text>
-            <Text>
-              ₹{deliveryFee.toFixed(0)}
-            </Text>
+<Text style={styles.summaryText}>Delivery</Text>
+<Text style={styles.summaryValue}>₹{deliveryFee.toFixed(0)}</Text>
           </View>
 
           <View style={styles.summaryRow}>
-            <Text style={styles.total}>
-              Total
-            </Text>
-
-            <Text style={styles.total}>
-              ₹{total.toFixed(0)}
-            </Text>
+<Text style={styles.total}>Total</Text>
+<Text style={styles.total}>₹{total.toFixed(0)}</Text>
           </View>
         </View>
 
+        {fieldErrors.submit ? <Text style={styles.submitError}>{fieldErrors.submit}</Text> : null}
+
         <Pressable
-          style={styles.button}
+          style={[styles.button, loading && styles.buttonLoading]}
           onPress={placeOrder}
-          disabled={loading}
+          disabled={loading || meal.length === 0}
         >
-          <Text style={styles.buttonText}>
-            {loading
-              ? "Placing..."
-              : "Place Order"}
-          </Text>
+          {loading ? (
+<View style={styles.loadingRow}>
+  <ActivityIndicator size="small" color="#ffffff" />
+  <Text style={styles.buttonText}>Placing order...</Text>
+</View>
+          ) : (
+<Text style={styles.buttonText}>Place order</Text>
+          )}
         </Pressable>
       </ScrollView>
     </SafeAreaView>
@@ -305,66 +271,73 @@ export default function Checkout() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#05080D",
+    backgroundColor: "#05080d",
   },
-
   content: {
     paddingHorizontal: 21,
-    paddingTop: 55,
+    paddingTop: 48,
     paddingBottom: 50,
   },
-
   title: {
-    color: "#F7FAFF",
+    color: "#f7faff",
     fontSize: 34,
     fontWeight: "900",
     letterSpacing: -1,
     marginBottom: 28,
   },
-
   section: {
-    color: "#F7FAFF",
+    color: "#f7faff",
     marginTop: 24,
-    marginBottom: 11,
-    fontWeight: "900",
-    fontSize: 16,
+    marginBottom: 12,
+    fontWeight: "700",
+    fontSize: 15,
   },
-
+  emptyState: {
+    color: "#b9c2d0",
+    fontSize: 12,
+    marginBottom: 14,
+  },
   item: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    backgroundColor: "#0B111A",
+    backgroundColor: "#0b111a",
     borderRadius: 18,
     borderWidth: 1,
-    borderColor: "rgba(255,255,255,0.055)",
+    borderColor: "rgba(255,255,255,0.08)",
     padding: 16,
     marginBottom: 10,
   },
-
   itemName: {
-    color: "#F7FAFF",
+    color: "#f7faff",
     fontSize: 14,
     fontWeight: "800",
   },
-
   itemQty: {
-    color: "#7F8C9D",
+    color: "#7f8c9d",
     fontSize: 10,
     marginTop: 5,
   },
-
   itemPrice: {
-    color: "#73C7FF",
+    color: "#73c7ff",
     fontSize: 13,
     fontWeight: "900",
   },
-
+  errorText: {
+    color: "#fca5a5",
+    fontSize: 12,
+    marginTop: 8,
+  },
+  submitError: {
+    marginTop: 18,
+    color: "#fca5a5",
+    fontSize: 12,
+    textAlign: "center",
+  },
   row: {
     flexDirection: "row",
     gap: 10,
   },
-
   option: {
     flex: 1,
     minHeight: 52,
@@ -372,77 +345,81 @@ const styles = StyleSheet.create({
     paddingVertical: 14,
     borderWidth: 1,
     borderColor: "rgba(255,255,255,0.08)",
-    backgroundColor: "#0B111A",
+    backgroundColor: "#0b111a",
     borderRadius: 16,
     alignItems: "center",
     justifyContent: "center",
   },
-
   selected: {
-    borderColor: "#2E9BFF",
-    backgroundColor: "rgba(46,155,255,0.12)",
+    borderColor: "#73c7ff",
+    backgroundColor: "rgba(115, 199, 255, 0.12)",
   },
-
   optionText: {
-    color: "#DCE5F0",
-    fontSize: 11,
+    color: "#dce5f0",
+    fontSize: 12,
     fontWeight: "800",
   },
-
   input: {
     borderWidth: 1,
     borderColor: "rgba(255,255,255,0.08)",
-    backgroundColor: "#0B111A",
+    backgroundColor: "#0b111a",
     borderRadius: 16,
     paddingHorizontal: 15,
     paddingVertical: 14,
-    color: "#F7FAFF",
-    fontSize: 12,
-    minHeight: 50,
+    color: "#f7faff",
+    fontSize: 13,
+    minHeight: 52,
   },
-
+  inputError: {
+    borderColor: "#fca5a5",
+  },
   summary: {
     marginTop: 30,
-    backgroundColor: "#0B111A",
+    backgroundColor: "#0b111a",
     borderRadius: 22,
     borderWidth: 1,
-    borderColor: "rgba(255,255,255,0.055)",
+    borderColor: "rgba(255,255,255,0.08)",
     padding: 19,
   },
-
   summaryRow: {
     flexDirection: "row",
     justifyContent: "space-between",
     marginBottom: 13,
   },
-
-  summaryRowText: {
-    color: "#7F8C9D",
-    fontSize: 11,
+  summaryText: {
+    color: "#aeb9c7",
+    fontSize: 12,
   },
-
   summaryValue: {
-    color: "#DCE5F0",
-    fontSize: 11,
+    color: "#dce5f0",
+    fontSize: 12,
     fontWeight: "700",
   },
-
   total: {
-    color: "#F7FAFF",
+    color: "#f7faff",
     fontSize: 19,
     fontWeight: "900",
   },
-
   button: {
     marginTop: 24,
-    backgroundColor: "#2E9BFF",
-    paddingVertical: 17,
+    backgroundColor: "#2e9bff",
+    minHeight: 52,
     borderRadius: 20,
     alignItems: "center",
+    justifyContent: "center",
+    paddingHorizontal: 20,
   },
-
+  buttonLoading: {
+    opacity: 0.9,
+  },
+  loadingRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 8,
+  },
   buttonText: {
-    color: "#F7FAFF",
+    color: "#f7faff",
     fontSize: 14,
     fontWeight: "900",
   },

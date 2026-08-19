@@ -3,6 +3,7 @@ import { StatusBar } from "expo-status-bar";
 import { useEffect, useState } from "react";
 import {
   ActivityIndicator,
+  Appearance,
   Image,
   Pressable,
   StyleSheet,
@@ -12,10 +13,13 @@ import {
 
 import { useAuth } from "../hooks/useAuth";
 import { supabase } from "../lib/supabase";
+import ScreenLayout from "@/components/ui/ScreenLayout";
+import { colors, spacing } from "@/theme";
 
 export default function Index() {
   const { session, loading } = useAuth();
   const [checkingProfile, setCheckingProfile] = useState(false);
+  const isLight = (Appearance.getColorScheme() ?? "dark") === "light";
 
   useEffect(() => {
     if (loading || !session?.user) {
@@ -58,18 +62,18 @@ export default function Index() {
   // Supabase is checking the stored auth session.
   if (loading || checkingProfile || session) {
     return (
-      <View style={styles.loadingContainer}>
-        <StatusBar style="dark" />
-        <ActivityIndicator size="large" color="#29A9EA" />
-      </View>
+      <ScreenLayout>
+        <StatusBar style={isLight ? "dark" : "light"} />
+        <ActivityIndicator size="large" color={colors.accent} />
+      </ScreenLayout>
     );
   }
 
   return (
-    <View style={styles.container}>
-      <StatusBar style="dark" />
+    <ScreenLayout>
+      <StatusBar style={isLight ? "dark" : "light"} />
 
-      <View style={styles.brandSection}>
+      <View style={[styles.brandSection, isLight && styles.brandSectionLight]}>
         <Image
           source={require("../../assets/images/foovio-logo.png")}
           style={styles.logo}
@@ -114,22 +118,22 @@ export default function Index() {
           </Text>
         </Pressable>
       </View>
-    </View>
+    </ScreenLayout>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#FFFFFF",
-    paddingHorizontal: 28,
+    backgroundColor: colors.background,
+    paddingHorizontal: spacing.md,
     paddingTop: 60,
     paddingBottom: 40,
   },
 
   loadingContainer: {
     flex: 1,
-    backgroundColor: "#FFFFFF",
+    backgroundColor: colors.background,
     justifyContent: "center",
     alignItems: "center",
   },
@@ -140,6 +144,10 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
 
+  brandSectionLight: {
+    backgroundColor: "transparent",
+  },
+
   logo: {
     width: 300,
     height: 230,
@@ -147,7 +155,7 @@ const styles = StyleSheet.create({
   },
 
   headline: {
-    color: "#111111",
+    color: colors.white,
     fontSize: 30,
     fontWeight: "800",
     textAlign: "center",
@@ -155,7 +163,7 @@ const styles = StyleSheet.create({
   },
 
   description: {
-    color: "#666666",
+    color: colors.textMuted,
     fontSize: 16,
     lineHeight: 24,
     textAlign: "center",
@@ -169,7 +177,7 @@ const styles = StyleSheet.create({
   },
 
   primaryButton: {
-    backgroundColor: "#29A9EA",
+    backgroundColor: colors.accent,
     paddingVertical: 18,
     borderRadius: 16,
     alignItems: "center",
@@ -180,7 +188,7 @@ const styles = StyleSheet.create({
   },
 
   primaryButtonText: {
-    color: "#FFFFFF",
+    color: colors.white,
     fontSize: 17,
     fontWeight: "700",
   },
@@ -194,13 +202,13 @@ const styles = StyleSheet.create({
   },
 
   login: {
-    color: "#777777",
+    color: colors.textMuted,
     fontSize: 14,
     textAlign: "center",
   },
 
   loginLink: {
-    color: "#111111",
+    color: colors.white,
     fontWeight: "700",
   },
 });

@@ -12,6 +12,8 @@ import {
   TextInput,
   View,
 } from "react-native";
+import { colors, spacing } from "@/theme";
+import ScreenLayout from "@/components/ui/ScreenLayout";
 
 import { supabase } from "../../lib/supabase";
 
@@ -59,108 +61,110 @@ export default function Login() {
   };
 
   return (
-    <KeyboardAvoidingView
-      style={styles.container}
-      behavior={Platform.OS === "ios" ? "padding" : undefined}
-    >
-      <StatusBar style="dark" />
-
-      <ScrollView
-        contentContainerStyle={styles.content}
-        keyboardShouldPersistTaps="handled"
-        showsVerticalScrollIndicator={false}
+    <ScreenLayout>
+      <KeyboardAvoidingView
+        style={styles.container}
+        behavior={Platform.OS === "ios" ? "padding" : undefined}
       >
-        <Text style={styles.brand}>foovio</Text>
+        <StatusBar style="light" />
 
-        <Text style={styles.title}>
-          Welcome{"\n"}back
-        </Text>
+        <ScrollView
+          contentContainerStyle={styles.content}
+          keyboardShouldPersistTaps="handled"
+          showsVerticalScrollIndicator={false}
+        >
+          <Text style={styles.brand}>foovio</Text>
 
-        <Text style={styles.subtitle}>
-          Log in and keep discovering food worth trying.
-        </Text>
-
-        <View style={styles.form}>
-          <Text style={styles.label}>EMAIL</Text>
-
-          <TextInput
-            value={email}
-            onChangeText={setEmail}
-            placeholder="you@example.com"
-            placeholderTextColor="#AAAAAA"
-            keyboardType="email-address"
-            autoCapitalize="none"
-            autoCorrect={false}
-            style={styles.input}
-          />
-
-          <Text style={styles.label}>PASSWORD</Text>
-
-          <TextInput
-            value={password}
-            onChangeText={setPassword}
-            placeholder="Your password"
-            placeholderTextColor="#AAAAAA"
-            secureTextEntry
-            autoCapitalize="none"
-            style={styles.input}
-          />
-
-          <Pressable
-            disabled={loading}
-            onPress={handleLogin}
-            style={[
-              styles.button,
-              loading && styles.buttonDisabled,
-            ]}
-          >
-            <Text style={styles.buttonText}>
-              {loading ? "Logging in..." : "Log in"}
-            </Text>
-          </Pressable>
-        </View>
-
-        <View style={styles.signupRow}>
-          <Text style={styles.signupQuestion}>
-            New to Foovio?
+          <Text style={styles.title}>
+            Welcome{"\n"}back
           </Text>
 
-          <Pressable
-            onPress={() => router.push("/auth/signup")}
-          >
-            <Text style={styles.signupText}>
-              Create account
+          <Text style={styles.subtitle}>
+            Log in and keep discovering food worth trying.
+          </Text>
+
+          <View style={styles.form}>
+            <Text style={styles.label}>EMAIL</Text>
+
+            <TextInput
+              value={email}
+              onChangeText={setEmail}
+              placeholder="you@example.com"
+              placeholderTextColor="#AAAAAA"
+              keyboardType="email-address"
+              autoCapitalize="none"
+              autoCorrect={false}
+              style={styles.input}
+            />
+
+            <Text style={styles.label}>PASSWORD</Text>
+
+            <TextInput
+              value={password}
+              onChangeText={setPassword}
+              placeholder="Your password"
+              placeholderTextColor="#AAAAAA"
+              secureTextEntry
+              autoCapitalize="none"
+              style={styles.input}
+            />
+
+            <Pressable
+              disabled={loading}
+              onPress={handleLogin}
+              style={[
+                styles.button,
+                loading && styles.buttonDisabled,
+              ]}
+            >
+              <Text style={styles.buttonText}>
+                {loading ? "Logging in..." : "Log in"}
+              </Text>
+            </Pressable>
+          </View>
+
+          <View style={styles.signupRow}>
+            <Text style={styles.signupQuestion}>
+              New to Foovio?
             </Text>
-          </Pressable>
-        </View>
-      </ScrollView>
-    </KeyboardAvoidingView>
+
+            <Pressable
+              onPress={() => router.push("/auth/signup")}
+            >
+              <Text style={styles.signupText}>
+                Create account
+              </Text>
+            </Pressable>
+          </View>
+        </ScrollView>
+      </KeyboardAvoidingView>
+    </ScreenLayout>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#FFFFFF",
+    backgroundColor: colors.background,
   },
 
   content: {
     flexGrow: 1,
-    paddingHorizontal: 28,
+    paddingHorizontal: spacing.md,
     paddingTop: 75,
     paddingBottom: 40,
   },
 
   brand: {
-    color: "#29A9EA",
+    color: colors.accent,
     fontSize: 22,
     fontWeight: "900",
     letterSpacing: -0.5,
-    marginBottom: 35,
+    marginBottom: 28,
   },
 
   title: {
-    color: "#111111",
+    color: colors.white,
     fontSize: 40,
     lineHeight: 45,
     fontWeight: "800",
@@ -168,7 +172,7 @@ const styles = StyleSheet.create({
   },
 
   subtitle: {
-    color: "#777777",
+    color: colors.textMuted,
     fontSize: 15,
     lineHeight: 22,
     marginTop: 14,
@@ -179,7 +183,7 @@ const styles = StyleSheet.create({
   },
 
   label: {
-    color: "#888888",
+    color: colors.textMuted,
     fontSize: 10,
     fontWeight: "800",
     letterSpacing: 1.3,
@@ -188,18 +192,18 @@ const styles = StyleSheet.create({
   },
 
   input: {
-    backgroundColor: "#F7F7F7",
+    backgroundColor: colors.surface,
     borderWidth: 1,
-    borderColor: "#EEEEEE",
+    borderColor: colors.border,
     borderRadius: 15,
     paddingHorizontal: 16,
     paddingVertical: 16,
-    color: "#111111",
+    color: colors.white,
     fontSize: 15,
   },
 
   button: {
-    backgroundColor: "#29A9EA",
+    backgroundColor: colors.accent,
     borderRadius: 16,
     paddingVertical: 18,
     alignItems: "center",
@@ -211,7 +215,7 @@ const styles = StyleSheet.create({
   },
 
   buttonText: {
-    color: "#FFFFFF",
+    color: colors.white,
     fontSize: 16,
     fontWeight: "800",
   },
@@ -225,12 +229,12 @@ const styles = StyleSheet.create({
   },
 
   signupQuestion: {
-    color: "#777777",
+    color: colors.textMuted,
     fontSize: 13,
   },
 
   signupText: {
-    color: "#29A9EA",
+    color: colors.accent,
     fontSize: 13,
     fontWeight: "800",
   },

@@ -12,6 +12,8 @@ import {
   TextInput,
   View,
 } from "react-native";
+import { colors, spacing } from "@/theme";
+import ScreenLayout from "@/components/ui/ScreenLayout";
 
 import { supabase } from "../../lib/supabase";
 
@@ -119,127 +121,129 @@ export default function SignUp() {
   };
 
   return (
-    <KeyboardAvoidingView
-      style={styles.container}
-      behavior={Platform.OS === "ios" ? "padding" : undefined}
-    >
-      <StatusBar style="dark" />
-
-      <ScrollView
-        contentContainerStyle={styles.content}
-        keyboardShouldPersistTaps="handled"
-        showsVerticalScrollIndicator={false}
+    <ScreenLayout>
+      <KeyboardAvoidingView
+        style={styles.container}
+        behavior={Platform.OS === "ios" ? "padding" : undefined}
       >
-        <Text style={styles.brand}>foovio</Text>
+        <StatusBar style="light" />
 
-        <Text style={styles.title}>
-          Create your{"\n"}account
-        </Text>
+        <ScrollView
+          contentContainerStyle={styles.content}
+          keyboardShouldPersistTaps="handled"
+          showsVerticalScrollIndicator={false}
+        >
+          <Text style={styles.brand}>foovio</Text>
 
-        <Text style={styles.subtitle}>
-          Discover food through people you trust.
-        </Text>
-
-        <View style={styles.form}>
-          <Text style={styles.label}>NAME</Text>
-
-          <TextInput
-            value={name}
-            onChangeText={setName}
-            placeholder="Your name"
-            placeholderTextColor="#AAAAAA"
-            autoCapitalize="words"
-            autoComplete="name"
-            style={styles.input}
-          />
-
-          <Text style={styles.label}>EMAIL</Text>
-
-          <TextInput
-            value={email}
-            onChangeText={setEmail}
-            placeholder="you@example.com"
-            placeholderTextColor="#AAAAAA"
-            keyboardType="email-address"
-            autoCapitalize="none"
-            autoCorrect={false}
-            autoComplete="email"
-            style={styles.input}
-          />
-
-          <Text style={styles.label}>PASSWORD</Text>
-
-          <TextInput
-            value={password}
-            onChangeText={setPassword}
-            placeholder="At least 6 characters"
-            placeholderTextColor="#AAAAAA"
-            secureTextEntry
-            autoCapitalize="none"
-            autoCorrect={false}
-            autoComplete="new-password"
-            style={styles.input}
-          />
-
-          <Pressable
-            disabled={loading}
-            onPress={handleSignUp}
-            style={({ pressed }) => [
-              styles.button,
-              loading && styles.buttonDisabled,
-              pressed && !loading && styles.buttonPressed,
-            ]}
-          >
-            <Text style={styles.buttonText}>
-              {loading
-                ? "Creating account..."
-                : "Create account"}
-            </Text>
-          </Pressable>
-        </View>
-
-        <View style={styles.loginRow}>
-          <Text style={styles.loginQuestion}>
-            Already have an account?
+          <Text style={styles.title}>
+            Create your{"\n"}account
           </Text>
 
-          <Pressable
-            disabled={loading}
-            onPress={() => router.push("/auth/login")}
-          >
-            <Text style={styles.loginText}>
-              Log in
+          <Text style={styles.subtitle}>
+            Discover food through people you trust.
+          </Text>
+
+          <View style={styles.form}>
+            <Text style={styles.label}>NAME</Text>
+
+            <TextInput
+              value={name}
+              onChangeText={setName}
+              placeholder="Your name"
+              placeholderTextColor="#AAAAAA"
+              autoCapitalize="words"
+              autoComplete="name"
+              style={styles.input}
+            />
+
+            <Text style={styles.label}>EMAIL</Text>
+
+            <TextInput
+              value={email}
+              onChangeText={setEmail}
+              placeholder="you@example.com"
+              placeholderTextColor="#AAAAAA"
+              keyboardType="email-address"
+              autoCapitalize="none"
+              autoCorrect={false}
+              autoComplete="email"
+              style={styles.input}
+            />
+
+            <Text style={styles.label}>PASSWORD</Text>
+
+            <TextInput
+              value={password}
+              onChangeText={setPassword}
+              placeholder="At least 6 characters"
+              placeholderTextColor="#AAAAAA"
+              secureTextEntry
+              autoCapitalize="none"
+              autoCorrect={false}
+              autoComplete="new-password"
+              style={styles.input}
+            />
+
+            <Pressable
+              disabled={loading}
+              onPress={handleSignUp}
+              style={({ pressed }) => [
+                styles.button,
+                loading && styles.buttonDisabled,
+                pressed && !loading && styles.buttonPressed,
+              ]}
+            >
+              <Text style={styles.buttonText}>
+                {loading
+                  ? "Creating account..."
+                  : "Create account"}
+              </Text>
+            </Pressable>
+          </View>
+
+          <View style={styles.loginRow}>
+            <Text style={styles.loginQuestion}>
+              Already have an account?
             </Text>
-          </Pressable>
-        </View>
-      </ScrollView>
-    </KeyboardAvoidingView>
+
+            <Pressable
+              disabled={loading}
+              onPress={() => router.push("/auth/login")}
+            >
+              <Text style={styles.loginText}>
+                Log in
+              </Text>
+            </Pressable>
+          </View>
+        </ScrollView>
+      </KeyboardAvoidingView>
+    </ScreenLayout>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#FFFFFF",
+    backgroundColor: colors.background,
   },
 
   content: {
     flexGrow: 1,
-    paddingHorizontal: 28,
+    paddingHorizontal: spacing.md,
     paddingTop: 75,
     paddingBottom: 40,
   },
 
   brand: {
-    color: "#29A9EA",
+    color: colors.accent,
     fontSize: 22,
     fontWeight: "900",
     letterSpacing: -0.5,
-    marginBottom: 35,
+    marginBottom: 28,
   },
 
   title: {
-    color: "#111111",
+    color: colors.white,
     fontSize: 40,
     lineHeight: 45,
     fontWeight: "800",
@@ -247,7 +251,7 @@ const styles = StyleSheet.create({
   },
 
   subtitle: {
-    color: "#777777",
+    color: colors.textMuted,
     fontSize: 15,
     lineHeight: 22,
     marginTop: 14,
@@ -258,7 +262,7 @@ const styles = StyleSheet.create({
   },
 
   label: {
-    color: "#888888",
+    color: colors.textMuted,
     fontSize: 10,
     fontWeight: "800",
     letterSpacing: 1.3,
@@ -267,18 +271,18 @@ const styles = StyleSheet.create({
   },
 
   input: {
-    backgroundColor: "#F7F7F7",
+    backgroundColor: colors.surface,
     borderWidth: 1,
-    borderColor: "#EEEEEE",
+    borderColor: colors.border,
     borderRadius: 15,
     paddingHorizontal: 16,
     paddingVertical: 16,
-    color: "#111111",
+    color: colors.white,
     fontSize: 15,
   },
 
   button: {
-    backgroundColor: "#29A9EA",
+    backgroundColor: colors.accent,
     borderRadius: 16,
     paddingVertical: 18,
     alignItems: "center",
@@ -294,7 +298,7 @@ const styles = StyleSheet.create({
   },
 
   buttonText: {
-    color: "#FFFFFF",
+    color: colors.white,
     fontSize: 16,
     fontWeight: "800",
   },
@@ -308,12 +312,12 @@ const styles = StyleSheet.create({
   },
 
   loginQuestion: {
-    color: "#777777",
+    color: colors.textMuted,
     fontSize: 13,
   },
 
   loginText: {
-    color: "#29A9EA",
+    color: colors.accent,
     fontSize: 13,
     fontWeight: "800",
   },

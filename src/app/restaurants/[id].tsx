@@ -229,7 +229,7 @@ export default function RestaurantDetails() {
               ]}
             >
               <Text style={styles.heroPlaceholderText}>
-                🍽️
+                Restaurant
               </Text>
             </View>
           )}
@@ -526,6 +526,57 @@ const styles = StyleSheet.create({
     fontWeight: "900",
   },
 
+  content: {
+    paddingHorizontal: 16,
+    paddingTop: 18,
+  },
+
+  name: {
+    color: "#F7FAFF",
+    fontSize: 27,
+    fontWeight: "900",
+    letterSpacing: -0.5,
+  },
+
+  cuisine: {
+    color: "#AAB4C2",
+    fontSize: 10,
+    marginTop: 9,
+  },
+
+  meta: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginTop: 9,
+  },
+
+  metaText: {
+    color: "#7F8C9D",
+    fontSize: 12,
+  },
+
+  locationRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    marginTop: 16,
+    paddingTop: 12,
+    paddingBottom: 6,
+  },
+
+  locationContent: {
+    flex: 1,
+    marginRight: 12,
+  },
+
+  locationLabel: {
+    color: "#73C7FF",
+    fontSize: 10,
+    fontWeight: "900",
+    letterSpacing: 1,
+    marginBottom: 4,
+  },
+
   description: {
     color: "#AAB4C2",
     fontSize: 12,
@@ -582,6 +633,20 @@ const styles = StyleSheet.create({
     fontSize: 10,
     lineHeight: 18,
     marginTop: 7,
+  },
+
+  goBackButton: {
+    marginTop: 20,
+    backgroundColor: "#2E9BFF",
+    paddingHorizontal: 22,
+    paddingVertical: 12,
+    borderRadius: 20,
+  },
+
+  goBack: {
+    color: "#F7FAFF",
+    fontSize: 11,
+    fontWeight: "900",
   },
 
   notFound: {

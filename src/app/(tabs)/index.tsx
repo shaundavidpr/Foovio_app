@@ -1,8 +1,6 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   ActivityIndicator,
-  Animated,
-  Easing,
   Image,
   Pressable,
   ScrollView,
@@ -17,8 +15,11 @@ import { router } from "expo-router";
 import {
   ArrowRight,
   ChevronRight,
+  Flame,
   Heart,
+  Leaf,
   MapPin,
+  MoonStar,
   Search,
   Sparkles,
   Star,
@@ -58,115 +59,41 @@ type Food = {
 
 const moods = [
   {
-    emoji: "🔥",
+    icon: Flame,
     title: "Hungry",
     subtitle: "Big & bold",
   },
   {
-    emoji: "✨",
+    icon: Sparkles,
     title: "Treat me",
     subtitle: "Worth it",
   },
   {
-    emoji: "🌙",
+    icon: MoonStar,
     title: "Late night",
     subtitle: "Open now",
   },
   {
-    emoji: "🥗",
+    icon: Leaf,
     title: "Light",
     subtitle: "Fresh picks",
   },
 ];
 
-function FadeIn({
-  children,
-  delay = 0,
-  distance = 25,
-}: {
-  children: React.ReactNode;
-  delay?: number;
-  distance?: number;
-}) {
-  const opacity = useRef(new Animated.Value(0)).current;
-  const translateY = useRef(new Animated.Value(distance)).current;
-
-  useEffect(() => {
-    Animated.parallel([
-      Animated.timing(opacity, {
-        toValue: 1,
-        duration: 650,
-        delay,
-        easing: Easing.out(Easing.cubic),
-        useNativeDriver: true,
-      }),
-      Animated.timing(translateY, {
-        toValue: 0,
-        duration: 650,
-        delay,
-        easing: Easing.out(Easing.cubic),
-        useNativeDriver: true,
-      }),
-    ]).start();
-  }, []);
-
-  return (
-    <Animated.View
-      style={{
-        opacity,
-        transform: [{ translateY }],
-      }}
-    >
-      {children}
-    </Animated.View>
-  );
+function FadeIn({ children, delay = 0 }: { children: React.ReactNode; delay?: number }) {
+  // No-op fade wrapper for a static, non-animated production feel.
+  // Accepts delay prop for compatibility but intentionally ignored.
+  return <View>{children}</View>;
 }
 
-function ScalePress({
-  children,
-  onPress,
-  style,
-}: {
-  children: React.ReactNode;
-  onPress?: () => void;
-  style?: any;
-}) {
-  const scale = useRef(new Animated.Value(1)).current;
-
-  const pressIn = () => {
-    Animated.spring(scale, {
-      toValue: 0.965,
-      friction: 7,
-      tension: 120,
-      useNativeDriver: true,
-    }).start();
-  };
-
-  const pressOut = () => {
-    Animated.spring(scale, {
-      toValue: 1,
-      friction: 7,
-      tension: 120,
-      useNativeDriver: true,
-    }).start();
-  };
-
+function ScalePress({ children, onPress, style }: { children: React.ReactNode; onPress?: () => void; style?: any; }) {
+  // Lightweight press feedback without heavy animations.
   return (
-    <Pressable
-      onPress={onPress}
-      onPressIn={pressIn}
-      onPressOut={pressOut}
-    >
-      <Animated.View
-        style={[
-          style,
-          {
-            transform: [{ scale }],
-          },
-        ]}
-      >
-        {children}
-      </Animated.View>
+    <Pressable onPress={onPress} style={({ pressed }: { pressed: boolean }) => [
+      style,
+      pressed && { transform: [{ scale: 0.985 }] },
+    ]}>
+      <View>{children}</View>
     </Pressable>
   );
 }
@@ -176,37 +103,13 @@ export default function Home() {
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState<string | null>(null);
 
-  const scrollY = useRef(new Animated.Value(0)).current;
-  const pulse = useRef(new Animated.Value(0)).current;
-  const heroScale = useRef(new Animated.Value(1.08)).current;
-
+  // Static values for motion-less production feel.
   useEffect(() => {
     loadDishes();
-
-    Animated.loop(
-      Animated.sequence([
-        Animated.timing(pulse, {
-          toValue: 1,
-          duration: 1700,
-          easing: Easing.inOut(Easing.sin),
-          useNativeDriver: true,
-        }),
-        Animated.timing(pulse, {
-          toValue: 0,
-          duration: 1700,
-          easing: Easing.inOut(Easing.sin),
-          useNativeDriver: true,
-        }),
-      ])
-    ).start();
-
-    Animated.timing(heroScale, {
-      toValue: 1,
-      duration: 1200,
-      easing: Easing.out(Easing.cubic),
-      useNativeDriver: true,
-    }).start();
   }, []);
+
+  const parallax = 0;
+  const glowScale = 1;
 
   async function loadDishes() {
     try {
@@ -252,16 +155,6 @@ export default function Home() {
 
   const heroFood = foods[0];
 
-  const parallax = scrollY.interpolate({
-    inputRange: [0, 250],
-    outputRange: [0, -35],
-    extrapolate: "clamp",
-  });
-
-  const glowScale = pulse.interpolate({
-    inputRange: [0, 1],
-    outputRange: [1, 1.13],
-  });
 
   return (
     <View style={styles.container}>
@@ -271,48 +164,11 @@ export default function Home() {
       />
 
       {/* AMBIENT BACKGROUND */}
-      <Animated.View
-        pointerEvents="none"
-        style={[
-          styles.backgroundGlow,
-          {
-            transform: [{ scale: glowScale }],
-          },
-        ]}
-      />
+      <View pointerEvents="none" style={[styles.backgroundGlow, { transform: [{ scale: glowScale }] }]} />
 
-      <Animated.View
-        pointerEvents="none"
-        style={[
-          styles.smallGlow,
-          {
-            opacity: pulse.interpolate({
-              inputRange: [0, 1],
-              outputRange: [0.02, 0.045],
-            }),
-          },
-        ]}
-      />
+      <View pointerEvents="none" style={[styles.smallGlow, { opacity: 0.03 }]} />
 
-      <Animated.ScrollView
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={styles.content}
-        scrollEventThrottle={16}
-        onScroll={Animated.event(
-          [
-            {
-              nativeEvent: {
-                contentOffset: {
-                  y: scrollY,
-                },
-              },
-            },
-          ],
-          {
-            useNativeDriver: true,
-          }
-        )}
-      >
+      <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.content}>
         {/* HEADER */}
         <FadeIn delay={0}>
           <View style={styles.header}>
@@ -492,19 +348,9 @@ export default function Home() {
               style={styles.hero}
               onPress={() => openDish(heroFood.id)}
             >
-              <Animated.Image
-                source={{
-                  uri: heroFood.image_url ?? undefined,
-                }}
-                style={[
-                  styles.heroImage,
-                  {
-                    transform: [
-                      { scale: heroScale },
-                      { translateY: parallax },
-                    ],
-                  },
-                ]}
+              <Image
+                source={{ uri: heroFood.image_url ?? undefined }}
+                style={styles.heroImage}
               />
 
               <LinearGradient
@@ -519,21 +365,7 @@ export default function Home() {
 
               <View style={styles.heroTop}>
                 <View style={styles.pickBadge}>
-                  <Animated.View
-                    style={[
-                      styles.pickDot,
-                      {
-                        transform: [
-                          {
-                            scale: pulse.interpolate({
-                              inputRange: [0, 1],
-                              outputRange: [1, 1.35],
-                            }),
-                          },
-                        ],
-                      },
-                    ]}
-                  />
+                  <View style={styles.pickDot} />
 
                   <Text style={styles.pickText}>
                     FOOVIO PICK
@@ -625,29 +457,33 @@ export default function Home() {
             showsHorizontalScrollIndicator={false}
             contentContainerStyle={styles.moodRow}
           >
-            {moods.map((mood, index) => (
-              <ScalePress
-                key={mood.title}
-                style={[
-                  styles.moodCard,
-                  index === 0 &&
-                    styles.moodCardActive,
-                ]}
-                onPress={() => router.push("/explore")}
-              >
-                <Text style={styles.moodEmoji}>
-                  {mood.emoji}
-                </Text>
+            {moods.map((mood, index) => {
+              const Icon = mood.icon;
 
-                <Text style={styles.moodTitle}>
-                  {mood.title}
-                </Text>
+              return (
+                <ScalePress
+                  key={mood.title}
+                  style={[
+                    styles.moodCard,
+                    index === 0 &&
+                      styles.moodCardActive,
+                  ]}
+                  onPress={() => router.push("/explore")}
+                >
+                  <View style={styles.moodIconWrap}>
+                    <Icon size={18} color={COLORS.white} />
+                  </View>
 
-                <Text style={styles.moodSubtitle}>
-                  {mood.subtitle}
-                </Text>
-              </ScalePress>
-            ))}
+                  <Text style={styles.moodTitle}>
+                    {mood.title}
+                  </Text>
+
+                  <Text style={styles.moodSubtitle}>
+                    {mood.subtitle}
+                  </Text>
+                </ScalePress>
+              );
+            })}
           </ScrollView>
         </FadeIn>
 
@@ -707,7 +543,7 @@ export default function Home() {
                       "rgba(0,0,0,0.55)",
                     ]}
                     style={
-                      StyleSheet.absoluteFillObject
+                      StyleSheet.absoluteFill
                     }
                   />
 
@@ -786,7 +622,7 @@ export default function Home() {
                 "#10243A",
                 "#09121D",
               ]}
-              style={StyleSheet.absoluteFillObject}
+              style={StyleSheet.absoluteFill}
             />
 
             <View style={styles.nearbyGlow} />
@@ -933,7 +769,7 @@ export default function Home() {
             FOOVIO · DISCOVER DIFFERENT
           </Text>
         </View>
-      </Animated.ScrollView>
+      </ScrollView>
     </View>
   );
 }
@@ -1219,7 +1055,7 @@ const styles = StyleSheet.create({
   },
 
   heroGradient: {
-    ...StyleSheet.absoluteFillObject,
+    ...StyleSheet.absoluteFill,
   },
 
   heroTop: {
@@ -1360,8 +1196,13 @@ const styles = StyleSheet.create({
     borderColor: "rgba(46,155,255,0.2)",
   },
 
-  moodEmoji: {
-    fontSize: 23,
+  moodIconWrap: {
+    width: 28,
+    height: 28,
+    borderRadius: 12,
+    backgroundColor: "rgba(46,155,255,0.12)",
+    alignItems: "center",
+    justifyContent: "center",
   },
 
   moodTitle: {

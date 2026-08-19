@@ -1,11 +1,13 @@
 import { router } from "expo-router";
 import { Pressable, StyleSheet, Text, View } from "react-native";
+import { colors, spacing } from "@/theme";
 import { StatusBar } from "expo-status-bar";
+import ScreenLayout from "@/components/ui/ScreenLayout";
 
 export default function Onboarding() {
   return (
-    <View style={styles.container}>
-      <StatusBar style="dark" />
+    <ScreenLayout>
+      <StatusBar style="light" />
 
       <View>
         <Text style={styles.step}>LET'S GET STARTED</Text>
@@ -26,22 +28,22 @@ export default function Onboarding() {
       >
         <Text style={styles.buttonText}>Continue</Text>
       </Pressable>
-    </View>
+    </ScreenLayout>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#FFFFFF",
-    paddingHorizontal: 28,
+    backgroundColor: colors.background,
+    paddingHorizontal: spacing.md,
     paddingTop: 80,
     paddingBottom: 40,
     justifyContent: "space-between",
   },
 
   step: {
-    color: "#29A9EA",
+    color: colors.accent,
     fontSize: 13,
     fontWeight: "800",
     letterSpacing: 1.8,
@@ -49,7 +51,7 @@ const styles = StyleSheet.create({
   },
 
   title: {
-    color: "#111111",
+    color: colors.white,
     fontSize: 40,
     lineHeight: 46,
     fontWeight: "800",
@@ -57,7 +59,7 @@ const styles = StyleSheet.create({
   },
 
   description: {
-    color: "#666666",
+    color: colors.textMuted,
     fontSize: 17,
     lineHeight: 26,
     marginTop: 20,
@@ -65,14 +67,14 @@ const styles = StyleSheet.create({
   },
 
   button: {
-    backgroundColor: "#29A9EA",
+    backgroundColor: colors.accent,
     paddingVertical: 18,
     borderRadius: 16,
     alignItems: "center",
   },
 
   buttonText: {
-    color: "#FFFFFF",
+    color: colors.white,
     fontSize: 17,
     fontWeight: "700",
   },

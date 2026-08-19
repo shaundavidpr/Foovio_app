@@ -9,6 +9,7 @@ import {
 import {
   colors,
   radius,
+  shadows,
   spacing,
 } from "@/theme";
 
@@ -16,48 +17,58 @@ type Props = {
   title: string;
   onPress: () => void;
   style?: ViewStyle | ViewStyle[];
+  disabled?: boolean;
+  loading?: boolean;
 };
 
 export default function AppButton({
   title,
   onPress,
   style,
+  disabled = false,
+  loading = false,
 }: Props) {
   return (
     <Pressable
       onPress={onPress}
+      disabled={disabled || loading}
       style={({ pressed }) => [
         styles.button,
-        pressed && styles.pressed,
+        pressed && !disabled && !loading && styles.pressed,
+        (disabled || loading) && styles.disabled,
         style,
       ]}
     >
-      <Text style={styles.text}>
-        {title}
-      </Text>
+      <Text style={styles.text}>{loading ? "Loading..." : title}</Text>
     </Pressable>
   );
 }
 
 const styles = StyleSheet.create({
   button: {
-    backgroundColor: colors.blue,
-    borderRadius: radius.pill,
+    backgroundColor: colors.accent,
+    borderRadius: radius.md,
     minHeight: 48,
-    paddingVertical: spacing.sm,
+    paddingVertical: spacing.md,
     paddingHorizontal: spacing.lg,
     alignItems: "center",
     justifyContent: "center",
+    ...shadows.card,
   },
 
   pressed: {
-    opacity: 0.82,
-    transform: [{ scale: 0.98 }],
+    opacity: 0.9,
+    transform: [{ scale: 0.99 }],
+  },
+
+  disabled: {
+    opacity: 0.5,
   },
 
   text: {
     color: colors.white,
-    fontWeight: "900",
-    fontSize: 14,
+    fontWeight: "800",
+    fontSize: 15,
+    letterSpacing: 0.2,
   },
 });

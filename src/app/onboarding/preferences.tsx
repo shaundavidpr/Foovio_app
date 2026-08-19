@@ -9,22 +9,33 @@ import {
   Text,
   View,
 } from "react-native";
+import {
+  Beef,
+  Coffee,
+  Flame,
+  Leaf,
+  Salad,
+  Sparkles,
+  UtensilsCrossed,
+} from "lucide-react-native";
 
 import { supabase } from "../../lib/supabase";
+import { colors, spacing } from "@/theme";
+import ScreenLayout from "@/components/ui/ScreenLayout";
 
 const preferences = [
-  "🍛 Indian",
-  "🍕 Pizza",
-  "🍔 Burgers",
-  "🍜 Chinese",
-  "🍗 Chicken",
-  "🥘 Biryani",
-  "🍰 Desserts",
-  "☕ Cafe",
-  "🥗 Healthy",
-  "🌱 Vegetarian",
-  "🌶️ Spicy",
-  "🍽️ Local food",
+  { label: "Indian", icon: UtensilsCrossed },
+  { label: "Pizza", icon: Flame },
+  { label: "Burgers", icon: Beef },
+  { label: "Chinese", icon: Salad },
+  { label: "Chicken", icon: Beef },
+  { label: "Biryani", icon: Sparkles },
+  { label: "Desserts", icon: Coffee },
+  { label: "Cafe", icon: Coffee },
+  { label: "Healthy", icon: Leaf },
+  { label: "Vegetarian", icon: Salad },
+  { label: "Spicy", icon: Flame },
+  { label: "Local food", icon: Sparkles },
 ];
 
 export default function Preferences() {
@@ -68,8 +79,6 @@ export default function Preferences() {
         .eq("id", user.id);
 
       if (error) {
-        console.error("Food preferences save error:", error);
-
         Alert.alert(
           "Couldn't save preferences",
           "Please try again."
@@ -79,8 +88,6 @@ export default function Preferences() {
 
       router.push("/onboarding/dietary");
     } catch (error) {
-      console.error("Preferences error:", error);
-
       Alert.alert(
         "Something went wrong",
         "Please try again."
@@ -91,8 +98,8 @@ export default function Preferences() {
   };
 
   return (
-    <View style={styles.container}>
-      <StatusBar style="dark" />
+    <ScreenLayout>
+      <StatusBar style="light" />
 
       <ScrollView
         contentContainerStyle={styles.scrollContent}
@@ -109,26 +116,30 @@ export default function Preferences() {
         </Text>
 
         <View style={styles.options}>
-          {preferences.map((item) => {
-            const isSelected = selected.includes(item);
+          {preferences.map(({ label, icon: Icon }) => {
+            const isSelected = selected.includes(label);
 
             return (
               <Pressable
-                key={item}
+                key={label}
                 disabled={saving}
-                onPress={() => togglePreference(item)}
+                onPress={() => togglePreference(label)}
                 style={[
                   styles.option,
                   isSelected && styles.optionSelected,
                 ]}
               >
+                <Icon
+                  size={16}
+                  color={isSelected ? colors.white : colors.textSecondary}
+                />
                 <Text
                   style={[
                     styles.optionText,
                     isSelected && styles.optionTextSelected,
                   ]}
                 >
-                  {item}
+                  {label}
                 </Text>
               </Pressable>
             );
@@ -148,8 +159,7 @@ export default function Preferences() {
           onPress={continueOnboarding}
           style={[
             styles.button,
-            (selected.length === 0 || saving) &&
-              styles.buttonDisabled,
+            (selected.length === 0 || saving) && styles.buttonDisabled,
           ]}
         >
           <Text style={styles.buttonText}>
@@ -157,24 +167,24 @@ export default function Preferences() {
           </Text>
         </Pressable>
       </View>
-    </View>
+    </ScreenLayout>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#FFFFFF",
+    backgroundColor: colors.background,
   },
 
   scrollContent: {
-    paddingHorizontal: 28,
+    paddingHorizontal: spacing.md,
     paddingTop: 70,
     paddingBottom: 30,
   },
 
   step: {
-    color: "#29A9EA",
+    color: colors.accent,
     fontSize: 13,
     fontWeight: "800",
     letterSpacing: 1.8,
@@ -182,7 +192,7 @@ const styles = StyleSheet.create({
   },
 
   title: {
-    color: "#111111",
+    color: colors.white,
     fontSize: 40,
     lineHeight: 46,
     fontWeight: "800",
@@ -190,7 +200,7 @@ const styles = StyleSheet.create({
   },
 
   description: {
-    color: "#666666",
+    color: colors.textMuted,
     fontSize: 16,
     lineHeight: 24,
     marginTop: 16,
@@ -205,56 +215,59 @@ const styles = StyleSheet.create({
   },
 
   option: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
     borderWidth: 1.5,
-    borderColor: "#E3E3E3",
+    borderColor: colors.border,
     borderRadius: 100,
     paddingHorizontal: 18,
     paddingVertical: 13,
-    backgroundColor: "#FFFFFF",
+    backgroundColor: colors.surface,
   },
 
   optionSelected: {
-    backgroundColor: "#29A9EA",
-    borderColor: "#29A9EA",
+    backgroundColor: colors.accent,
+    borderColor: colors.accent,
   },
 
   optionText: {
-    color: "#333333",
+    color: colors.white,
     fontSize: 15,
     fontWeight: "600",
   },
 
   optionTextSelected: {
-    color: "#FFFFFF",
+    color: colors.white,
   },
 
   footer: {
-    paddingHorizontal: 28,
+    paddingHorizontal: spacing.md,
     paddingTop: 15,
     paddingBottom: 35,
-    backgroundColor: "#FFFFFF",
+    backgroundColor: colors.surface,
   },
 
   count: {
-    color: "#888888",
+    color: colors.textMuted,
     fontSize: 13,
     textAlign: "center",
     marginBottom: 12,
   },
 
   button: {
-    backgroundColor: "#29A9EA",
+    backgroundColor: colors.accent,
     borderRadius: 16,
     paddingVertical: 18,
     alignItems: "center",
   },
 
   buttonDisabled: {
-    backgroundColor: "#C8E9F9",
+    opacity: 0.5,
   },
 
   buttonText: {
-    color: "#FFFFFF",
+    color: colors.white,
     fontSize: 17,
     fontWeight: "700",
   },

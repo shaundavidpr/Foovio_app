@@ -1,11 +1,15 @@
 import { router } from "expo-router";
 import { StatusBar } from "expo-status-bar";
-import { Image, Pressable, StyleSheet, Text, View } from "react-native";
+import { Appearance, Image, Pressable, StyleSheet, Text, View } from "react-native";
+import { colors, spacing } from "@/theme";
+import ScreenLayout from "@/components/ui/ScreenLayout";
 
 export default function Auth() {
+  const isLight = (Appearance.getColorScheme() ?? "dark") === "light";
+
   return (
-    <View style={styles.container}>
-      <StatusBar style="dark" />
+    <ScreenLayout>
+      <StatusBar style={isLight ? "dark" : "light"} />
 
       <Pressable onPress={() => router.back()}>
         <Text style={styles.back}>←</Text>
@@ -59,22 +63,22 @@ export default function Auth() {
       <Text style={styles.terms}>
         By continuing, you agree to Foovio's Terms and Privacy Policy.
       </Text>
-    </View>
+    </ScreenLayout>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#FFFFFF",
-    paddingHorizontal: 24,
+    backgroundColor: colors.background,
+    paddingHorizontal: spacing.md,
     paddingTop: 50,
     paddingBottom: 30,
   },
 
   back: {
     fontSize: 30,
-    color: "#111111",
+    color: colors.white,
   },
 
   content: {
@@ -85,22 +89,22 @@ const styles = StyleSheet.create({
   logo: {
     width: 75,
     height: 75,
-    marginBottom: 25,
+    marginBottom: 20,
   },
 
   title: {
     fontSize: 38,
     fontWeight: "800",
-    color: "#111111",
+    color: colors.white,
     letterSpacing: -1,
   },
 
   subtitle: {
     fontSize: 16,
     lineHeight: 24,
-    color: "#666666",
+    color: colors.textMuted,
     marginTop: 12,
-    marginBottom: 38,
+    marginBottom: 28,
     maxWidth: 340,
   },
 
@@ -111,7 +115,7 @@ const styles = StyleSheet.create({
   socialButton: {
     height: 58,
     borderWidth: 1.5,
-    borderColor: "#E2E2E2",
+    borderColor: colors.border,
     borderRadius: 16,
     flexDirection: "row",
     alignItems: "center",
@@ -122,12 +126,12 @@ const styles = StyleSheet.create({
   socialButtonText: {
     fontSize: 16,
     fontWeight: "600",
-    color: "#111111",
+    color: colors.white,
   },
 
   apple: {
     fontSize: 15,
-    color: "#111111",
+    color: colors.white,
   },
 
   divider: {
@@ -140,32 +144,32 @@ const styles = StyleSheet.create({
   line: {
     flex: 1,
     height: 1,
-    backgroundColor: "#E5E5E5",
+    backgroundColor: colors.border,
   },
 
   or: {
     fontSize: 12,
-    color: "#999999",
+    color: colors.textMuted,
     fontWeight: "600",
   },
 
   emailButton: {
     height: 58,
-    backgroundColor: "#29A9EA",
+    backgroundColor: colors.accent,
     borderRadius: 16,
     justifyContent: "center",
     alignItems: "center",
   },
 
   emailButtonText: {
-    color: "#FFFFFF",
+    color: colors.white,
     fontSize: 16,
     fontWeight: "700",
   },
 
   terms: {
     textAlign: "center",
-    color: "#999999",
+    color: colors.textMuted,
     fontSize: 12,
     lineHeight: 18,
   },

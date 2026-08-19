@@ -1,11 +1,13 @@
 import { router } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { Pressable, StyleSheet, Text, View } from "react-native";
+import { colors, spacing } from "@/theme";
+import ScreenLayout from "@/components/ui/ScreenLayout";
 
 export default function Location() {
   return (
-    <View style={styles.container}>
-      <StatusBar style="dark" />
+    <ScreenLayout>
+      <StatusBar style="light" />
 
       <Pressable onPress={() => router.back()} style={styles.backButton}>
         <Text style={styles.back}>←</Text>
@@ -47,15 +49,15 @@ export default function Location() {
           You can change your location anytime.
         </Text>
       </View>
-    </View>
+    </ScreenLayout>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#FFFFFF",
-    paddingHorizontal: 24,
+    backgroundColor: colors.background,
+    paddingHorizontal: spacing.md,
     paddingTop: 50,
     paddingBottom: 30,
   },
@@ -65,7 +67,7 @@ const styles = StyleSheet.create({
   },
 
   back: {
-    color: "#111111",
+    color: colors.white,
     fontSize: 30,
   },
 
@@ -78,20 +80,20 @@ const styles = StyleSheet.create({
     width: 70,
     height: 70,
     borderRadius: 22,
-    backgroundColor: "#EAF7FD",
+    backgroundColor: colors.surface,
     alignItems: "center",
     justifyContent: "center",
     marginBottom: 28,
   },
 
   iconText: {
-    color: "#29A9EA",
+    color: colors.accent,
     fontSize: 36,
     fontWeight: "700",
   },
 
   label: {
-    color: "#29A9EA",
+    color: colors.accent,
     fontSize: 13,
     fontWeight: "800",
     letterSpacing: 1.8,
@@ -99,7 +101,7 @@ const styles = StyleSheet.create({
   },
 
   title: {
-    color: "#111111",
+    color: colors.white,
     fontSize: 40,
     lineHeight: 46,
     fontWeight: "800",
@@ -107,7 +109,7 @@ const styles = StyleSheet.create({
   },
 
   description: {
-    color: "#666666",
+    color: colors.textMuted,
     fontSize: 16,
     lineHeight: 25,
     marginTop: 18,
@@ -119,34 +121,34 @@ const styles = StyleSheet.create({
   },
 
   primaryButton: {
-    backgroundColor: "#29A9EA",
+    backgroundColor: colors.accent,
     borderRadius: 16,
     paddingVertical: 18,
     alignItems: "center",
   },
 
   primaryButtonText: {
-    color: "#FFFFFF",
+    color: colors.white,
     fontSize: 17,
     fontWeight: "700",
   },
 
   secondaryButton: {
     borderWidth: 1.5,
-    borderColor: "#E5E5E5",
+    borderColor: colors.border,
     borderRadius: 16,
     paddingVertical: 18,
     alignItems: "center",
   },
 
   secondaryButtonText: {
-    color: "#222222",
+    color: colors.white,
     fontSize: 16,
     fontWeight: "600",
   },
 
   note: {
-    color: "#999999",
+    color: colors.textMuted,
     textAlign: "center",
     fontSize: 12,
     marginTop: 5,

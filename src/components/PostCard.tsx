@@ -1,4 +1,5 @@
 import { router } from "expo-router";
+import React, { useState } from "react";
 import {
   Image,
   Pressable,
@@ -8,6 +9,7 @@ import {
 } from "react-native";
 
 import { colors, radius, spacing } from "@/theme";
+import { Heart, MessageSquare, Share2, Bookmark, MoreHorizontal, Star, Trash2 } from "lucide-react-native";
 
 export type PostCardPost = {
   id: string;
@@ -105,6 +107,8 @@ export default function PostCard({
     return value.trim().charAt(0).toUpperCase();
   };
 
+  const [menuOpen, setMenuOpen] = useState(false);
+
   return (
     <Pressable
       style={styles.post}
@@ -141,19 +145,36 @@ export default function PostCard({
         </Pressable>
 
         {post.user_id === currentUserId ? (
-          <Pressable
-            onPress={() => onDelete(post.id)}
-            style={styles.deleteButton}
-          >
-            <Text style={styles.deleteText}>
-              DELETE
-            </Text>
-          </Pressable>
-        ) : (
-          <Pressable>
-            <Text style={styles.more}>•••</Text>
-          </Pressable>
-        )}
+          <View>
+            <Pressable onPress={() => setMenuOpen((s) => !s)} style={styles.moreButton}>
+              <MoreHorizontal size={18} color={colors.textMuted} />
+            </Pressable>
+
+            {menuOpen ? (
+              <View style={styles.menu}>
+                <Pressable
+                  onPress={() => {
+                    setMenuOpen(false);
+                    onShare(post);
+                  }}
+                  style={styles.menuItem}
+                >
+                  <Text style={styles.menuText}>Share</Text>
+                </Pressable>
+
+                <Pressable
+                  onPress={() => {
+                    setMenuOpen(false);
+                    onDelete(post.id);
+                  }}
+                  style={styles.menuItem}
+                >
+                  <Text style={[styles.menuText, { color: colors.danger }]}>Delete</Text>
+                </Pressable>
+              </View>
+            ) : null}
+          </View>
+        ) : null}
       </View>
 
       {/* Caption */}
@@ -178,7 +199,7 @@ export default function PostCard({
           ]}
         >
           <Text style={styles.imagePlaceholderText}>
-            🍽️
+            Dish
           </Text>
         </View>
       )}
@@ -203,9 +224,8 @@ export default function PostCard({
 
           {post.rating !== null && (
             <View style={styles.rating}>
-              <Text style={styles.ratingText}>
-                ★ {post.rating}
-              </Text>
+              <Star size={14} color={colors.gold} />
+              <Text style={styles.ratingText}>{post.rating}</Text>
             </View>
           )}
         </Pressable>
@@ -223,15 +243,7 @@ export default function PostCard({
             disabled={isLiking}
             onPress={() => onLike(post.id)}
           >
-            <Text
-              style={[
-                styles.actionIcon,
-                isLiked && styles.likedIcon,
-              ]}
-            >
-              {isLiked ? "♥" : "♡"}
-            </Text>
-
+            <Heart size={18} color={isLiked ? colors.danger : colors.textMuted} />
             <Text style={styles.actionCount}>
               {likes}
             </Text>
@@ -246,9 +258,7 @@ export default function PostCard({
               )
             }
           >
-            <Text style={styles.commentIcon}>
-              ○
-            </Text>
+            <MessageSquare size={18} color={colors.textMuted} />
 
             <Text style={styles.actionCount}>
               {comments}
@@ -258,20 +268,12 @@ export default function PostCard({
 
         {/* Share + Save */}
         <View style={styles.rightActions}>
-          <Pressable
-            onPress={() => onShare(post)}
-          >
-            <Text style={styles.save}>
-              ↗
-            </Text>
+          <Pressable onPress={() => onShare(post)}>
+            <Share2 size={18} color={colors.textMuted} />
           </Pressable>
 
-          <Pressable
-            onPress={() => onSave(post.id)}
-          >
-            <Text style={styles.save}>
-              {isSaved ? "🔖" : "♡"}
-            </Text>
+          <Pressable onPress={() => onSave(post.id)}>
+            <Bookmark size={18} color={isSaved ? colors.accent : colors.textMuted} />
           </Pressable>
         </View>
       </View>
@@ -332,23 +334,33 @@ const styles = StyleSheet.create({
     marginTop: 3,
   },
 
-  deleteButton: {
+  moreButton: {
     paddingHorizontal: spacing.sm,
     paddingVertical: spacing.xs,
-    backgroundColor: "rgba(239,68,68,0.12)",
-    borderRadius: radius.sm,
   },
 
-  deleteText: {
-    color: colors.danger,
-    fontWeight: "700",
-    fontSize: 11,
+  menu: {
+    position: "absolute",
+    right: 0,
+    top: 36,
+    backgroundColor: colors.surface,
+    borderRadius: 8,
+    paddingVertical: 6,
+    paddingHorizontal: 6,
+    borderWidth: 1,
+    borderColor: colors.border,
+    zIndex: 40,
   },
 
-  more: {
-    color: colors.textMuted,
-    fontSize: 14,
-    letterSpacing: 1,
+  menuItem: {
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+  },
+
+  menuText: {
+    color: colors.textPrimary,
+    fontWeight: "600",
+    fontSize: 13,
   },
 
   postText: {

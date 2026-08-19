@@ -12,6 +12,15 @@ import {
   Text,
   View,
 } from "react-native";
+import {
+  Bell,
+  Bookmark,
+  Heart,
+  MessageCircle,
+  Plus,
+  Send,
+  Share2,
+} from "lucide-react-native";
 
 import { supabase } from "../../lib/supabase";
 
@@ -354,7 +363,7 @@ export default function Social() {
 
 ⭐ ${post.rating ?? "-"}/5
 
-Shared from Foovio 🍽️`,
+Shared from Foovio`,
       });
     } catch (error) {
       console.log(error);
@@ -477,27 +486,23 @@ Shared from Foovio 🍽️`,
               See what people are eating.
             </Text>
           </View>
-          <Pressable
-  onPress={() => router.push("/notifications")}
-  style={{ marginRight: 15 }}
->
-  <Text style={{ fontSize: 24 }}>🔔</Text>
-</Pressable>
-          {/* CREATE POST */}
+         <Pressable
+           onPress={() => router.push("/notifications")}
+           style={{ marginRight: 15 }}
+         >
+           <Bell size={20} color="#f7faff" />
+         </Pressable>
+         {/* CREATE POST */}
 
-          <Pressable
-            style={({ pressed }) => [
-              styles.createButton,
-              pressed && styles.createButtonPressed,
-            ]}
-            onPress={() =>
-              router.push("/(tabs)/create")
-            }
-          >
-            <Text style={styles.createButtonIcon}>
-              ＋
-            </Text>
-          </Pressable>
+         <Pressable
+           style={({ pressed }) => [
+             styles.createButton,
+             pressed && styles.createButtonPressed,
+           ]}
+           onPress={() => router.push("/(tabs)/create")}
+         >
+           <Plus size={18} color="#f7faff" />
+         </Pressable>
         </View>
 
         {/* Feed selector */}
@@ -654,13 +659,7 @@ Shared from Foovio 🍽️`,
                       styles.imagePlaceholder,
                     ]}
                   >
-                    <Text
-                      style={
-                        styles.imagePlaceholderText
-                      }
-                    >
-                      🍽️
-                    </Text>
+                    <Text style={styles.imagePlaceholderText}>Dish</Text>
                   </View>
                 )}
 
@@ -720,45 +719,36 @@ Shared from Foovio 🍽️`,
       disabled={isLiking}
       onPress={() => toggleLike(post.id)}
     >
-      <Text
-        style={[
-          styles.actionIcon,
-          isLiked && styles.likedIcon,
-        ]}
-      >
-        {isLiked ? "♥" : "♡"}
-      </Text>
+      <Heart
+        size={16}
+        color={isLiked ? "#ef4444" : "#94a3b8"}
+        fill={isLiked ? "#ef4444" : "none"}
+      />
 
-      <Text style={styles.actionCount}>
-        {likes}
-      </Text>
+      <Text style={styles.actionCount}>{likes}</Text>
     </Pressable>
 
     {/* COMMENT */}
     <Pressable
       style={styles.action}
-      onPress={() =>
-        router.push(`/social/comments/${post.id}`)
-      }
+      onPress={() => router.push(`/social/comments/${post.id}`)}
     >
-      <Text style={styles.commentIcon}>◯</Text>
-
-      <Text style={styles.actionCount}>
-        {comments}
-      </Text>
+      <MessageCircle size={16} color="#94a3b8" />
+      <Text style={styles.actionCount}>{comments}</Text>
     </Pressable>
   </View>
 
-
   <View style={{ flexDirection: "row", alignItems: "center", gap: 16 }}>
     <Pressable onPress={() => sharePost(post)}>
-      <Text style={styles.save}>📤</Text>
+      <Share2 size={16} color="#94a3b8" />
     </Pressable>
 
     <Pressable onPress={() => toggleSave(post.id)}>
-      <Text style={styles.save}>
-        {savedPosts.includes(post.id) ? "🔖" : "📑"}
-      </Text>
+      <Bookmark
+        size={16}
+        color={savedPosts.includes(post.id) ? "#111827" : "#94a3b8"}
+        fill={savedPosts.includes(post.id) ? "#111827" : "none"}
+      />
     </Pressable>
   </View>
 </View>

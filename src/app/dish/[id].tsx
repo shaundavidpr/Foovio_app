@@ -242,7 +242,7 @@ export default function DishDetails() {
               ]}
             >
               <Text style={styles.imagePlaceholderText}>
-                🍽️
+                Dish
               </Text>
             </View>
           )}
@@ -351,19 +351,19 @@ export default function DishDetails() {
           <View style={styles.tags}>
             <View style={styles.tag}>
               <Text style={styles.tagText}>
-                ⭐ {averageRating} Average Rating
+                {averageRating} Average Rating
               </Text>
             </View>
 
             <View style={styles.tag}>
               <Text style={styles.tagText}>
-                📝 {totalReviews} Reviews
+                {totalReviews} Reviews
               </Text>
             </View>
 
             <View style={styles.tag}>
               <Text style={styles.tagText}>
-                📷 {totalPhotos} Photos
+                {totalPhotos} Photos
               </Text>
             </View>
           </View>
@@ -376,7 +376,7 @@ export default function DishDetails() {
           {posts.length === 0 ? (
             <View style={styles.review}>
               <Text style={styles.imagePlaceholderText}>
-                🍽️
+                Dish
               </Text>
 
               <Text style={styles.username}>

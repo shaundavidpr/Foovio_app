@@ -9,21 +9,31 @@ import {
   Text,
   View,
 } from "react-native";
+import {
+  Beef,
+  Leaf,
+  Nut,
+  Sparkles,
+  Wheat,
+  WheatOff,
+} from "lucide-react-native";
 
 import { supabase } from "../../lib/supabase";
+import { colors, spacing } from "@/theme";
+import ScreenLayout from "@/components/ui/ScreenLayout";
 
 const diets = [
-  "🍗 Non-vegetarian",
-  "🌱 Vegetarian",
-  "🌿 Vegan",
-  "🥚 Eggetarian",
+  { label: "Non-vegetarian", icon: Beef },
+  { label: "Vegetarian", icon: Leaf },
+  { label: "Vegan", icon: Sparkles },
+  { label: "Eggetarian", icon: Sparkles },
 ];
 
 const restrictions = [
-  "🥜 Nut-free",
-  "🥛 Dairy-free",
-  "🌾 Gluten-free",
-  "🕌 Halal",
+  { label: "Nut-free", icon: Nut },
+  { label: "Dairy-free", icon: WheatOff },
+  { label: "Gluten-free", icon: Wheat },
+  { label: "Halal", icon: Leaf },
 ];
 
 export default function Dietary() {
@@ -73,8 +83,6 @@ export default function Dietary() {
         .eq("id", user.id);
 
       if (error) {
-        console.error("Dietary save error:", error);
-
         Alert.alert(
           "Couldn't save preferences",
           "Please try again."
@@ -85,8 +93,6 @@ export default function Dietary() {
 
       router.replace("/(tabs)");
     } catch (error) {
-      console.error("Finish onboarding error:", error);
-
       Alert.alert(
         "Something went wrong",
         "Please try again."
@@ -124,8 +130,6 @@ export default function Dietary() {
         .eq("id", user.id);
 
       if (error) {
-        console.error("Dietary skip error:", error);
-
         Alert.alert(
           "Couldn't finish setup",
           "Please try again."
@@ -136,8 +140,6 @@ export default function Dietary() {
 
       router.replace("/(tabs)");
     } catch (error) {
-      console.error("Skip onboarding error:", error);
-
       Alert.alert(
         "Something went wrong",
         "Please try again."
@@ -148,8 +150,8 @@ export default function Dietary() {
   };
 
   return (
-    <View style={styles.container}>
-      <StatusBar style="dark" />
+    <ScreenLayout>
+      <StatusBar style="light" />
 
       <ScrollView
         contentContainerStyle={styles.content}
@@ -159,80 +161,65 @@ export default function Dietary() {
           <Text style={styles.back}>←</Text>
         </Pressable>
 
-        <Text style={styles.label}>
-          DIETARY PREFERENCES
-        </Text>
+        <Text style={styles.label}>DIETARY PREFERENCES</Text>
 
-        <Text style={styles.title}>
-          Anything we should{"\n"}know?
-        </Text>
+        <Text style={styles.title}>Anything we should{"\n"}know?</Text>
 
         <Text style={styles.description}>
           Help Foovio show food that's relevant to you. You can change this
           anytime.
         </Text>
 
-        <Text style={styles.sectionTitle}>
-          I eat
-        </Text>
+        <Text style={styles.sectionTitle}>I eat</Text>
 
         <View style={styles.options}>
-          {diets.map((item) => {
-            const active = diet === item;
+          {diets.map(({ label, icon: Icon }) => {
+            const active = diet === label;
 
             return (
               <Pressable
-                key={item}
+                key={label}
                 disabled={saving}
-                onPress={() => setDiet(item)}
-                style={[
-                  styles.option,
-                  active && styles.selected,
-                ]}
+                onPress={() => setDiet(label)}
+                style={[styles.option, active && styles.selected]}
               >
+                <Icon
+                  size={16}
+                  color={active ? colors.white : colors.textSecondary}
+                />
                 <Text
-                  style={[
-                    styles.optionText,
-                    active && styles.selectedText,
-                  ]}
+                  style={[styles.optionText, active && styles.selectedText]}
                 >
-                  {item}
+                  {label}
                 </Text>
               </Pressable>
             );
           })}
         </View>
 
-        <Text style={styles.sectionTitle}>
-          Dietary needs
-        </Text>
+        <Text style={styles.sectionTitle}>Dietary needs</Text>
 
-        <Text style={styles.optional}>
-          Optional
-        </Text>
+        <Text style={styles.optional}>Optional</Text>
 
         <View style={styles.options}>
-          {restrictions.map((item) => {
-            const active =
-              selectedRestrictions.includes(item);
+          {restrictions.map(({ label, icon: Icon }) => {
+            const active = selectedRestrictions.includes(label);
 
             return (
               <Pressable
-                key={item}
+                key={label}
                 disabled={saving}
-                onPress={() => toggleRestriction(item)}
-                style={[
-                  styles.option,
-                  active && styles.selected,
-                ]}
+                onPress={() => toggleRestriction(label)}
+                style={[styles.option, active && styles.selected]}
               >
+                <Icon
+                  size={16}
+                  color={active ? colors.white : colors.textSecondary}
+                />
                 <Text
-                  style={[
-                    styles.optionText,
-                    active && styles.selectedText,
-                  ]}
+                  style={[styles.optionText, active && styles.selectedText]}
                 >
-                  {item}
+                  {label}
                 </Text>
               </Pressable>
             );
@@ -243,10 +230,7 @@ export default function Dietary() {
       <View style={styles.footer}>
         <Pressable
           disabled={saving}
-          style={[
-            styles.button,
-            saving && styles.buttonDisabled,
-          ]}
+          style={[styles.button, saving && styles.buttonDisabled]}
           onPress={finish}
         >
           <Text style={styles.buttonText}>
@@ -254,39 +238,34 @@ export default function Dietary() {
           </Text>
         </Pressable>
 
-        <Pressable
-          disabled={saving}
-          onPress={skip}
-        >
-          <Text style={styles.skip}>
-            Skip for now
-          </Text>
+        <Pressable disabled={saving} onPress={skip}>
+          <Text style={styles.skip}>Skip for now</Text>
         </Pressable>
       </View>
-    </View>
+    </ScreenLayout>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#FFFFFF",
+    backgroundColor: colors.background,
   },
 
   content: {
-    paddingHorizontal: 24,
+    paddingHorizontal: spacing.md,
     paddingTop: 50,
     paddingBottom: 30,
   },
 
   back: {
     fontSize: 30,
-    color: "#111111",
+    color: colors.white,
     marginBottom: 35,
   },
 
   label: {
-    color: "#29A9EA",
+    color: colors.accent,
     fontSize: 13,
     fontWeight: "800",
     letterSpacing: 1.8,
@@ -294,7 +273,7 @@ const styles = StyleSheet.create({
   },
 
   title: {
-    color: "#111111",
+    color: colors.white,
     fontSize: 40,
     lineHeight: 46,
     fontWeight: "800",
@@ -302,7 +281,7 @@ const styles = StyleSheet.create({
   },
 
   description: {
-    color: "#666666",
+    color: colors.textMuted,
     fontSize: 16,
     lineHeight: 24,
     marginTop: 16,
@@ -310,7 +289,7 @@ const styles = StyleSheet.create({
   },
 
   sectionTitle: {
-    color: "#111111",
+    color: colors.white,
     fontSize: 18,
     fontWeight: "700",
     marginTop: 10,
@@ -318,7 +297,7 @@ const styles = StyleSheet.create({
   },
 
   optional: {
-    color: "#999999",
+    color: colors.textMuted,
     fontSize: 12,
     marginTop: -8,
     marginBottom: 12,
@@ -332,37 +311,41 @@ const styles = StyleSheet.create({
   },
 
   option: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
     borderWidth: 1.5,
-    borderColor: "#E5E5E5",
+    borderColor: colors.border,
     borderRadius: 100,
     paddingVertical: 13,
     paddingHorizontal: 17,
+    backgroundColor: colors.surface,
   },
 
   selected: {
-    backgroundColor: "#29A9EA",
-    borderColor: "#29A9EA",
+    backgroundColor: colors.accent,
+    borderColor: colors.accent,
   },
 
   optionText: {
-    color: "#333333",
+    color: colors.white,
     fontSize: 15,
     fontWeight: "600",
   },
 
   selectedText: {
-    color: "#FFFFFF",
+    color: colors.white,
   },
 
   footer: {
-    paddingHorizontal: 24,
+    paddingHorizontal: spacing.md,
     paddingBottom: 30,
     paddingTop: 12,
-    backgroundColor: "#FFFFFF",
+    backgroundColor: colors.surface,
   },
 
   button: {
-    backgroundColor: "#29A9EA",
+    backgroundColor: colors.accent,
     borderRadius: 16,
     paddingVertical: 18,
     alignItems: "center",
@@ -373,13 +356,13 @@ const styles = StyleSheet.create({
   },
 
   buttonText: {
-    color: "#FFFFFF",
+    color: colors.white,
     fontSize: 17,
     fontWeight: "700",
   },
 
   skip: {
-    color: "#777777",
+    color: colors.textMuted,
     fontSize: 14,
     fontWeight: "600",
     textAlign: "center",

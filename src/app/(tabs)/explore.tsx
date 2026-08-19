@@ -11,6 +11,7 @@ import {
   TextInput,
   View,
 } from "react-native";
+import { Search, UtensilsCrossed, X } from "lucide-react-native";
 
 import { supabase } from "../../lib/supabase";
 
@@ -145,7 +146,7 @@ export default function Explore() {
         {/* Search */}
 
         <View style={styles.search}>
-          <Text style={styles.searchIcon}>⌕</Text>
+          <Search size={18} color="#7F8C9D" />
 
           <TextInput
             value={search}
@@ -158,7 +159,7 @@ export default function Explore() {
 
           {search.length > 0 && (
             <Pressable onPress={() => setSearch("")}>
-              <Text style={styles.clear}>×</Text>
+              <X size={18} color="#7F8C9D" />
             </Pressable>
           )}
         </View>
@@ -216,7 +217,9 @@ export default function Explore() {
           </View>
         ) : loadError ? (
           <View style={styles.errorContainer}>
-            <Text style={styles.emptyIcon}>🍽️</Text>
+            <View style={styles.emptyIconWrap}>
+              <UtensilsCrossed size={30} color="#111827" />
+            </View>
 
             <Text style={styles.emptyTitle}>
               Couldn't load dishes
@@ -280,13 +283,10 @@ export default function Explore() {
                         styles.imagePlaceholder,
                       ]}
                     >
-                      <Text
-                        style={
-                          styles.imagePlaceholderText
-                        }
-                      >
-                        🍽️
-                      </Text>
+                      <UtensilsCrossed
+                        size={28}
+                        color="#dce5f0"
+                      />
                     </View>
                   )}
 
@@ -335,9 +335,9 @@ export default function Explore() {
 
               {results.length === 0 && (
                 <View style={styles.empty}>
-                  <Text style={styles.emptyIcon}>
-                    🍽️
-                  </Text>
+                  <View style={styles.emptyIconWrap}>
+                    <UtensilsCrossed size={26} color="#dce5f0" />
+                  </View>
 
                   <Text style={styles.emptyTitle}>
                     Nothing found
@@ -580,6 +580,15 @@ const styles = StyleSheet.create({
   empty: {
     alignItems: "center",
     paddingTop: 60,
+  },
+
+  emptyIconWrap: {
+    width: 56,
+    height: 56,
+    borderRadius: 18,
+    backgroundColor: "#111B2B",
+    alignItems: "center",
+    justifyContent: "center",
   },
 
   emptyIcon: {
